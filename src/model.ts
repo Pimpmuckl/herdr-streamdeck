@@ -128,9 +128,7 @@ function normalizeAgentSession(value: unknown): AgentSessionRef | undefined {
 }
 
 export function slotForCoordinates(column: number, row: number): number | null {
-  if (row === 0 && column >= 0 && column < 4) return column;
-  if (row === 1 && column >= 0 && column < 2) return column + 4;
-  return null;
+  return column >= 0 && column < 3 && row >= 0 && row < 2 ? row * 3 + column : null;
 }
 
 export function wrappedIndex(index: number, ticks: number, length: number): number {

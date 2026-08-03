@@ -29,6 +29,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 ## Operating Context
 
 - The primary surface is an Elgato Stream Deck+ with eight LCD keys, four dials, and an 800 x 100 touch strip composed of four coordinated 200 x 100 encoder regions.
+- The fixed key rows are `1 2 3 INBOX` and `4 5 6 COMMAND`.
 - The user normally operates it with one hand while Herdr is open in the background.
 - The Herdr client may be foreground, background, or closed. Device actions may focus an existing client but never launch one implicitly.
 - A bundled Stream Deck+ profile owns all four encoder positions so Question Mode can appear as one coordinated strip.
@@ -44,7 +45,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - **Command target:** the focused thread frozen when Command Mode opens.
 - **Attention item:** a structured question or approval, explicit error, or unseen completion that needs human action.
 
-### Pin pages and buttons 1-6
+### Pin pages and six thread keys
 
 - Users may create and name pages of six pinned threads.
 - Dial 1 previews page names while turning and switches page only when pressed.
@@ -57,12 +58,12 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Herdr should expose `Pin to Stream Deck...` on a thread. It opens a compact page-and-slot map that shows occupied slots and allows direct placement.
 - Both configuration surfaces operate on one shared pin and page model.
 
-### Attention queue and button 7
+### Attention queue and Inbox key
 
 - The queue contains structured questions or approvals, explicit errors, and unseen completions.
 - Working and ordinary idle threads do not enter the queue.
-- Button 7 cycles attention items. A single tap focuses in the background; a second tap raises Herdr.
-- Holding button 7 opens the attention queue in Herdr.
+- Inbox cycles attention items. A single tap focuses in the background; a second tap raises Herdr.
+- Holding Inbox opens the attention queue in Herdr.
 - Resolved items leave the queue automatically. An empty queue briefly reports `ALL CLEAR`.
 - Passive arrivals update status but never steal operating-system focus or replace the dashboard.
 - Dial 2 previews questions or details within the selected attention item and presses to select the preview.
@@ -86,14 +87,14 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Approvals or destructive choices require an armed confirmation.
 - Submission must include a stable interaction ID. If the interaction changed or resolved, submit nothing and show `QUESTION CHANGED`.
 - Free-form or unsupported interactions show `OPEN HERDR`; the device never guesses an answer from terminal text.
-- Button 8 cancels Question Mode and returns to the dashboard.
+- Command cancels Question Mode and returns to the dashboard.
 
-### One-shot Command Mode and button 8
+### One-shot Command Mode and Command key
 
-- Tap button 8 to enter Command Mode. Holding another control simultaneously is never required.
+- Tap Command to enter Command Mode. Holding another control simultaneously is never required.
 - Entry freezes and visibly identifies the focused command target.
-- One successful action returns automatically to the dashboard. Button 8 cancels.
-- Buttons 1-6 become fixed command positions:
+- One successful action returns automatically to the dashboard. Command cancels.
+- The six thread keys become fixed command positions:
   1. `CONTINUE`: send a fixed continue-with-best-judgment prompt.
   2. `STATUS`: request a concise completed, next, and blocked report.
   3. `VERIFY`: request relevant checks and their result.

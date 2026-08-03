@@ -31,6 +31,12 @@ if ($target.DeviceType -ne 7 -or $target.DeviceModel -ne "20GBD9901" -or $manife
 }
 if (Compare-Object $expectedKeys $keyNames) { throw "Profile must assign all eight Stream Deck+ keys." }
 if (Compare-Object $expectedEncoders $encoderNames) { throw "Profile must assign all four Stream Deck+ encoders." }
+if ($keypad.Actions."3,0".UUID -ne "dev.herdr.streamdeck.attention" -or $keypad.Actions."3,1".UUID -ne "dev.herdr.streamdeck.command") {
+    throw "Inbox and Command must occupy the top-right and bottom-right keys."
+}
+foreach ($coordinate in @("0,0", "1,0", "2,0", "0,1", "1,1", "2,1")) {
+    if ($keypad.Actions.$coordinate.UUID -ne "dev.herdr.streamdeck.pin") { throw "Thread slot $coordinate must use the pinned-thread action." }
+}
 
 $actions = @($keypad.Actions.PSObject.Properties.Value) + @($encoder.Actions.PSObject.Properties.Value)
 $ids = @($actions | ForEach-Object ActionID)

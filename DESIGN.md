@@ -3,23 +3,26 @@ name: Herdr Stream Deck+
 description: A dense, runtime-themed physical triage instrument for Herdr.
 typography:
   primary-label:
-    fontSize: "19px"
+    fontSize: "22px"
     fontWeight: 700
-    lineHeight: "24px"
+    lineHeight: "25px"
+  dial-value:
+    fontSize: "24px"
+    fontWeight: 700
   status-mark:
     fontSize: "20px"
     fontWeight: 700
   meta-label:
-    fontSize: "14px"
+    fontSize: "15px"
     fontWeight: 700
   strip-title:
+    fontSize: "15px"
+    fontWeight: 700
+    letterSpacing: "0.4px"
+  hint:
     fontSize: "12px"
     fontWeight: 700
-    letterSpacing: "0.8px"
-  hint:
-    fontSize: "10px"
-    fontWeight: 600
-    letterSpacing: "0.4px"
+    letterSpacing: "0.2px"
 rounded:
   key-shell: "18px"
   key-face: "14px"
@@ -84,11 +87,12 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 
 ### Hierarchy
 
-- **Primary label** (700, 19px, 24px line step): key names and dial values; key labels use at most two centered lines.
+- **Primary label** (700, 22px, 25px line step): key names use at most two centered lines.
+- **Dial value** (700, 24px): the current page, thread, or question state.
 - **Status mark** (700, 20px): the compact upper-right state marker on a key.
-- **Meta label** (700, 14px): slot numbers and compact key metadata.
-- **Strip title** (700, 12px, 0.8px tracking): uppercase dial-region context.
-- **Hint** (600, 10px, 0.4px tracking): secondary physical instructions such as `HOLD TO PIN`.
+- **Meta label** (700, 15px): slot numbers and compact key metadata.
+- **Strip title** (700, 15px, 0.4px tracking): uppercase dial-region context.
+- **Hint** (700, 12px, 0.2px tracking): secondary physical instructions such as `PRESS TO SEND`.
 
 **The Operational Copy Rule.** Labels stay brief, literal, and free of implementation terminology; longer content belongs only in the coordinated Question surface.
 
@@ -116,15 +120,15 @@ Keys use one recurring nested silhouette: an outer 18-pixel rounded shell and an
 
 - **Canvas:** 144 by 144 pixels with a 7-pixel inset face.
 - **Content:** slot number, compact workspace and tab context, the deepest useful pane identity, a state mark, and an optional short hint.
-- **Label behavior:** split labels at word separators when possible, cap lines at 13 characters, and truncate overflow with an ellipsis. The deepest useful identity gets the largest type.
+- **Label behavior:** split labels at word separators when possible, cap lines at 9 characters, and truncate overflow with an ellipsis. The deepest useful identity gets the largest type.
 - **State:** focused keys use the stronger 5-pixel text-role border; ordinary keys use the 2-pixel surface-role border. A bottom rail and authored mark repeat state without relying on color alone.
 - **Empty slot:** show only its slot number and a quiet plus mark.
 
 ### Dial region
 
 - **Canvas:** 200 by 100 pixels, one quarter of the coordinated strip.
-- **Content:** uppercase title at 18 by 31 pixels and primary value at 18 by 67 pixels.
-- **Label behavior:** dial values cap at 17 characters and truncate with an ellipsis.
+- **Content:** uppercase 15-pixel title at 18 by 30 pixels and 24-pixel primary value at 18 by 70 pixels.
+- **Label behavior:** dial values cap at 12 characters and truncate with an ellipsis.
 - **Identity:** use the appearance-matched wide logo as one aligned 800-by-100-pixel, 10%-opacity underlay across all four regions.
 
 ### Command bank

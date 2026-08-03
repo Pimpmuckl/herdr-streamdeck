@@ -14,6 +14,7 @@ import {
   wrappedIndex
 } from "./model.ts";
 import { themeFromHerdrConfig } from "../.preview/theme.js";
+import { keySvg } from "../.preview/render.js";
 
 test("device state keeps six pins and soft navigation wraps", () => {
   const settings = normalizeSettings({
@@ -94,4 +95,11 @@ red = "rgb(255, 85, 85)"
   assert.equal(themeFromHerdrConfig(`[theme]\nname = "not-a-theme"`)?.name, "catppuccin");
   assert.equal(themeFromHerdrConfig(`[theme]\nname = "terminal"`), null);
   assert.equal(themeFromHerdrConfig(`[theme] # palette\nname = 'nord' # TOML literal string`)?.name, "nord");
+
+  const wrappedKey = keySvg({ label: "ABCDEFGHIJ" });
+  assert.match(wrappedKey, />ABCDEFGHI<\/tspan>/);
+  assert.match(wrappedKey, />J<\/tspan>/);
+  const mixedKey = keySvg({ label: "ABCDEFGHIJ-K" });
+  assert.match(mixedKey, />ABCDEFGHI<\/tspan>/);
+  assert.match(mixedKey, />J K<\/tspan>/);
 });

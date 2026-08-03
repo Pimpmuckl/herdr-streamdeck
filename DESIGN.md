@@ -126,7 +126,7 @@ Keys use one 16-pixel-radius outline on the full black OLED field. The dial stri
 
 - **Canvas:** full 144 by 144 pixels of deep black with a 3-pixel inset outline.
 - **Content:** slot number, compact workspace and tab context, the deepest useful pane identity, a state mark, and an optional short hint.
-- **Label behavior:** split labels at word separators when possible, cap lines at 8 characters, and truncate overflow with an ellipsis. Context caps at 11 characters and preserves its trailing tab identity. The deepest useful identity gets the largest type.
+- **Label behavior:** split labels at word separators when possible, cap lines at 8 monospaced columns, and truncate overflow with an ellipsis. Context caps at 11 columns and prioritizes its trailing tab identity, dropping the workspace first when both do not fit. The deepest useful identity gets the largest type.
 - **State:** focused keys use the stronger 5-pixel text-role border; ordinary keys use the 2-pixel surface-role border. A bottom rail and authored mark repeat state without relying on color alone.
 - **Empty slot:** show only its slot number and a quiet plus mark.
 
@@ -134,7 +134,7 @@ Keys use one 16-pixel-radius outline on the full black OLED field. The dial stri
 
 - **Canvas:** 200 by 100 pixels, one quarter of the coordinated strip.
 - **Content:** uppercase 20-pixel title at 18 by 32 pixels and 28-pixel primary value at 18 by 73 pixels.
-- **Label behavior:** dial values cap at 10 characters and truncate with an ellipsis.
+- **Label behavior:** dial values cap at 10 monospaced columns and truncate with an ellipsis.
 - **Field:** keep the full strip background deep black; only information-bearing pixels may light.
 
 ### Command bank

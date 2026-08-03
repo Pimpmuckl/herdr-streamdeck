@@ -125,37 +125,53 @@ function relativeLuminance(rgb: { r: number; g: number; b: number }): number {
 
 function splitLabel(value: string, width: number): string[] {
   const clean = value.trim() || "EMPTY";
-  if (graphemes(clean).length <= width) return [clean];
+  if (displayWidth(clean) <= width) return [clean];
   const words = clean.split(/[-_\s]+/).filter(Boolean);
   if (words.length === 1) {
-    const characters = graphemes(clean);
-    return [characters.slice(0, width).join(""), truncate(characters.slice(width).join(""), width)];
+    const [first, rest] = splitAtWidth(clean, width);
+    return [first, truncate(rest, width)];
   }
   const first: string[] = [];
-  while (words.length && graphemes(`${first.join(" ")} ${words[0]}`.trim()).length <= width) first.push(words.shift()!);
+  while (words.length && displayWidth(`${first.join(" ")} ${words[0]}`.trim()) <= width) first.push(words.shift()!);
   if (first.length) return [first.join(" "), truncate(words.join(" "), width)];
-  const word = graphemes(words.shift()!);
-  return [word.slice(0, width).join(""), truncate([word.slice(width).join(""), ...words].filter(Boolean).join(" "), width)];
+  const [firstPart, rest] = splitAtWidth(words.shift()!, width);
+  return [firstPart, truncate([rest, ...words].filter(Boolean).join(" "), width)];
 }
 
 function truncate(value: string, width: number): string {
-  const characters = graphemes(value);
-  return characters.length <= width ? value : `${characters.slice(0, Math.max(1, width - 1)).join("")}…`;
+  return displayWidth(value) <= width ? value : `${splitAtWidth(value, Math.max(1, width - 1))[0]}…`;
 }
 
 function compactContext(value: string, width: number): string {
-  if (graphemes(value).length <= width) return value;
+  if (displayWidth(value) <= width) return value;
   const separator = " › ";
   const split = value.lastIndexOf(separator);
   if (split < 0) return truncate(value, width);
   const suffix = value.slice(split);
-  const suffixWidth = graphemes(suffix).length;
-  if (suffixWidth > width - 2) return truncate(value, width);
+  const suffixWidth = displayWidth(suffix);
+  if (suffixWidth > width - 2) return truncate(value.slice(split + separator.length), width);
   return `${truncate(value.slice(0, split), width - suffixWidth)}${suffix}`;
 }
 
 function graphemes(value: string): string[] {
   return Array.from(graphemeSegmenter.segment(value), ({ segment }) => segment);
+}
+
+function splitAtWidth(value: string, width: number): [string, string] {
+  const characters = graphemes(value);
+  let index = 0;
+  let used = 0;
+  while (index < characters.length && used + graphemeWidth(characters[index]) <= width) used += graphemeWidth(characters[index++]);
+  return [characters.slice(0, index).join(""), characters.slice(index).join("")];
+}
+
+function displayWidth(value: string): number {
+  return graphemes(value).reduce((width, character) => width + graphemeWidth(character), 0);
+}
+
+// ponytail: Device labels use terminal-style cell widths; measure the shipped font only if physical overflow proves this estimate insufficient.
+function graphemeWidth(value: string): number {
+  return /[\p{Extended_Pictographic}\p{Regional_Indicator}\u1100-\u115f\u2e80-\ua4cf\uac00-\ud7a3\uf900-\ufaff\ufe10-\ufe6f\uff00-\uff60\uffe0-\uffe6]/u.test(value) ? 2 : 1;
 }
 
 function escapeXml(value: string): string {

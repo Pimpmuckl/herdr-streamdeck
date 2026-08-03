@@ -97,11 +97,12 @@ red = "rgb(255, 85, 85)"
   assert.equal(themeFromHerdrConfig(`[theme] # palette\nname = 'nord' # TOML literal string`)?.name, "nord");
 
   const wrappedKey = keySvg({ label: "ABCDEFGHIJ" });
-  assert.match(wrappedKey, />ABCDEFGHI<\/tspan>/);
-  assert.match(wrappedKey, />J<\/tspan>/);
+  assert.match(wrappedKey, />ABCDEFGH<\/tspan>/);
+  assert.match(wrappedKey, />IJ<\/tspan>/);
   const mixedKey = keySvg({ label: "ABCDEFGHIJ-K" });
-  assert.match(mixedKey, />ABCDEFGHI<\/tspan>/);
-  assert.match(mixedKey, />J K<\/tspan>/);
+  assert.match(mixedKey, />ABCDEFGH<\/tspan>/);
+  assert.match(mixedKey, />IJ K<\/tspan>/);
+  assert.match(keySvg({ label: "PANE", context: "VOD RESEARCH › T5" }), />VOD R… › T5<\/text>/);
 
   const lowContrastTheme = {
     name: "custom", appearance: "light",

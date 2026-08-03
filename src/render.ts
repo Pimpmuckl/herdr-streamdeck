@@ -17,21 +17,21 @@ export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): str
   const subtext = oledForeground(theme, "subtext");
   const statusVisual = statusAppearance(view.status, theme);
   const border = palette ? oledColor(view.danger ? palette.red : view.selected ? palette.text : palette.surface1, 3) : (view.selected || view.danger ? "#ffffff" : "#34363f");
-  const lines = splitLabel(view.label, 9);
-  const slot = view.slot === undefined ? "" : `<text x="14" y="23" class="meta">${view.slot + 1}</text>`;
+  const lines = splitLabel(view.label, 8);
+  const slot = view.slot === undefined ? "" : `<text x="14" y="28" class="meta">${view.slot + 1}</text>`;
   const status = statusVisual ? statusMark(view.status, statusVisual.color) : "";
   const rail = statusVisual ? `<path d="M18 136H126" stroke="${statusVisual.color}" stroke-width="6" stroke-linecap="round"/>` : "";
   const empty = view.empty ? `<path d="M57 72H87M72 57V87" stroke="${subtext}" stroke-width="5" stroke-linecap="round"/>` : "";
-  const context = view.context ? `<text x="72" y="45" class="context">${escapeXml(truncate(view.context.toUpperCase(), 17))}</text>` : "";
-  const detail = view.detail ? `<text x="72" y="117" class="detail">${escapeXml(truncate(view.detail.toUpperCase(), 17))}</text>` : "";
-  const labelY = view.context ? (lines.length === 1 ? 82 : 69) : (lines.length === 1 ? 81 : 68);
+  const context = view.context ? `<text x="72" y="48" class="context">${escapeXml(compactContext(view.context.toUpperCase(), 11))}</text>` : "";
+  const detail = view.detail ? `<text x="72" y="124" class="detail">${escapeXml(truncate(view.detail.toUpperCase(), 11))}</text>` : "";
+  const labelY = lines.length === 1 ? 84 : 70;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <style>.label{font:700 22px Consolas,'Cascadia Mono',monospace;fill:${text};text-anchor:middle}.meta{font:700 15px Consolas,'Cascadia Mono',monospace;fill:${subtext}}.context,.detail{font:700 12px Consolas,'Cascadia Mono',monospace;fill:${subtext};text-anchor:middle;letter-spacing:.2px}</style>
+    <style>.label{font:700 26px Consolas,'Cascadia Mono',monospace;fill:${text};text-anchor:middle}.meta{font:700 20px Consolas,'Cascadia Mono',monospace;fill:${subtext}}.context,.detail{font:700 18px Consolas,'Cascadia Mono',monospace;fill:${subtext};text-anchor:middle;letter-spacing:.1px}</style>
     <rect width="144" height="144" fill="#000000"/>
     <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="${border}" stroke-width="${view.danger ? 7 : view.selected ? 5 : 2}"/>
     ${slot}${status}
     ${context}
-    ${view.empty ? "" : `<text x="72" y="${labelY}" class="label">${lines.map((line, index) => `<tspan x="72" dy="${index ? 25 : 0}">${escapeXml(line)}</tspan>`).join("")}</text>`}
+    ${view.empty ? "" : `<text x="72" y="${labelY}" class="label">${lines.map((line, index) => `<tspan x="72" dy="${index ? 29 : 0}">${escapeXml(line)}</tspan>`).join("")}</text>`}
     ${detail}${empty}${rail}
   </svg>`;
 }
@@ -47,11 +47,11 @@ export function dialSvg(
   const subtext = oledForeground(theme, "subtext");
   const accent = palette ? oledColor(palette[accentToken], 3) : "#ffffff";
   return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">
-    <style>.title{font:700 15px Consolas,'Cascadia Mono',monospace;fill:${subtext};letter-spacing:.4px}.value{font:700 24px Consolas,'Cascadia Mono',monospace;fill:${text}}</style>
+    <style>.title{font:700 20px Consolas,'Cascadia Mono',monospace;fill:${subtext};letter-spacing:.2px}.value{font:700 28px Consolas,'Cascadia Mono',monospace;fill:${text}}</style>
     <rect width="200" height="100" fill="#000000"/>
     <rect x="0" y="0" width="5" height="100" fill="${accent}"/>
-    <text x="18" y="30" class="title">${escapeXml(title.toUpperCase())}</text>
-    <text x="18" y="70" class="value">${escapeXml(truncate(value, 12))}</text>
+    <text x="18" y="32" class="title">${escapeXml(title.toUpperCase())}</text>
+    <text x="18" y="73" class="value">${escapeXml(truncate(value, 10))}</text>
   </svg>`;
 }
 
@@ -68,12 +68,12 @@ function statusAppearance(status: KeyView["status"], theme?: ResolvedThemeSnapsh
 
 function statusMark(status: KeyView["status"], fill: string): string {
   switch (status) {
-    case "blocked": return `<circle cx="121" cy="21" r="9" fill="none" stroke="${fill}" stroke-width="2"/><text x="121" y="26" text-anchor="middle" font-family="Consolas,monospace" font-size="14" font-weight="700" fill="${fill}">?</text>`;
-    case "working": return `<path d="M116 13L128 21L116 29Z" fill="${fill}"/>`;
-    case "done": return `<path d="M113 21L119 27L130 14" fill="none" stroke="${fill}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`;
-    case "idle": return `<circle cx="121" cy="21" r="5" fill="${fill}"/>`;
-    case "unknown": return `<circle cx="121" cy="21" r="5" fill="none" stroke="${fill}" stroke-width="2"/>`;
-    case "offline": return `<path d="M115 15L127 27M127 15L115 27" stroke="${fill}" stroke-width="3" stroke-linecap="round"/>`;
+    case "blocked": return `<circle cx="119" cy="22" r="10" fill="none" stroke="${fill}" stroke-width="3"/><text x="119" y="29" text-anchor="middle" font-family="Consolas,monospace" font-size="18" font-weight="700" fill="${fill}">?</text>`;
+    case "working": return `<path d="M113 12L129 22L113 32Z" fill="${fill}"/>`;
+    case "done": return `<path d="M110 22L117 30L130 13" fill="none" stroke="${fill}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+    case "idle": return `<circle cx="119" cy="22" r="7" fill="${fill}"/>`;
+    case "unknown": return `<circle cx="119" cy="22" r="7" fill="none" stroke="${fill}" stroke-width="3"/>`;
+    case "offline": return `<path d="M112 15L126 29M126 15L112 29" stroke="${fill}" stroke-width="4" stroke-linecap="round"/>`;
     default: return "";
   }
 }
@@ -135,6 +135,16 @@ function splitLabel(value: string, width: number): string[] {
 
 function truncate(value: string, width: number): string {
   return value.length <= width ? value : `${value.slice(0, Math.max(1, width - 1))}…`;
+}
+
+function compactContext(value: string, width: number): string {
+  if (value.length <= width) return value;
+  const separator = " › ";
+  const split = value.lastIndexOf(separator);
+  if (split < 0) return truncate(value, width);
+  const suffix = value.slice(split);
+  if (suffix.length > width - 2) return truncate(value, width);
+  return `${truncate(value.slice(0, split), width - suffix.length)}${suffix}`;
 }
 
 function escapeXml(value: string): string {

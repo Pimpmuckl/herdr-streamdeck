@@ -250,7 +250,7 @@ class PinnedThreadAction extends SingletonAction {
       return renderKey(action, keySvg({
         label: occupied ? "OCCUPIED" : "PIN HERE",
         context: `SLOT ${slot + 1}`,
-        detail: occupied ? "UNPIN FIRST" : "PRESS TO PLACE",
+        detail: occupied ? "UNPIN FIRST" : "PRESS PLACE",
         slot,
         danger: Boolean(occupied)
       }, theme));
@@ -262,7 +262,7 @@ class PinnedThreadAction extends SingletonAction {
       return renderKey(action, keySvg({
         label,
         context: "COMMAND",
-        detail: armed ? "PRESS TO CONFIRM" : slot === 4 ? "UNASSIGNED" : "PRESS TO SEND",
+        detail: armed ? "PRESS AGAIN" : slot === 4 ? "UNASSIGNED" : "PRESS SEND",
         slot,
         danger: armed
       }, theme));
@@ -371,7 +371,7 @@ class CommandAction extends SingletonAction {
     if (command.active) return renderKey(action, keySvg({ label: "CANCEL", context: "COMMAND", detail: command.targetLabel }, theme));
     const pane = currentPane(herdr.snapshot?.panes ?? [], herdr.snapshot?.focused_pane_id);
     const available = pane && pane.agent_status !== "blocked";
-    return renderKey(action, keySvg({ label: "COMMAND", detail: available ? "TAP FOR ACTIONS" : "NO TARGET" }, theme));
+    return renderKey(action, keySvg({ label: "COMMAND", detail: available ? "TAP ACTIONS" : "NO TARGET" }, theme));
   }
 
   private async renderAll(): Promise<void> {

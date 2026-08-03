@@ -120,10 +120,41 @@ class PinChooserState {
   }
 }
 
+class InboxState {
+  active = false;
+  paneId: string | null = null;
+  private readonly listeners = new Set<Listener>();
+
+  open(paneId: string | null): void {
+    this.active = true;
+    this.paneId = paneId;
+    this.emit();
+  }
+
+  cancel(): void {
+    if (!this.active) return;
+    this.active = false;
+    this.paneId = null;
+    this.emit();
+  }
+
+  subscribe(listener: Listener): void {
+    this.listeners.add(listener);
+  }
+
+  private emit(): void {
+    for (const listener of this.listeners) listener();
+  }
+}
+
 const deck = new DeckStore();
 const command = new CommandState();
 const pinChooser = new PinChooserState();
-herdr.subscribePinRequests((pane) => pinChooser.enter(pane));
+const inbox = new InboxState();
+herdr.subscribePinRequests((pane) => {
+  inbox.cancel();
+  pinChooser.enter(pane);
+});
 
 @action({ UUID: "dev.herdr.streamdeck.pin" })
 class PinnedThreadAction extends SingletonAction {
@@ -293,11 +324,11 @@ class PinnedThreadAction extends SingletonAction {
 @action({ UUID: "dev.herdr.streamdeck.attention" })
 class AttentionAction extends SingletonAction {
   private readonly downAt = new Map<string, number>();
-  private cursor = 0;
 
   constructor() {
     super();
     herdr.subscribe(() => void this.renderAll());
+    inbox.subscribe(() => void this.renderAll());
   }
 
   override onWillAppear(event: WillAppearEvent): Promise<void> | void {
@@ -313,12 +344,17 @@ class AttentionAction extends SingletonAction {
     this.downAt.delete(event.action.id);
     if (duration >= HOLD_MS) return event.action.showAlert();
     const queue = attentionPanes(herdr.snapshot);
-    if (!queue.length) return event.action.showAlert();
+    command.cancel();
+    pinChooser.cancel();
+    if (!queue.length) {
+      inbox.open(null);
+      return;
+    }
+    const current = inbox.active ? queue.findIndex((pane) => pane.pane_id === inbox.paneId) : -1;
+    const pane = queue[current >= 0 ? wrappedIndex(current, 1, queue.length) : 0];
+    inbox.open(pane.pane_id);
     try {
-      const focused = queue.findIndex((pane) => pane.pane_id === herdr.snapshot?.focused_pane_id);
-      this.cursor = focused >= 0 ? wrappedIndex(focused, 1, queue.length) : wrappedIndex(this.cursor, 0, queue.length);
-      await herdr.focusPane(queue[this.cursor].pane_id);
-      this.cursor = wrappedIndex(this.cursor, 1, queue.length);
+      await herdr.focusPane(pane.pane_id);
     } catch (error) {
       streamDeck.logger.error(`Attention action failed: ${String(error)}`);
       await event.action.showAlert();
@@ -331,7 +367,8 @@ class AttentionAction extends SingletonAction {
     return renderKey(action, keySvg({
       label: "INBOX",
       detail: count ? `${count} NEED YOU` : "ALL CLEAR",
-      status: count ? "blocked" : "idle"
+      status: count ? "blocked" : "idle",
+      selected: inbox.active
     }, theme));
   }
 
@@ -347,6 +384,7 @@ class CommandAction extends SingletonAction {
     herdr.subscribe(() => void this.renderAll());
     command.subscribe(() => void this.renderAll());
     pinChooser.subscribe(() => void this.renderAll());
+    inbox.subscribe(() => void this.renderAll());
   }
 
   override onWillAppear(event: WillAppearEvent): Promise<void> | void {
@@ -354,6 +392,10 @@ class CommandAction extends SingletonAction {
   }
 
   override async onKeyUp(event: KeyUpEvent): Promise<void> {
+    if (inbox.active) {
+      inbox.cancel();
+      return;
+    }
     if (pinChooser.pane) {
       pinChooser.cancel();
       return;
@@ -364,6 +406,7 @@ class CommandAction extends SingletonAction {
     }
     const pane = currentPane(herdr.snapshot?.panes ?? [], herdr.snapshot?.focused_pane_id);
     if (!pane || pane.agent_status === "blocked") return event.action.showAlert();
+    inbox.cancel();
     command.enter(pane.pane_id, paneIdentity(pane, herdr.snapshot, pane.pane_id).primary);
   }
 
@@ -373,6 +416,7 @@ class CommandAction extends SingletonAction {
       const identity = paneIdentity(pinChooser.pane, herdr.snapshot, pinChooser.pane.pane_id);
       return renderKey(action, keySvg({ label: "CANCEL", context: "PIN MODE", detail: identity.primary }, theme));
     }
+    if (inbox.active) return renderKey(action, keySvg({ label: "BACK", context: "INBOX", detail: "RETURN" }, theme));
     if (command.active) return renderKey(action, keySvg({ label: "CANCEL", context: "COMMAND", detail: command.targetLabel }, theme));
     const pane = currentPane(herdr.snapshot?.panes ?? [], herdr.snapshot?.focused_pane_id);
     const available = pane && pane.agent_status !== "blocked";
@@ -390,6 +434,7 @@ class PagesDialAction extends SingletonAction {
     super();
     herdr.subscribe(() => void this.renderAll());
     deck.subscribe(() => void this.renderAll());
+    inbox.subscribe(() => void this.renderAll());
   }
 
   override onWillAppear(event: WillAppearEvent): Promise<void> | void {
@@ -397,12 +442,14 @@ class PagesDialAction extends SingletonAction {
   }
 
   override async onDialRotate(event: DialRotateEvent): Promise<void> {
+    if (inbox.active) return;
     await deck.update((settings) => {
       settings.pageIndex = wrappedIndex(settings.pageIndex, event.payload.ticks, settings.pages.length);
     });
   }
 
   private async render(action: DialAction): Promise<void> {
+    if (inbox.active) return renderInboxDial(action, 0);
     const theme = herdr.theme;
     const settings = await deck.get();
     await action.setFeedback({ "full-canvas": svgImage(dialSvg("PINNED PAGE", settings.pages[settings.pageIndex].name, theme, "accent")) });
@@ -415,11 +462,10 @@ class PagesDialAction extends SingletonAction {
 
 @action({ UUID: "dev.herdr.streamdeck.attention-dial" })
 class AttentionDialAction extends SingletonAction {
-  private readonly preview = new Map<string, number>();
-
   constructor() {
     super();
     herdr.subscribe(() => void this.renderAll());
+    inbox.subscribe(() => void this.renderAll());
   }
 
   override onWillAppear(event: WillAppearEvent): Promise<void> | void {
@@ -429,18 +475,18 @@ class AttentionDialAction extends SingletonAction {
   override async onDialRotate(event: DialRotateEvent): Promise<void> {
     const queue = attentionPanes(herdr.snapshot);
     if (!queue.length) return;
-    const current = this.preview.get(event.action.id) ?? 0;
-    this.preview.set(event.action.id, wrappedIndex(current, event.payload.ticks, queue.length));
-    await this.render(event.action);
+    const current = queue.findIndex((pane) => pane.pane_id === inbox.paneId);
+    const start = current >= 0 ? current : event.payload.ticks > 0 ? -1 : 0;
+    inbox.open(queue[wrappedIndex(start, event.payload.ticks, queue.length)].pane_id);
   }
 
   override async onDialDown(event: DialDownEvent): Promise<void> {
     const queue = attentionPanes(herdr.snapshot);
     if (!queue.length) return event.action.showAlert();
-    const index = this.preview.get(event.action.id) ?? 0;
+    const pane = selectedAttentionPane() ?? queue[0];
     try {
-      await herdr.focusPane(queue[index].pane_id);
-      this.preview.delete(event.action.id);
+      inbox.open(pane.pane_id);
+      await herdr.focusPane(pane.pane_id);
     } catch (error) {
       streamDeck.logger.error(`Attention dial failed: ${String(error)}`);
       await event.action.showAlert();
@@ -448,10 +494,10 @@ class AttentionDialAction extends SingletonAction {
   }
 
   private render(action: DialAction): Promise<void> {
+    if (inbox.active) return renderInboxDial(action, 1);
     const theme = herdr.theme;
     const queue = attentionPanes(herdr.snapshot);
-    const index = this.preview.get(action.id) ?? 0;
-    const pane = queue[Math.min(index, queue.length - 1)];
+    const pane = queue[0];
     const value = queue.length ? paneIdentity(pane, herdr.snapshot, "BLOCKED").primary : "CLEAR";
     return action.setFeedback({ "full-canvas": svgImage(dialSvg(`ATTENTION ${queue.length}`, value, theme, queue.length ? "yellow" : "overlay0")) });
   }
@@ -466,6 +512,7 @@ class ThreadDialAction extends SingletonAction {
   constructor() {
     super();
     herdr.subscribe(() => void this.renderAll());
+    inbox.subscribe(() => void this.renderAll());
   }
 
   override onWillAppear(event: WillAppearEvent): Promise<void> | void {
@@ -473,6 +520,7 @@ class ThreadDialAction extends SingletonAction {
   }
 
   private render(action: DialAction): Promise<void> {
+    if (inbox.active) return renderInboxDial(action, 2);
     const theme = herdr.theme;
     const snapshot = herdr.snapshot;
     if (command.active) {
@@ -492,6 +540,7 @@ class AnswerDialAction extends SingletonAction {
   constructor() {
     super();
     herdr.subscribe(() => void this.renderAll());
+    inbox.subscribe(() => void this.renderAll());
   }
 
   override onWillAppear(event: WillAppearEvent): Promise<void> | void {
@@ -499,7 +548,7 @@ class AnswerDialAction extends SingletonAction {
   }
 
   override async onDialDown(event: DialDownEvent): Promise<void> {
-    const blocked = attentionPanes(herdr.snapshot)[0];
+    const blocked = selectedAttentionPane() ?? attentionPanes(herdr.snapshot)[0];
     if (!blocked) return event.action.showAlert();
     try {
       await herdr.focusPane(blocked.pane_id);
@@ -510,6 +559,7 @@ class AnswerDialAction extends SingletonAction {
   }
 
   private render(action: DialAction): Promise<void> {
+    if (inbox.active) return renderInboxDial(action, 3);
     const theme = herdr.theme;
     const blocked = attentionPanes(herdr.snapshot)[0];
     return action.setFeedback({ "full-canvas": svgImage(dialSvg(blocked ? "QUESTION" : "QUICK SELECT", blocked ? "FOCUS IN HERDR" : "NO QUESTION", theme, blocked ? "yellow" : "overlay0")) });
@@ -518,6 +568,22 @@ class AnswerDialAction extends SingletonAction {
   private async renderAll(): Promise<void> {
     await Promise.all(this.actions.toArray().flatMap((item) => item.isDial() ? [this.render(item)] : []));
   }
+}
+
+function selectedAttentionPane(): PaneSnapshot | undefined {
+  return attentionPanes(herdr.snapshot).find((pane) => pane.pane_id === inbox.paneId);
+}
+
+function renderInboxDial(action: DialAction, region: number): Promise<void> {
+  const queue = attentionPanes(herdr.snapshot);
+  const pane = selectedAttentionPane() ?? queue[0];
+  const index = pane ? queue.findIndex((item) => item.pane_id === pane.pane_id) : -1;
+  const identity = paneIdentity(pane, herdr.snapshot, "BLOCKED").primary;
+  const content = queue.length
+    ? [["INBOX", `${index + 1} OF ${queue.length}`], ["THREAD", identity], ["NEEDS INPUT", "IN HERDR"], ["PRESS DIAL", "OPEN"]]
+    : [["INBOX", "ALL CLEAR"], ["QUEUE", "EMPTY"], ["NO ACTION", "NEEDED"], ["COMMAND", "BACK"]];
+  const [title, value] = content[region];
+  return action.setFeedback({ "full-canvas": svgImage(dialSvg(title, value, herdr.theme, queue.length ? "yellow" : "overlay0")) });
 }
 
 function keySlot(action: KeyAction): number | null {

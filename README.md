@@ -6,7 +6,7 @@ A Windows Stream Deck+ control surface for six pinned Herdr threads, attention t
 
 - Windows 10 or newer
 - Stream Deck 7.1 or newer and a Stream Deck+ (`20GBD9901`, DeviceType 7)
-- Herdr 0.7.5 on `PATH`
+- Herdr 0.8.0 on `PATH`
 - Node.js 24 and npm
 
 ## Local setup
@@ -36,14 +36,14 @@ In Herdr, open keyboard shortcut settings and assign a shortcut to **Pin focused
 | Control | Dashboard | Command mode |
 | --- | --- | --- |
 | Thread keys 1-6 | Focus pinned thread; hold to pin/unpin | Continue, Status, Verify, Zoom, unused, armed Stop |
-| Inbox (top-right) | Cycle attention items | Attention |
+| Inbox (top-right) | Open/cycle the full attention strip | Attention |
 | Command (bottom-right) | Enter/cancel Command mode | Cancel |
 | Dial 1 | Switch pinned page immediately | Pinned page |
 | Dial 2 | Preview and open attention item | Attention queue |
 | Dial 3 | Show current thread | Frozen command target |
 | Dial 4 | Open the current question in Herdr | Open question |
 
-## Herdr 0.7.5 capability matrix
+## Herdr 0.8.0 capability matrix
 
 | Capability | Status |
 | --- | --- |
@@ -55,9 +55,9 @@ In Herdr, open keyboard shortcut settings and assign a shortcut to **Pin focused
 | Host-derived `terminal` palette | Awaiting a resolved-theme snapshot API; uses monochrome fallback |
 | Automatic host-appearance theme switching | Awaiting a resolved-theme snapshot API |
 | Pin-focused-pane Herdr plugin action | Supported |
-| Raise an existing client window | Not exposed by stock 0.7.5 |
-| Scroll/follow control from dial 3 | Not exposed by stock 0.7.5 |
-| Structured multi-question paging and answer submission | Not exposed by stock 0.7.5; dial 4 opens the item in Herdr |
+| Raise an existing client window | Not exposed by stock 0.8.0 |
+| Scroll/follow control from dial 3 | Not exposed by stock 0.8.0 |
+| Structured multi-question paging and answer submission | Not exposed by stock 0.8.0; the attention strip identifies the item and dial 4 opens it in Herdr |
 
 The profile source is committed under `profiles/`; generated `.streamDeckPlugin` and `.streamDeckProfile` archives remain ignored. Validate without writing archives with `npm run package:dry-run`.
 

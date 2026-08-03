@@ -139,6 +139,13 @@ Keys use one 16-pixel-radius outline on the full black OLED field. The dial stri
 - **Label behavior:** dial values cap at 10 monospaced columns and truncate with an ellipsis.
 - **Field:** keep the full strip background deep black; only information-bearing pixels may light.
 
+### Inbox takeover
+
+- **Entry:** tapping Inbox immediately replaces all four dial regions; no second press is required.
+- **Content:** show queue position, selected thread, needs-input state, and the available `OPEN` action.
+- **Fallback:** when Herdr does not expose structured question content, never infer it from terminal text; identify the item and open it in Herdr.
+- **Exit:** Command returns to the dashboard. An empty queue uses the same full-strip surface to report `ALL CLEAR`.
+
 ### Command bank
 
 - **Positions:** the six thread slots remain `CONTINUE`, `STATUS`, `VERIFY`, `ZOOM`, unassigned, and `STOP`; Inbox stays top-right and Command becomes Cancel at bottom-right.

@@ -62,9 +62,9 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 
 - The queue contains structured questions or approvals, explicit errors, and unseen completions.
 - Working and ordinary idle threads do not enter the queue.
-- Inbox cycles attention items. A single tap focuses in the background; a second tap raises Herdr.
+- Inbox immediately replaces the full touch strip with the selected attention item and focuses it in the background. Repeated taps cycle the queue.
 - Holding Inbox opens the attention queue in Herdr.
-- Resolved items leave the queue automatically. An empty queue briefly reports `ALL CLEAR`.
+- Resolved items leave the queue automatically. An empty queue reports `ALL CLEAR` across the strip.
 - Passive arrivals update status but never steal operating-system focus or replace the dashboard.
 - Dial 2 previews questions or details within the selected attention item and presses to select the preview.
 

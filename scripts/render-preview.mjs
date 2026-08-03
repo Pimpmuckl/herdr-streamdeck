@@ -12,6 +12,7 @@ for (const [name, value] of [["dark", dark], ["light", light]]) {
   writeFileSync(`artifacts/device-preview-${name}.svg`, cleanSvg(devicePreview(value)));
 }
 writeFileSync("artifacts/device-preview-command-dark.svg", cleanSvg(devicePreview(dark, "command")));
+writeFileSync("artifacts/device-preview-attention-dark.svg", cleanSvg(devicePreview(dark, "attention")));
 writeFileSync("artifacts/device-preview-stop-armed-dark.svg", cleanSvg(devicePreview(dark, "stop")));
 
 function devicePreview(activeTheme, mode = "dashboard") {
@@ -19,7 +20,7 @@ function devicePreview(activeTheme, mode = "dashboard") {
     { label: "api-rewrite", context: "KRAKEN › T6", slot: 0, status: "blocked", selected: true },
     { label: "review-suite", context: "TOOLS › T2", slot: 1, status: "working" },
     { label: "kraken-backup", context: "AUDIT › T1", slot: 2, status: "done" },
-    { label: "INBOX", detail: "2 NEED YOU", status: "blocked" },
+    { label: "INBOX", detail: "2 NEED YOU", status: "blocked", selected: mode === "attention" },
     { label: "", slot: 3, empty: true },
     { label: "daedalus", context: "DAEDALUS › T1", slot: 4, status: "idle" },
     { label: "vod-graph", context: "VOD RESEARCH › T5", slot: 5, status: "working" },
@@ -33,7 +34,7 @@ function devicePreview(activeTheme, mode = "dashboard") {
     ...commandActions.slice(3),
     { label: "CANCEL", context: "COMMAND", detail: "review-suite" }
   ];
-  const keys = (mode === "dashboard" ? dashboardKeys : commandKeys).map((view) => keySvg(view, activeTheme));
+  const keys = (["command", "stop"].includes(mode) ? commandKeys : dashboardKeys).map((view) => keySvg(view, activeTheme));
   const dashboardDials = [
     dialSvg("PINNED PAGE", "WORK", activeTheme, "accent"),
     dialSvg("ATTENTION 2", "api-rewrite", activeTheme, "yellow"),
@@ -46,7 +47,13 @@ function devicePreview(activeTheme, mode = "dashboard") {
     dialSvg("COMMAND TARGET", "review-suite", activeTheme, "accent"),
     dialSvg("QUICK SELECT", "NO QUESTION", activeTheme, "overlay0")
   ];
-  const dials = mode === "dashboard" ? dashboardDials : commandDials;
+  const attentionDials = [
+    dialSvg("INBOX", "1 OF 2", activeTheme, "yellow"),
+    dialSvg("THREAD", "api-rewrite", activeTheme, "yellow"),
+    dialSvg("NEEDS INPUT", "IN HERDR", activeTheme, "yellow"),
+    dialSvg("PRESS DIAL", "OPEN", activeTheme, "yellow")
+  ];
+  const dials = mode === "attention" ? attentionDials : mode === "dashboard" ? dashboardDials : commandDials;
   const placedKeys = keys.map((svg, index) => place(svg, 88 + (index % 4) * 160, 18 + Math.floor(index / 4) * 160)).join("\n");
   const placedDials = dials.map((svg, index) => place(svg, index * 200, 348)).join("\n");
   return `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="466" viewBox="0 0 800 466">

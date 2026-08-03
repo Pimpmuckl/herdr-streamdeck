@@ -23,10 +23,10 @@ function devicePreview(activeTheme, mode = "dashboard") {
     { label: "daedalus", context: "DAEDALUS › T1", slot: 4, status: "idle" },
     { label: "vod-graph", context: "VOD RESEARCH › T5", slot: 5, status: "working" },
     { label: "INBOX", detail: "2 NEED YOU", status: "blocked" },
-    { label: "COMMAND", detail: "TAP FOR ACTIONS" }
+    { label: "COMMAND", detail: "TAP ACTIONS" }
   ];
   const commandKeys = ["CONTINUE", "STATUS", "VERIFY", "ZOOM", "—", mode === "stop" ? "STOP AGAIN" : "STOP"]
-    .map((label, slot) => ({ label, context: "COMMAND", detail: mode === "stop" && slot === 5 ? "PRESS TO CONFIRM" : slot === 4 ? "UNASSIGNED" : "PRESS TO SEND", slot, danger: mode === "stop" && slot === 5 }))
+    .map((label, slot) => ({ label, context: "COMMAND", detail: mode === "stop" && slot === 5 ? "PRESS AGAIN" : slot === 4 ? "UNASSIGNED" : "PRESS SEND", slot, danger: mode === "stop" && slot === 5 }))
     .concat([{ label: "INBOX", detail: "2 NEED YOU", status: "blocked" }, { label: "CANCEL", context: "COMMAND", detail: "review-suite" }]);
   const keys = (mode === "dashboard" ? dashboardKeys : commandKeys).map((view) => keySvg(view, activeTheme));
   const dashboardDials = [

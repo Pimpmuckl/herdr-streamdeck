@@ -139,7 +139,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Exact canned prompt copy for `CONTINUE`, `STATUS`, and `VERIFY`.
 - Hold, double-tap, confirmation, and acknowledgement timing values; these require device testing.
 - Distribution and update channel.
-- Physical-device typography, brightness, and acknowledgement timing calibration.
+- Physical-device brightness and acknowledgement timing calibration.
 
 ## Brand Commitments
 
@@ -168,4 +168,5 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Never rely on color alone; pair every state with a short label, symbol, or outline.
 - Preserve one-handed operation and avoid simultaneous holds or chords.
 - Keep touch-strip text readable at its physical size and page overflow rather than animating it.
+- Keep all authored informational device text at 18 pixels or larger; shorten copy before reducing type.
 - Destructive actions require an explicit armed state and confirmation.

@@ -97,11 +97,18 @@ red = "rgb(255, 85, 85)"
   assert.equal(themeFromHerdrConfig(`[theme] # palette\nname = 'nord' # TOML literal string`)?.name, "nord");
 
   const wrappedKey = keySvg({ label: "ABCDEFGHIJ" });
-  assert.match(wrappedKey, />ABCDEFGHI<\/tspan>/);
-  assert.match(wrappedKey, />J<\/tspan>/);
+  assert.match(wrappedKey, />ABCDEFGH<\/tspan>/);
+  assert.match(wrappedKey, />IJ<\/tspan>/);
   const mixedKey = keySvg({ label: "ABCDEFGHIJ-K" });
-  assert.match(mixedKey, />ABCDEFGHI<\/tspan>/);
-  assert.match(mixedKey, />J K<\/tspan>/);
+  assert.match(mixedKey, />ABCDEFGH<\/tspan>/);
+  assert.match(mixedKey, />IJ K<\/tspan>/);
+  assert.match(keySvg({ label: "1234567😀" }), />1234567<\/tspan><tspan[^>]*>😀<\/tspan>/u);
+  assert.match(keySvg({ label: "1234567e\u0301" }), />1234567é<\/tspan>/u);
+  assert.match(keySvg({ label: "😀😀😀😀😀😀😀😀" }), />😀😀😀😀<\/tspan><tspan[^>]*>😀😀😀😀<\/tspan>/u);
+  assert.match(keySvg({ label: "1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣8️⃣" }), />1️⃣2️⃣3️⃣4️⃣<\/tspan><tspan[^>]*>5️⃣6️⃣7️⃣8️⃣<\/tspan>/u);
+  assert.match(keySvg({ label: "𠀀𠀀𠀀𠀀𠀀𠀀𠀀𠀀" }), />𠀀𠀀𠀀𠀀<\/tspan><tspan[^>]*>𠀀𠀀𠀀𠀀<\/tspan>/u);
+  assert.match(keySvg({ label: "PANE", context: "VOD RESEARCH › T5" }), />VOD R… › T5<\/text>/);
+  assert.match(keySvg({ label: "PANE", context: "WORK › IMPLEMENTATION" }), />IMPLEMENTA…<\/text>/);
 
   const lowContrastTheme = {
     name: "custom", appearance: "light",

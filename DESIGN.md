@@ -3,26 +3,26 @@ name: Herdr Stream Deck+
 description: A dense, runtime-themed physical triage instrument for Herdr.
 typography:
   primary-label:
-    fontSize: "22px"
+    fontSize: "26px"
     fontWeight: 700
-    lineHeight: "25px"
+    lineHeight: "29px"
   dial-value:
-    fontSize: "24px"
+    fontSize: "28px"
     fontWeight: 700
   status-mark:
-    fontSize: "20px"
+    fontSize: "22px"
     fontWeight: 700
   meta-label:
-    fontSize: "15px"
+    fontSize: "20px"
     fontWeight: 700
   strip-title:
-    fontSize: "15px"
-    fontWeight: 700
-    letterSpacing: "0.4px"
-  hint:
-    fontSize: "12px"
+    fontSize: "20px"
     fontWeight: 700
     letterSpacing: "0.2px"
+  hint:
+    fontSize: "18px"
+    fontWeight: 700
+    letterSpacing: "0.1px"
 rounded:
   key-outline: "16px"
 spacing:
@@ -91,12 +91,14 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 
 ### Hierarchy
 
-- **Primary label** (700, 22px, 25px line step): key names use at most two centered lines.
-- **Dial value** (700, 24px): the current page, thread, or question state.
-- **Status mark** (700, 20px): the compact upper-right state marker on a key.
-- **Meta label** (700, 15px): slot numbers and compact key metadata.
-- **Strip title** (700, 15px, 0.4px tracking): uppercase dial-region context.
-- **Hint** (700, 12px, 0.2px tracking): secondary physical instructions such as `PRESS TO SEND`.
+- **Primary label** (700, 26px, 29px line step): key names use at most two centered lines.
+- **Dial value** (700, 28px): the current page, thread, or question state.
+- **Status mark** (700, 22px): the compact upper-right state marker on a key.
+- **Meta label** (700, 20px): slot numbers and compact key metadata.
+- **Strip title** (700, 20px, 0.2px tracking): uppercase dial-region context.
+- **Hint** (700, 18px, 0.1px tracking): secondary physical instructions such as `PRESS SEND`.
+
+**The Physical Type Floor.** Informational device text never falls below 18 pixels on its authored key or dial canvas. Shorten, truncate, or omit secondary copy before reducing type.
 
 **The Operational Copy Rule.** Labels stay brief, literal, and free of implementation terminology; longer content belongs only in the coordinated Question surface.
 
@@ -124,15 +126,15 @@ Keys use one 16-pixel-radius outline on the full black OLED field. The dial stri
 
 - **Canvas:** full 144 by 144 pixels of deep black with a 3-pixel inset outline.
 - **Content:** slot number, compact workspace and tab context, the deepest useful pane identity, a state mark, and an optional short hint.
-- **Label behavior:** split labels at word separators when possible, cap lines at 9 characters, and truncate overflow with an ellipsis. The deepest useful identity gets the largest type.
+- **Label behavior:** split labels at word separators when possible, cap lines at 8 monospaced columns, and truncate overflow with an ellipsis. Context caps at 11 columns and prioritizes its trailing tab identity, dropping the workspace first when both do not fit. The deepest useful identity gets the largest type.
 - **State:** focused keys use the stronger 5-pixel text-role border; ordinary keys use the 2-pixel surface-role border. A bottom rail and authored mark repeat state without relying on color alone.
 - **Empty slot:** show only its slot number and a quiet plus mark.
 
 ### Dial region
 
 - **Canvas:** 200 by 100 pixels, one quarter of the coordinated strip.
-- **Content:** uppercase 15-pixel title at 18 by 30 pixels and 24-pixel primary value at 18 by 70 pixels.
-- **Label behavior:** dial values cap at 12 characters and truncate with an ellipsis.
+- **Content:** uppercase 20-pixel title at 18 by 32 pixels and 28-pixel primary value at 18 by 73 pixels.
+- **Label behavior:** dial values cap at 10 monospaced columns and truncate with an ellipsis.
 - **Field:** keep the full strip background deep black; only information-bearing pixels may light.
 
 ### Command bank

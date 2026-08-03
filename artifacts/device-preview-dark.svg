@@ -12,7 +12,7 @@
 <svg x="248" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 22px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 15px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 12px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.2px}</style>
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(69 71 90)" stroke-width="2"/>
+    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
     <text x="14" y="23" class="meta">2</text><path d="M116 13L128 21L116 29Z" fill="rgb(137 180 250)"/>
     <text x="72" y="45" class="context">TOOLS › T2</text>
     <text x="72" y="69" class="label"><tspan x="72" dy="0">review</tspan><tspan x="72" dy="25">suite</tspan></text>
@@ -21,7 +21,7 @@
 <svg x="408" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 22px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 15px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 12px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.2px}</style>
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(69 71 90)" stroke-width="2"/>
+    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
     <text x="14" y="23" class="meta">3</text><path d="M113 21L119 27L130 14" fill="none" stroke="rgb(166 227 161)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
     <text x="72" y="45" class="context">AUDIT › T1</text>
     <text x="72" y="69" class="label"><tspan x="72" dy="0">kraken</tspan><tspan x="72" dy="25">backup</tspan></text>
@@ -30,7 +30,7 @@
 <svg x="568" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 22px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 15px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 12px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.2px}</style>
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(69 71 90)" stroke-width="2"/>
+    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
     <text x="14" y="23" class="meta">4</text>
 
 
@@ -39,16 +39,16 @@
 <svg x="88" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 22px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 15px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 12px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.2px}</style>
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(69 71 90)" stroke-width="2"/>
-    <text x="14" y="23" class="meta">5</text><circle cx="121" cy="21" r="5" fill="rgb(108 112 134)"/>
+    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
+    <text x="14" y="23" class="meta">5</text><circle cx="121" cy="21" r="5" fill="rgb(112 116 137)"/>
     <text x="72" y="45" class="context">DAEDALUS › T1</text>
     <text x="72" y="82" class="label"><tspan x="72" dy="0">daedalus</tspan></text>
-    <path d="M18 136H126" stroke="rgb(108 112 134)" stroke-width="6" stroke-linecap="round"/>
+    <path d="M18 136H126" stroke="rgb(112 116 137)" stroke-width="6" stroke-linecap="round"/>
   </svg>
 <svg x="248" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 22px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 15px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 12px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.2px}</style>
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(69 71 90)" stroke-width="2"/>
+    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
     <text x="14" y="23" class="meta">6</text><path d="M116 13L128 21L116 29Z" fill="rgb(137 180 250)"/>
     <text x="72" y="45" class="context">VOD RESEARCH › T5</text>
     <text x="72" y="82" class="label"><tspan x="72" dy="0">vod-graph</tspan></text>
@@ -57,7 +57,7 @@
 <svg x="408" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 22px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 15px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 12px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.2px}</style>
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(69 71 90)" stroke-width="2"/>
+    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
     <circle cx="121" cy="21" r="9" fill="none" stroke="rgb(249 226 175)" stroke-width="2"/><text x="121" y="26" text-anchor="middle" font-family="Consolas,monospace" font-size="14" font-weight="700" fill="rgb(249 226 175)">?</text>
 
     <text x="72" y="81" class="label"><tspan x="72" dy="0">INBOX</tspan></text>
@@ -66,7 +66,7 @@
 <svg x="568" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 22px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 15px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 12px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.2px}</style>
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(69 71 90)" stroke-width="2"/>
+    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
 
 
     <text x="72" y="81" class="label"><tspan x="72" dy="0">COMMAND</tspan></text>

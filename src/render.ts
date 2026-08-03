@@ -13,10 +13,10 @@ type KeyView = {
 
 export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): string {
   const palette = theme?.palette;
-  const text = palette && view.danger ? color(palette.red) : oledForeground(theme, "text");
+  const text = palette && view.danger ? oledColor(palette.red) : oledForeground(theme, "text");
   const subtext = oledForeground(theme, "subtext");
   const statusVisual = statusAppearance(view.status, theme);
-  const border = palette ? color(view.danger ? palette.red : view.selected ? (theme.appearance === "light" ? palette.panel_bg : palette.text) : palette.surface1) : (view.selected || view.danger ? "#ffffff" : "#34363f");
+  const border = palette ? oledColor(view.danger ? palette.red : view.selected ? palette.text : palette.surface1, 3) : (view.selected || view.danger ? "#ffffff" : "#34363f");
   const lines = splitLabel(view.label, 9);
   const slot = view.slot === undefined ? "" : `<text x="14" y="23" class="meta">${view.slot + 1}</text>`;
   const status = statusVisual ? statusMark(view.status, statusVisual.color) : "";
@@ -45,7 +45,7 @@ export function dialSvg(
   const palette = theme?.palette;
   const text = oledForeground(theme, "text");
   const subtext = oledForeground(theme, "subtext");
-  const accent = palette ? color(palette[accentToken]) : "#ffffff";
+  const accent = palette ? oledColor(palette[accentToken], 3) : "#ffffff";
   return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">
     <style>.title{font:700 15px Consolas,'Cascadia Mono',monospace;fill:${subtext};letter-spacing:.4px}.value{font:700 24px Consolas,'Cascadia Mono',monospace;fill:${text}}</style>
     <rect width="200" height="100" fill="#000000"/>
@@ -58,10 +58,10 @@ export function dialSvg(
 function statusAppearance(status: KeyView["status"], theme?: ResolvedThemeSnapshot | null): { color: string } | null {
   const palette = theme?.palette;
   switch (status) {
-    case "blocked": return { color: palette ? color(palette.yellow) : "#ffffff" };
-    case "working": return { color: palette ? color(palette.blue) : "#ffffff" };
-    case "done": return { color: palette ? color(palette.green) : "#ffffff" };
-    case "idle": case "unknown": case "offline": return { color: palette ? color(palette.overlay0) : "#9a9ca5" };
+    case "blocked": return { color: palette ? oledColor(palette.yellow) : "#ffffff" };
+    case "working": return { color: palette ? oledColor(palette.blue) : "#ffffff" };
+    case "done": return { color: palette ? oledColor(palette.green) : "#ffffff" };
+    case "idle": case "unknown": case "offline": return { color: palette ? oledColor(palette.overlay0) : "#9a9ca5" };
     default: return null;
   }
 }
@@ -88,8 +88,37 @@ function color(rgb: { r: number; g: number; b: number }): string {
 
 function oledForeground(theme: ResolvedThemeSnapshot | null | undefined, role: "text" | "subtext"): string {
   if (!theme) return role === "text" ? "#ffffff" : "#9a9ca5";
-  if (theme.appearance === "light") return color(role === "text" ? theme.palette.panel_bg : theme.palette.surface1);
-  return color(role === "text" ? theme.palette.text : theme.palette.subtext0);
+  return oledColor(role === "text" ? theme.palette.text : theme.palette.subtext0);
+}
+
+function oledColor(rgb: { r: number; g: number; b: number }, minimumContrast = 4.5): string {
+  if ((relativeLuminance(rgb) + 0.05) / 0.05 >= minimumContrast) return color(rgb);
+  let low = 0;
+  let high = 1;
+  let adjusted = rgb;
+  for (let step = 0; step < 8; step++) {
+    const amount = (low + high) / 2;
+    adjusted = {
+      r: Math.round(rgb.r + (255 - rgb.r) * amount),
+      g: Math.round(rgb.g + (255 - rgb.g) * amount),
+      b: Math.round(rgb.b + (255 - rgb.b) * amount)
+    };
+    if ((relativeLuminance(adjusted) + 0.05) / 0.05 >= minimumContrast) high = amount;
+    else low = amount;
+  }
+  return color({
+    r: Math.round(rgb.r + (255 - rgb.r) * high),
+    g: Math.round(rgb.g + (255 - rgb.g) * high),
+    b: Math.round(rgb.b + (255 - rgb.b) * high)
+  });
+}
+
+function relativeLuminance(rgb: { r: number; g: number; b: number }): number {
+  const [r, g, b] = [rgb.r, rgb.g, rgb.b].map((channel) => {
+    const value = channel / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
 function splitLabel(value: string, width: number): string[] {

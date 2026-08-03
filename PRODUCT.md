@@ -111,7 +111,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - The plugin has no theme settings or manual light/dark override. `npm run themes:sync` refreshes the temporary generated copy from a local Herdr checkout.
 - Saved palette changes redraw every visible key and encoder region. The host-derived `terminal` palette, unsaved previews, and automatic appearance changes require a future resolved-theme API.
 - Every OLED background is fixed deep black. Herdr themes color text, status marks, rails, focus outlines, and dial bars only.
-- Light themes use their own bright panel and surface roles as OLED foregrounds; backgrounds never leave black.
+- Foreground colors retain their configured hue and are lifted only when required to meet the black-field contrast floor.
 - Pinned keys read from parent to child as workspace, tab, then the deepest available pane or thread label. Empty slots stay almost blank.
 - Status colors are paired with a label or symbol:
   - amber: needs input;

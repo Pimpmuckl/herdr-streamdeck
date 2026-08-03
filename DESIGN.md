@@ -73,13 +73,15 @@ The plugin has no independent palette. Until Herdr exposes its resolved runtime 
 - **OLED field:** every key and dial background is fixed `#000000`; theme surface colors never tint unused pixels.
 - **Surface role:** `surface1` defines only the resting key outline.
 - **Text roles:** `text` and `subtext0` separate primary labels from slot numbers, titles, and hints.
-- **Light-theme foregrounds:** `panel_bg` and `surface1` become primary and secondary foregrounds so the fixed black field retains readable contrast.
+- **Contrast adaptation:** configured text and semantic roles retain their hue and are lifted toward white only when needed to remain legible on black.
 - **State roles:** `yellow` marks attention, `blue` marks working, `green` marks completed, `overlay0` marks idle, unknown, or offline, and `red` marks the armed destructive state.
 - **Accent role:** `accent` anchors ordinary dial regions and non-destructive emphasis.
 
 **The Herdr Owns Color Rule.** Never add plugin palette settings or hand-maintained swatches. The temporary generated palette copy must remain mechanically derived from Herdr and disappear when a resolved-theme API exists.
 
 **The OLED Black Rule.** Keep every background pixel `#000000`. Theme roles color information only: text, state marks, rails, outlines, and dial bars.
+
+**The OLED Contrast Rule.** Resolve every foreground from its actual configured RGB value, not the theme name or appearance. Text and small marks require 4.5:1 against black; outlines and bars require 3:1.
 
 **The Meaning Is Redundant Rule.** Pair every runtime state color with a short label, a non-color mark, an outline, or a stable position; exact glyph artwork is not defined by this system.
 

@@ -1,68 +1,76 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="466" viewBox="0 0 800 466">
     <rect width="800" height="466" rx="28" fill="#101015"/>
     <svg x="88" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
+    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.35px}</style>
     <rect width="144" height="144" rx="18" fill="rgb(24 24 37)"/>
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
     <text x="14" y="23" class="meta">1</text>
-    <text x="72" y="77" class="label"><tspan x="72" dy="0">CONTINUE</tspan></text>
-
+    <text x="72" y="45" class="context">COMMAND</text>
+    <text x="72" y="81" class="label"><tspan x="72" dy="0">CONTINUE</tspan></text>
+    <text x="72" y="116" class="detail">PRESS TO SEND</text>
   </svg>
 <svg x="248" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
+    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.35px}</style>
     <rect width="144" height="144" rx="18" fill="rgb(24 24 37)"/>
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
     <text x="14" y="23" class="meta">2</text>
-    <text x="72" y="77" class="label"><tspan x="72" dy="0">STATUS</tspan></text>
-
+    <text x="72" y="45" class="context">COMMAND</text>
+    <text x="72" y="81" class="label"><tspan x="72" dy="0">STATUS</tspan></text>
+    <text x="72" y="116" class="detail">PRESS TO SEND</text>
   </svg>
 <svg x="408" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
+    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.35px}</style>
     <rect width="144" height="144" rx="18" fill="rgb(24 24 37)"/>
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
     <text x="14" y="23" class="meta">3</text>
-    <text x="72" y="77" class="label"><tspan x="72" dy="0">VERIFY</tspan></text>
-
+    <text x="72" y="45" class="context">COMMAND</text>
+    <text x="72" y="81" class="label"><tspan x="72" dy="0">VERIFY</tspan></text>
+    <text x="72" y="116" class="detail">PRESS TO SEND</text>
   </svg>
 <svg x="568" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
+    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.35px}</style>
     <rect width="144" height="144" rx="18" fill="rgb(24 24 37)"/>
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
     <text x="14" y="23" class="meta">4</text>
-    <text x="72" y="77" class="label"><tspan x="72" dy="0">ZOOM</tspan></text>
-
+    <text x="72" y="45" class="context">COMMAND</text>
+    <text x="72" y="81" class="label"><tspan x="72" dy="0">ZOOM</tspan></text>
+    <text x="72" y="116" class="detail">PRESS TO SEND</text>
   </svg>
 <svg x="88" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
+    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.35px}</style>
     <rect width="144" height="144" rx="18" fill="rgb(24 24 37)"/>
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
     <text x="14" y="23" class="meta">5</text>
-    <text x="72" y="77" class="label"><tspan x="72" dy="0">—</tspan></text>
-
+    <text x="72" y="45" class="context">COMMAND</text>
+    <text x="72" y="81" class="label"><tspan x="72" dy="0">—</tspan></text>
+    <text x="72" y="116" class="detail">UNASSIGNED</text>
   </svg>
 <svg x="248" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
+    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.35px}</style>
     <rect width="144" height="144" rx="18" fill="rgb(24 24 37)"/>
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
     <text x="14" y="23" class="meta">6</text>
-    <text x="72" y="77" class="label"><tspan x="72" dy="0">STOP</tspan></text>
-
+    <text x="72" y="45" class="context">COMMAND</text>
+    <text x="72" y="81" class="label"><tspan x="72" dy="0">STOP</tspan></text>
+    <text x="72" y="116" class="detail">PRESS TO SEND</text>
   </svg>
 <svg x="408" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
+    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.35px}</style>
     <rect width="144" height="144" rx="18" fill="rgb(24 24 37)"/>
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
-    <text x="121" y="25" class="status" fill="rgb(249 226 175)">?</text>
-    <text x="72" y="77" class="label"><tspan x="72" dy="0">INBOX 2</tspan></text>
+    <circle cx="121" cy="21" r="9" fill="none" stroke="rgb(249 226 175)" stroke-width="2"/><text x="121" y="26" text-anchor="middle" font-family="Consolas,monospace" font-size="14" font-weight="700" fill="rgb(249 226 175)">?</text>
 
+    <text x="72" y="80" class="label"><tspan x="72" dy="0">INBOX</tspan></text>
+    <text x="72" y="116" class="detail">2 NEED YOU</text><path d="M22 132H122" stroke="rgb(249 226 175)" stroke-width="6" stroke-linecap="round"/>
   </svg>
 <svg x="568" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
+    <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.context,.detail{font:700 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.35px}</style>
     <rect width="144" height="144" rx="18" fill="rgb(24 24 37)"/>
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
 
-    <text x="72" y="77" class="label"><tspan x="72" dy="0">CANCEL</tspan></text>
-
+    <text x="72" y="45" class="context">COMMAND</text>
+    <text x="72" y="81" class="label"><tspan x="72" dy="0">CANCEL</tspan></text>
+    <text x="72" y="116" class="detail">REVIEW-SUITE</text>
   </svg>
     <rect y="342" width="800" height="112" rx="10" fill="#050507"/>
     <svg x="0" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">

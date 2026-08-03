@@ -51,13 +51,17 @@ In Herdr, open keyboard shortcut settings and assign a shortcut to **Pin focused
 | Focus an existing pane without launching Herdr | Supported |
 | Attention from blocked/needs-input snapshot state | Supported |
 | Continue, Status, Verify, Zoom, and confirm-to-Stop | Supported |
-| Resolved Herdr light/dark palette and supplied logos | Supported |
+| Saved RGB built-in theme and custom RGB override sync | Supported through a generated compatibility copy |
+| Host-derived `terminal` palette | Awaiting a resolved-theme snapshot API; uses monochrome fallback |
+| Automatic host-appearance theme switching | Awaiting a resolved-theme snapshot API |
 | Pin-focused-pane Herdr plugin action | Supported |
 | Raise an existing client window | Not exposed by stock 0.7.5 |
 | Scroll/follow control from dial 3 | Not exposed by stock 0.7.5 |
 | Structured multi-question paging and answer submission | Not exposed by stock 0.7.5; dial 4 opens the item in Herdr |
 
 The profile source is committed under `profiles/`; generated `.streamDeckPlugin` and `.streamDeckProfile` archives remain ignored. Validate without writing archives with `npm run package:dry-run`.
+
+Herdr still owns the palette. `npm run themes:sync` regenerates the temporary built-in theme copy from a sibling Herdr checkout; saved theme and custom RGB changes redraw automatically. Unsaved previews and host-driven automatic switching require Herdr to expose its resolved palette.
 
 ## Uninstall
 

@@ -13,6 +13,7 @@ import {
   resolvePinRequest,
   snapshotFromApi
 } from "./model.js";
+import { copiedThemeFromHerdrConfig } from "./theme.js";
 
 const run = promisify(execFile);
 
@@ -74,13 +75,18 @@ export class HerdrBridge {
       const { stdout } = await this.command(["api", "snapshot"]);
       const snapshot = snapshotFromApi(JSON.parse(stdout.toString()));
       if (!snapshot) throw new Error("invalid session snapshot");
+      this.snapshot = snapshot;
+      this.theme = hasResolvedTheme(snapshot.theme) ? snapshot.theme : await copiedThemeFromHerdrConfig();
       const signature = JSON.stringify({
         focused: snapshot.focused_pane_id,
-        panes: snapshot.panes.map((pane) => [pane.pane_id, pane.agent_status, pane.focused, pane.label]),
-        theme: snapshot.theme
+        panes: snapshot.panes.map((pane) => [
+          pane.pane_id, pane.agent_status, pane.focused, pane.label, pane.terminal_title_stripped,
+          pane.cwd, pane.workspace_id, pane.tab_id
+        ]),
+        tabs: snapshot.tabs,
+        workspaces: snapshot.workspaces,
+        theme: this.theme
       });
-      this.snapshot = snapshot;
-      this.theme = hasResolvedTheme(snapshot.theme) ? snapshot.theme : null;
       await this.consumePinRequest(snapshot);
       if (signature !== this.signature) {
         this.signature = signature;

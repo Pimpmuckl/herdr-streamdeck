@@ -34,6 +34,8 @@ export type AgentStatus = "idle" | "working" | "blocked" | "done" | "unknown";
 
 export type PaneSnapshot = {
   pane_id: string;
+  workspace_id?: string;
+  tab_id?: string;
   terminal_id?: string;
   focused: boolean;
   agent_status: AgentStatus;
@@ -42,6 +44,9 @@ export type PaneSnapshot = {
   terminal_title_stripped?: string;
   cwd?: string;
 };
+
+export type TabSnapshot = { tab_id: string; workspace_id: string; label?: string; number?: number };
+export type WorkspaceSnapshot = { workspace_id: string; label?: string; number?: number };
 
 export type AgentSessionRef = {
   source: string;
@@ -53,8 +58,12 @@ export type AgentSessionRef = {
 export type HerdrSnapshot = {
   focused_pane_id?: string;
   panes: PaneSnapshot[];
+  tabs?: TabSnapshot[];
+  workspaces?: WorkspaceSnapshot[];
   theme?: ThemeSnapshot;
 };
+
+export type PaneIdentity = { primary: string; context?: string };
 
 export type PinRequest = { paneId: string; requestedAt: string };
 
@@ -169,6 +178,19 @@ export function paneLabel(pane: PaneSnapshot | undefined, fallback: string): str
   return cwd?.split(/[\\/]/).pop() || fallback;
 }
 
+export function paneIdentity(pane: PaneSnapshot | undefined, snapshot: HerdrSnapshot | null, fallback: string): PaneIdentity {
+  if (!pane) return { primary: fallback };
+  const workspace = snapshot?.workspaces?.find((item) => item.workspace_id === pane.workspace_id);
+  const tab = snapshot?.tabs?.find((item) => item.tab_id === pane.tab_id);
+  const repo = pane.cwd?.replace(/[\\/]+$/, "").split(/[\\/]/).pop();
+  const primary = firstDistinct(pane.label, pane.terminal_title_stripped, repo, fallback) || fallback;
+  const workspaceLabel = cleanLabel(workspace?.label) || (workspace?.number ? `SPACE ${workspace.number}` : undefined);
+  const rawTab = cleanLabel(tab?.label);
+  const tabLabel = rawTab ? (/^\d+$/.test(rawTab) ? `T${rawTab}` : rawTab) : (tab?.number ? `T${tab.number}` : undefined);
+  const context = [workspaceLabel, tabLabel].filter((value, index, values) => value && value !== primary && values.indexOf(value) === index).join(" › ");
+  return { primary, ...(context ? { context } : {}) };
+}
+
 export function resolvePin(pin: Pin | null, snapshot: HerdrSnapshot | null): PaneSnapshot | undefined {
   if (!pin || !snapshot) return undefined;
   const agentSession = pin.agentSession;
@@ -195,4 +217,12 @@ function sameSession(left: AgentSessionRef | undefined, right: AgentSessionRef):
     && left.agent === right.agent
     && left.kind === right.kind
     && left.value === right.value);
+}
+
+function cleanLabel(value: string | undefined): string | undefined {
+  return value?.trim() || undefined;
+}
+
+function firstDistinct(...values: Array<string | undefined>): string | undefined {
+  return values.map(cleanLabel).find(Boolean);
 }

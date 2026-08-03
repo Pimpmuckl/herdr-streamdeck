@@ -6,12 +6,14 @@ import {
   commandIntent,
   hasResolvedTheme,
   normalizeSettings,
+  paneIdentity,
   resolvePin,
   resolvePinRequest,
   snapshotFromApi,
   slotForCoordinates,
   wrappedIndex
 } from "./model.ts";
+import { themeFromHerdrConfig } from "../.preview/theme.js";
 
 test("device state keeps six pins and soft navigation wraps", () => {
   const settings = normalizeSettings({
@@ -66,4 +68,29 @@ test("device state keeps six pins and soft navigation wraps", () => {
   ].map((token) => [token, { r: 1, g: 2, b: 3 }]));
   assert.equal(hasResolvedTheme({ name: "herdr", appearance: "dark", palette }), true);
   assert.equal(hasResolvedTheme({ name: "herdr", appearance: "dark", palette: { ...palette, red: null } }), false);
+
+  const identityPane = {
+    pane_id: "w1:p2", workspace_id: "w1", tab_id: "w1:t3", label: "review-suite",
+    terminal_title_stripped: "review-suite", cwd: "C:\\Code\\review-suite", focused: true, agent_status: "working"
+  };
+  assert.deepEqual(paneIdentity(identityPane, {
+    panes: [identityPane],
+    workspaces: [{ workspace_id: "w1", label: "TOOLS" }],
+    tabs: [{ tab_id: "w1:t3", workspace_id: "w1", label: "2" }]
+  }, "fallback"), { primary: "review-suite", context: "TOOLS › T2" });
+
+  const copiedTheme = themeFromHerdrConfig(`
+[theme]
+name = "nord"
+
+[theme.custom]
+accent = "#123456"
+red = "rgb(255, 85, 85)"
+`);
+  assert.equal(copiedTheme?.name, "nord");
+  assert.deepEqual(copiedTheme?.palette.accent, { r: 18, g: 52, b: 86 });
+  assert.deepEqual(copiedTheme?.palette.red, { r: 255, g: 85, b: 85 });
+  assert.equal(themeFromHerdrConfig(`[theme]\nname = "tokyo-night-day"\nauto_switch = true`)?.name, "tokyo-night");
+  assert.equal(themeFromHerdrConfig(`[theme]\nname = "not-a-theme"`)?.name, "catppuccin");
+  assert.equal(themeFromHerdrConfig(`[theme]\nname = "terminal"`), null);
 });

@@ -3,9 +3,12 @@ import test from "node:test";
 
 import {
   attentionPanes,
+  commandIntent,
   hasResolvedTheme,
   normalizeSettings,
   resolvePin,
+  resolvePinRequest,
+  snapshotFromApi,
   slotForCoordinates,
   wrappedIndex
 } from "./model.ts";
@@ -30,6 +33,19 @@ test("device state keeps six pins and soft navigation wraps", () => {
     }).map((pane) => pane.pane_id),
     ["blocked"]
   );
+  const stockSnapshot = {
+    focused_pane_id: "blocked",
+    panes: [{ pane_id: "blocked", focused: true, agent_status: "blocked" }]
+  };
+  assert.equal(snapshotFromApi({ result: stockSnapshot }), stockSnapshot);
+  assert.equal(snapshotFromApi({ result: { snapshot: stockSnapshot } }), stockSnapshot);
+  assert.equal(resolvePinRequest({ paneId: "blocked", requestedAt: "2026-08-03T12:00:00Z" }, stockSnapshot)?.pane_id, "blocked");
+  assert.equal(resolvePinRequest({ paneId: "missing", requestedAt: "2026-08-03T12:00:00Z" }, stockSnapshot), undefined);
+  assert.equal(resolvePinRequest({ paneId: "blocked" }, stockSnapshot), undefined);
+  assert.deepEqual(commandIntent(0, false), { kind: "prompt", text: "Continue with your best judgment." });
+  assert.deepEqual(commandIntent(4, false), { kind: "unavailable" });
+  assert.deepEqual(commandIntent(5, false), { kind: "arm-stop" });
+  assert.deepEqual(commandIntent(5, true), { kind: "stop" });
   const session = { source: "herdr:codex", agent: "codex", kind: "id", value: "session-1" };
   const pinned = { paneId: "old", label: "api", terminalId: "term-2", agentSession: session };
   assert.equal(resolvePin(pinned, {

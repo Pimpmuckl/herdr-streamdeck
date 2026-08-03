@@ -1,22 +1,41 @@
 import { execFile } from "node:child_process";
+import { readFile, unlink } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { promisify } from "node:util";
 
-import { hasResolvedTheme, type HerdrSnapshot, type ResolvedThemeSnapshot } from "./model.js";
+import {
+  hasResolvedTheme,
+  type HerdrSnapshot,
+  type PaneSnapshot,
+  type ResolvedThemeSnapshot,
+  resolvePinRequest,
+  snapshotFromApi
+} from "./model.js";
 
 const run = promisify(execFile);
 
 type Listener = () => void;
+type PinRequestListener = (pane: PaneSnapshot) => void;
+
+const pinRequestPath = join(process.env.LOCALAPPDATA || tmpdir(), "Herdr Stream Deck", "pin-request.json");
 
 export class HerdrBridge {
   snapshot: HerdrSnapshot | null = null;
   theme: ResolvedThemeSnapshot | null = null;
   private readonly listeners = new Set<Listener>();
+  private readonly pinRequestListeners = new Set<PinRequestListener>();
   private running = false;
   private signature = "";
 
   subscribe(listener: Listener): () => void {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
+  }
+
+  subscribePinRequests(listener: PinRequestListener): () => void {
+    this.pinRequestListeners.add(listener);
+    return () => this.pinRequestListeners.delete(listener);
   }
 
   start(): void {
@@ -52,16 +71,16 @@ export class HerdrBridge {
   private async refresh(): Promise<void> {
     try {
       const { stdout } = await this.command(["api", "snapshot"]);
-      const envelope = JSON.parse(stdout.toString()) as { result?: { snapshot?: HerdrSnapshot } };
-      const snapshot = envelope.result?.snapshot;
-      if (!snapshot || !Array.isArray(snapshot.panes)) throw new Error("invalid session snapshot");
+      const snapshot = snapshotFromApi(JSON.parse(stdout.toString()));
+      if (!snapshot) throw new Error("invalid session snapshot");
       const signature = JSON.stringify({
         focused: snapshot.focused_pane_id,
         panes: snapshot.panes.map((pane) => [pane.pane_id, pane.agent_status, pane.focused, pane.label]),
         theme: snapshot.theme
       });
       this.snapshot = snapshot;
-      if (hasResolvedTheme(snapshot.theme)) this.theme = snapshot.theme;
+      this.theme = hasResolvedTheme(snapshot.theme) ? snapshot.theme : null;
+      await this.consumePinRequest(snapshot);
       if (signature !== this.signature) {
         this.signature = signature;
         this.emit();
@@ -69,8 +88,22 @@ export class HerdrBridge {
     } catch {
       if (this.snapshot !== null) {
         this.snapshot = null;
+        this.theme = null;
         this.signature = "";
         this.emit();
+      }
+    }
+  }
+
+  private async consumePinRequest(snapshot: HerdrSnapshot): Promise<void> {
+    try {
+      const request = JSON.parse(await readFile(pinRequestPath, "utf8"));
+      await unlink(pinRequestPath);
+      const pane = resolvePinRequest(request, snapshot);
+      if (pane) for (const listener of this.pinRequestListeners) listener(pane);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
+        try { await unlink(pinRequestPath); } catch { /* already gone */ }
       }
     }
   }

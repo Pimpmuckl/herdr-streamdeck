@@ -56,6 +56,15 @@ export type HerdrSnapshot = {
   theme?: ThemeSnapshot;
 };
 
+export type PinRequest = { paneId: string; requestedAt: string };
+
+export type CommandIntent =
+  | { kind: "prompt"; text: string }
+  | { kind: "zoom" }
+  | { kind: "arm-stop" }
+  | { kind: "stop" }
+  | { kind: "unavailable" };
+
 export type Pin = {
   paneId: string;
   label: string;
@@ -122,6 +131,34 @@ export function wrappedIndex(index: number, ticks: number, length: number): numb
 
 export function attentionPanes(snapshot: HerdrSnapshot | null): PaneSnapshot[] {
   return snapshot?.panes.filter((pane) => pane.agent_status === "blocked") ?? [];
+}
+
+export function snapshotFromApi(value: unknown): HerdrSnapshot | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const result = (value as { result?: unknown }).result;
+  if (!result || typeof result !== "object") return undefined;
+  const candidate = (result as { snapshot?: unknown }).snapshot ?? result;
+  if (!candidate || typeof candidate !== "object" || !Array.isArray((candidate as HerdrSnapshot).panes)) return undefined;
+  return candidate as HerdrSnapshot;
+}
+
+export function resolvePinRequest(value: unknown, snapshot: HerdrSnapshot | null): PaneSnapshot | undefined {
+  if (!value || typeof value !== "object" || !snapshot) return undefined;
+  const request = value as Partial<PinRequest>;
+  if (typeof request.paneId !== "string" || !request.paneId || typeof request.requestedAt !== "string") return undefined;
+  const matches = snapshot.panes.filter((pane) => pane.pane_id === request.paneId);
+  return matches.length === 1 ? matches[0] : undefined;
+}
+
+export function commandIntent(slot: number, stopArmed: boolean): CommandIntent {
+  if (slot === 3) return { kind: "zoom" };
+  if (slot === 5) return { kind: stopArmed ? "stop" : "arm-stop" };
+  const prompts = [
+    "Continue with your best judgment.",
+    "Report what is complete, what is next, and what is blocked.",
+    "Run the relevant verification and report the result."
+  ];
+  return prompts[slot] ? { kind: "prompt", text: prompts[slot] } : { kind: "unavailable" };
 }
 
 export function paneLabel(pane: PaneSnapshot | undefined, fallback: string): string {

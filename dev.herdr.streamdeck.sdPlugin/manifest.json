@@ -23,7 +23,7 @@
       "Tooltip": "Tap to focus. Hold to pin or unpin the focused Herdr thread.",
       "Controllers": ["Keypad"],
       "UserTitleEnabled": false,
-      "States": [{ "Image": "imgs/key", "TitleAlignment": "middle" }]
+      "States": [{ "Image": "imgs/action-icon", "TitleAlignment": "middle" }]
     },
     {
       "Name": "Attention",
@@ -32,7 +32,7 @@
       "Tooltip": "Jump to the next Herdr item that needs attention.",
       "Controllers": ["Keypad"],
       "UserTitleEnabled": false,
-      "States": [{ "Image": "imgs/key", "TitleAlignment": "middle" }]
+      "States": [{ "Image": "imgs/action-icon", "TitleAlignment": "middle" }]
     },
     {
       "Name": "Command",
@@ -41,7 +41,7 @@
       "Tooltip": "Tap to enter one-shot thread commands. Tap again to cancel.",
       "Controllers": ["Keypad"],
       "UserTitleEnabled": false,
-      "States": [{ "Image": "imgs/key", "TitleAlignment": "middle" }]
+      "States": [{ "Image": "imgs/action-icon", "TitleAlignment": "middle" }]
     },
     {
       "Name": "Pinned Pages",
@@ -52,7 +52,7 @@
         "layout": "$A0",
         "TriggerDescription": { "Rotate": "Preview page", "Push": "Switch page" }
       },
-      "States": [{ "Image": "imgs/key" }]
+      "States": [{ "Image": "imgs/action-icon" }]
     },
     {
       "Name": "Attention Queue",
@@ -63,7 +63,7 @@
         "layout": "$A0",
         "TriggerDescription": { "Rotate": "Preview item", "Push": "Open item" }
       },
-      "States": [{ "Image": "imgs/key" }]
+      "States": [{ "Image": "imgs/action-icon" }]
     },
     {
       "Name": "Current Thread",
@@ -72,20 +72,20 @@
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
-        "TriggerDescription": { "Rotate": "Scroll thread", "Push": "Follow live output" }
+        "TriggerDescription": { "Rotate": "View only", "Push": "View only" }
       },
-      "States": [{ "Image": "imgs/key" }]
+      "States": [{ "Image": "imgs/action-icon" }]
     },
     {
-      "Name": "Answer",
+      "Name": "Open Question",
       "UUID": "dev.herdr.streamdeck.answer",
       "Icon": "imgs/action-icon",
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
-        "TriggerDescription": { "Rotate": "Preview option", "Push": "Confirm option" }
+        "TriggerDescription": { "Rotate": "View only", "Push": "Focus in Herdr" }
       },
-      "States": [{ "Image": "imgs/key" }]
+      "States": [{ "Image": "imgs/action-icon" }]
     }
   ]
 }

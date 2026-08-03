@@ -1,0 +1,91 @@
+{
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+  "Name": "Herdr",
+  "Version": "0.1.0.0",
+  "Author": "Herdr",
+  "Description": "Physical triage and control for Herdr.",
+  "Category": "Herdr",
+  "CategoryIcon": "imgs/category-icon",
+  "Icon": "imgs/plugin-icon",
+  "CodePath": "bin/plugin.js",
+  "SDKVersion": 3,
+  "Software": { "MinimumVersion": "7.1" },
+  "OS": [{ "Platform": "windows", "MinimumVersion": "10" }],
+  "Nodejs": { "Version": "24", "Debug": "enabled" },
+  "UUID": "dev.herdr.streamdeck",
+  "URL": "https://herdr.dev",
+  "SupportURL": "https://github.com/herdrdev/herdr/issues",
+  "Actions": [
+    {
+      "Name": "Pinned Thread",
+      "UUID": "dev.herdr.streamdeck.pin",
+      "Icon": "imgs/action-icon",
+      "Tooltip": "Tap to focus. Hold to pin or unpin the focused Herdr thread.",
+      "Controllers": ["Keypad"],
+      "UserTitleEnabled": false,
+      "States": [{ "Image": "imgs/key", "TitleAlignment": "middle" }]
+    },
+    {
+      "Name": "Attention",
+      "UUID": "dev.herdr.streamdeck.attention",
+      "Icon": "imgs/action-icon",
+      "Tooltip": "Jump to the next Herdr item that needs attention.",
+      "Controllers": ["Keypad"],
+      "UserTitleEnabled": false,
+      "States": [{ "Image": "imgs/key", "TitleAlignment": "middle" }]
+    },
+    {
+      "Name": "Command",
+      "UUID": "dev.herdr.streamdeck.command",
+      "Icon": "imgs/action-icon",
+      "Tooltip": "Tap to enter one-shot thread commands. Tap again to cancel.",
+      "Controllers": ["Keypad"],
+      "UserTitleEnabled": false,
+      "States": [{ "Image": "imgs/key", "TitleAlignment": "middle" }]
+    },
+    {
+      "Name": "Pinned Pages",
+      "UUID": "dev.herdr.streamdeck.pages",
+      "Icon": "imgs/action-icon",
+      "Controllers": ["Encoder"],
+      "Encoder": {
+        "layout": "$A0",
+        "TriggerDescription": { "Rotate": "Preview page", "Push": "Switch page" }
+      },
+      "States": [{ "Image": "imgs/key" }]
+    },
+    {
+      "Name": "Attention Queue",
+      "UUID": "dev.herdr.streamdeck.attention-dial",
+      "Icon": "imgs/action-icon",
+      "Controllers": ["Encoder"],
+      "Encoder": {
+        "layout": "$A0",
+        "TriggerDescription": { "Rotate": "Preview item", "Push": "Open item" }
+      },
+      "States": [{ "Image": "imgs/key" }]
+    },
+    {
+      "Name": "Current Thread",
+      "UUID": "dev.herdr.streamdeck.thread",
+      "Icon": "imgs/action-icon",
+      "Controllers": ["Encoder"],
+      "Encoder": {
+        "layout": "$A0",
+        "TriggerDescription": { "Rotate": "Scroll thread", "Push": "Follow live output" }
+      },
+      "States": [{ "Image": "imgs/key" }]
+    },
+    {
+      "Name": "Answer",
+      "UUID": "dev.herdr.streamdeck.answer",
+      "Icon": "imgs/action-icon",
+      "Controllers": ["Encoder"],
+      "Encoder": {
+        "layout": "$A0",
+        "TriggerDescription": { "Rotate": "Preview option", "Push": "Confirm option" }
+      },
+      "States": [{ "Image": "imgs/key" }]
+    }
+  ]
+}

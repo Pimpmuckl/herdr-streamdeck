@@ -1,0 +1,5 @@
+node_modules/
+.preview/
+dist/
+dev.herdr.streamdeck.sdPlugin/bin/
+*.streamDeckPlugin

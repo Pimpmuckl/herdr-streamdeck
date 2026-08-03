@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-03T14:09:52.7664973Z",
+  "title": "Design System: Herdr Stream Deck+",
+  "extensions": {
+    "typographyMeta": {
+      "primary-label": {
+        "displayName": "Primary Label",
+        "purpose": "Key names and dial values; key labels use at most two centered lines."
+      },
+      "status-mark": {
+        "displayName": "Status Mark",
+        "purpose": "Compact upper-right state mark on a key."
+      },
+      "meta-label": {
+        "displayName": "Meta Label",
+        "purpose": "Slot numbers and compact key metadata."
+      },
+      "strip-title": {
+        "displayName": "Strip Title",
+        "purpose": "Uppercase dial-region context."
+      },
+      "hint": {
+        "displayName": "Hint",
+        "purpose": "Secondary physical instructions such as HOLD TO PIN."
+      }
+    }
+  },
+  "components": [],
+  "narrative": {
+    "northStar": "The Dense Terminal Instrument",
+    "overview": "Herdr Stream Deck+ is a one-handed physical triage surface, not a miniature application. Eight fixed keys carry terse operational labels and state marks; four adjacent dial regions read as one continuous status strip. The visual hierarchy favors instant recognition, stable positions, and deliberate commits over decoration.\n\nThe implementation is flat, compact, and terminal-like. Herdr supplies the resolved active palette at runtime, while this plugin supplies geometry, type scale, state hierarchy, and interaction marks. The matching wide Herdr logo sits across the strip at low opacity as a quiet shared underlay.",
+    "keyCharacteristics": [
+      "Fixed 4-by-2 key bank above one 800-by-100-pixel dial strip.",
+      "Short, bold monospaced labels with small uppercase strip titles.",
+      "Strong border changes for focus and armed destructive state.",
+      "Turns preview and presses commit, except direct thread scrolling.",
+      "One-shot Command mode preserves fixed command positions."
+    ],
+    "rules": [
+      {
+        "name": "The Herdr Owns Color Rule",
+        "body": "Never add plugin palette settings, copied theme definitions, fallback swatches, or fixed preview colors.",
+        "section": "colors"
+      },
+      {
+        "name": "The Meaning Is Redundant Rule",
+        "body": "Pair every runtime state color with a short label, a non-color mark, an outline, or a stable position; exact glyph artwork is not defined by this system.",
+        "section": "colors"
+      },
+      {
+        "name": "The Operational Copy Rule",
+        "body": "Labels stay brief, literal, and free of implementation terminology; longer content belongs only in the coordinated Question surface.",
+        "section": "typography"
+      },
+      {
+        "name": "The Fixed Geography Rule",
+        "body": "Preserve key and command positions across modes so one-handed muscle memory remains reliable.",
+        "section": "layout"
+      },
+      {
+        "name": "The Flat Instrument Rule",
+        "body": "Do not add decorative chrome, gradients, gloss, or simulated physical depth.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep dashboard labels short enough to scan at physical-device size.",
+      "Do preserve the continuous four-region strip and aligned quiet logo underlay.",
+      "Do use border weight, wording, and stable position alongside runtime color.",
+      "Do keep turns as previews and presses as commits unless the control is direct thread scrolling."
+    ],
+    "donts": [
+      "Don't introduce fixed colors, copied themes, manual appearance controls, or values sampled from preview images.",
+      "Don't turn the dial regions into separate cards or add decorative depth.",
+      "Don't use color alone to communicate focus, attention, completion, offline state, or danger.",
+      "Don't canonize the current Unicode status glyphs or system-installed font preferences as reusable design assets."
+    ]
+  }
+}

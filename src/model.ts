@@ -1,0 +1,161 @@
+export type RgbColor = { r: number; g: number; b: number };
+
+export type ThemePalette = {
+  accent: RgbColor | null;
+  panel_bg: RgbColor | null;
+  surface0: RgbColor | null;
+  surface1: RgbColor | null;
+  surface_dim: RgbColor | null;
+  overlay0: RgbColor | null;
+  overlay1: RgbColor | null;
+  text: RgbColor | null;
+  subtext0: RgbColor | null;
+  mauve: RgbColor | null;
+  green: RgbColor | null;
+  yellow: RgbColor | null;
+  red: RgbColor | null;
+  blue: RgbColor | null;
+  teal: RgbColor | null;
+  peach: RgbColor | null;
+};
+
+export type ThemeSnapshot = {
+  name: string;
+  appearance: "dark" | "light" | null;
+  palette: ThemePalette;
+};
+
+export type ResolvedThemeSnapshot = ThemeSnapshot & {
+  appearance: "dark" | "light";
+  palette: { [K in keyof ThemePalette]: RgbColor };
+};
+
+export type AgentStatus = "idle" | "working" | "blocked" | "done" | "unknown";
+
+export type PaneSnapshot = {
+  pane_id: string;
+  terminal_id?: string;
+  focused: boolean;
+  agent_status: AgentStatus;
+  agent_session?: AgentSessionRef;
+  label?: string;
+  terminal_title_stripped?: string;
+  cwd?: string;
+};
+
+export type AgentSessionRef = {
+  source: string;
+  agent: string;
+  kind: string;
+  value: string;
+};
+
+export type HerdrSnapshot = {
+  focused_pane_id?: string;
+  panes: PaneSnapshot[];
+  theme?: ThemeSnapshot;
+};
+
+export type Pin = {
+  paneId: string;
+  label: string;
+  terminalId?: string;
+  agentSession?: AgentSessionRef;
+};
+export type PinPage = { name: string; pins: Array<Pin | null> };
+export type DeckSettings = { pageIndex: number; pages: PinPage[] };
+
+export const DEFAULT_SETTINGS: DeckSettings = {
+  pageIndex: 0,
+  pages: ["ONE", "TWO", "THREE"].map((name) => ({ name, pins: Array(6).fill(null) }))
+};
+
+export function normalizeSettings(value: unknown): DeckSettings {
+  if (!value || typeof value !== "object") return structuredClone(DEFAULT_SETTINGS);
+  const input = value as Partial<DeckSettings>;
+  const pages = Array.isArray(input.pages)
+    ? input.pages.flatMap((page, index) => {
+        if (!page || typeof page !== "object") return [];
+        const raw = page as Partial<PinPage>;
+        const name = typeof raw.name === "string" && raw.name.trim() ? raw.name.trim() : `PAGE ${index + 1}`;
+        const source = Array.isArray(raw.pins) ? raw.pins : [];
+        const pins = Array.from({ length: 6 }, (_, slot) => normalizePin(source[slot]));
+        return [{ name, pins }];
+      })
+    : [];
+  const safePages = pages.length ? pages : structuredClone(DEFAULT_SETTINGS.pages);
+  const requested = Number.isInteger(input.pageIndex) ? Number(input.pageIndex) : 0;
+  return { pageIndex: Math.max(0, Math.min(requested, safePages.length - 1)), pages: safePages };
+}
+
+function normalizePin(value: unknown): Pin | null {
+  if (!value || typeof value !== "object") return null;
+  const pin = value as Partial<Pin>;
+  if (typeof pin.paneId !== "string" || !pin.paneId.trim()) return null;
+  const terminalId = typeof pin.terminalId === "string" && pin.terminalId ? pin.terminalId : undefined;
+  const agentSession = normalizeAgentSession(pin.agentSession);
+  return {
+    paneId: pin.paneId,
+    label: typeof pin.label === "string" && pin.label.trim() ? pin.label.trim() : pin.paneId,
+    ...(terminalId ? { terminalId } : {}),
+    ...(agentSession ? { agentSession } : {})
+  };
+}
+
+function normalizeAgentSession(value: unknown): AgentSessionRef | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const session = value as Partial<AgentSessionRef>;
+  if (![session.source, session.agent, session.kind, session.value].every((part) => typeof part === "string" && part)) return undefined;
+  return session as AgentSessionRef;
+}
+
+export function slotForCoordinates(column: number, row: number): number | null {
+  if (row === 0 && column >= 0 && column < 4) return column;
+  if (row === 1 && column >= 0 && column < 2) return column + 4;
+  return null;
+}
+
+export function wrappedIndex(index: number, ticks: number, length: number): number {
+  if (length <= 0) return 0;
+  return ((index + ticks) % length + length) % length;
+}
+
+export function attentionPanes(snapshot: HerdrSnapshot | null): PaneSnapshot[] {
+  return snapshot?.panes.filter((pane) => pane.agent_status === "blocked") ?? [];
+}
+
+export function paneLabel(pane: PaneSnapshot | undefined, fallback: string): string {
+  if (!pane) return fallback;
+  if (pane.label?.trim()) return pane.label.trim();
+  if (pane.terminal_title_stripped?.trim()) return pane.terminal_title_stripped.trim();
+  const cwd = pane.cwd?.replace(/[\\/]+$/, "");
+  return cwd?.split(/[\\/]/).pop() || fallback;
+}
+
+export function resolvePin(pin: Pin | null, snapshot: HerdrSnapshot | null): PaneSnapshot | undefined {
+  if (!pin || !snapshot) return undefined;
+  const agentSession = pin.agentSession;
+  if (agentSession) {
+    const matches = snapshot.panes.filter((pane) => sameSession(pane.agent_session, agentSession));
+    if (matches.length === 1) return matches[0];
+    if (matches.length === 0) return undefined;
+  }
+  if (pin.terminalId) {
+    const matches = snapshot.panes.filter((pane) => pane.terminal_id === pin.terminalId);
+    if (matches.length === 1) return matches[0];
+    return undefined;
+  }
+  return snapshot.panes.find((pane) => pane.pane_id === pin.paneId);
+}
+
+export function hasResolvedTheme(theme: ThemeSnapshot | undefined): theme is ResolvedThemeSnapshot {
+  return Boolean(theme?.appearance && Object.values(theme.palette).every((token) => token !== null));
+}
+
+function sameSession(left: AgentSessionRef | undefined, right: AgentSessionRef): boolean {
+  return Boolean(left
+    && left.source === right.source
+    && left.agent === right.agent
+    && left.kind === right.kind
+    && left.value === right.value);
+}

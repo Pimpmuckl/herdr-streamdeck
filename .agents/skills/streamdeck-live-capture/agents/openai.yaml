@@ -1,0 +1,4 @@
+interface:
+  display_name: "Stream Deck Live Capture"
+  short_description: "Capture and inspect the live Stream Deck surface"
+  default_prompt: "Use $streamdeck-live-capture to capture and inspect the live Stream Deck UI."

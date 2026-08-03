@@ -12,9 +12,12 @@ $profile = Get-ChildItem $source -Directory -Filter "*.sdProfile" -File:$false -
 if ($profile.Count -ne 1) { throw "Profile source must contain exactly one .sdProfile directory." }
 
 $manifest = Get-Content (Join-Path $profile.FullName "manifest.json") -Raw | ConvertFrom-Json
-$pageId = $manifest.Pages.Default
+$pageId = $manifest.Pages.Current
+$pages = @($manifest.Pages.Pages)
+if ($pageId -notin $pages) { throw "Current profile page is not listed: $pageId" }
+if ($manifest.Pages.Default -in $pages) { throw "Default page ID must not duplicate an imported page." }
 $pagePath = Join-Path $profile.FullName "Profiles\$($pageId.ToUpperInvariant())\manifest.json"
-if (-not (Test-Path $pagePath)) { throw "Default profile page is missing: $pageId" }
+if (-not (Test-Path $pagePath)) { throw "Current profile page is missing: $pageId" }
 $page = Get-Content $pagePath -Raw | ConvertFrom-Json
 $keypad = $page.Controllers | Where-Object Type -eq "Keypad"
 $encoder = $page.Controllers | Where-Object Type -eq "Encoder"

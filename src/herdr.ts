@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
-import { readFile, unlink } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { readFile, rename, unlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -96,14 +97,18 @@ export class HerdrBridge {
   }
 
   private async consumePinRequest(snapshot: HerdrSnapshot): Promise<void> {
+    const claimedPath = `${pinRequestPath}.${randomUUID()}.claimed`;
+    let claimed = false;
     try {
-      const request = JSON.parse(await readFile(pinRequestPath, "utf8"));
-      await unlink(pinRequestPath);
+      await rename(pinRequestPath, claimedPath);
+      claimed = true;
+      const request = JSON.parse(await readFile(claimedPath, "utf8"));
+      await unlink(claimedPath);
       const pane = resolvePinRequest(request, snapshot);
       if (pane) for (const listener of this.pinRequestListeners) listener(pane);
     } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-        try { await unlink(pinRequestPath); } catch { /* already gone */ }
+      if (claimed && (error as NodeJS.ErrnoException).code !== "ENOENT") {
+        try { await unlink(claimedPath); } catch { /* already gone */ }
       }
     }
   }

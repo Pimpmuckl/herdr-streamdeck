@@ -51,8 +51,8 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Turning dial 1 immediately switches the active page and redraws the six thread keys.
 - Stream Deck settings are the primary page manager for create, rename, reorder, and delete.
 - A single pin tap focuses its thread inside Herdr without stealing operating-system focus.
+- Tapping an empty slot pins Herdr's focused thread.
 - A second tap raises the existing Herdr client.
-- Holding an empty slot pins Herdr's focused thread.
 - Holding an occupied slot unpins it. Replacement requires unpinning first.
 - Offline pins remain visible and dim. They are never silently reassigned or resumed.
 - Herdr should expose `Pin to Stream Deck...` on a thread. It opens a compact page-and-slot map that shows occupied slots and allows direct placement.

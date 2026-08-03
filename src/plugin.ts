@@ -198,6 +198,11 @@ class PinnedThreadAction extends SingletonAction {
       } else {
         const settings = await deck.get();
         const pin = settings.pages[settings.pageIndex].pins[slot];
+        if (!pin) {
+          if (await this.togglePin(slot)) await event.action.showOk();
+          else await event.action.showAlert();
+          return;
+        }
         const pane = resolvePin(pin, herdr.snapshot);
         if (!pane) return event.action.showAlert();
         await herdr.focusPane(pane.pane_id);

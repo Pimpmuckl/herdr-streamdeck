@@ -1,5 +1,7 @@
 import type { AgentStatus, PaneSnapshot, ResolvedThemeSnapshot } from "./model.js";
 
+const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
+
 type KeyView = {
   label: string;
   context?: string;
@@ -123,32 +125,37 @@ function relativeLuminance(rgb: { r: number; g: number; b: number }): number {
 
 function splitLabel(value: string, width: number): string[] {
   const clean = value.trim() || "EMPTY";
-  if ([...clean].length <= width) return [clean];
+  if (graphemes(clean).length <= width) return [clean];
   const words = clean.split(/[-_\s]+/).filter(Boolean);
   if (words.length === 1) {
-    const characters = [...clean];
+    const characters = graphemes(clean);
     return [characters.slice(0, width).join(""), truncate(characters.slice(width).join(""), width)];
   }
   const first: string[] = [];
-  while (words.length && [...`${first.join(" ")} ${words[0]}`.trim()].length <= width) first.push(words.shift()!);
+  while (words.length && graphemes(`${first.join(" ")} ${words[0]}`.trim()).length <= width) first.push(words.shift()!);
   if (first.length) return [first.join(" "), truncate(words.join(" "), width)];
-  const word = [...words.shift()!];
+  const word = graphemes(words.shift()!);
   return [word.slice(0, width).join(""), truncate([word.slice(width).join(""), ...words].filter(Boolean).join(" "), width)];
 }
 
 function truncate(value: string, width: number): string {
-  const characters = [...value];
+  const characters = graphemes(value);
   return characters.length <= width ? value : `${characters.slice(0, Math.max(1, width - 1)).join("")}…`;
 }
 
 function compactContext(value: string, width: number): string {
-  if (value.length <= width) return value;
+  if (graphemes(value).length <= width) return value;
   const separator = " › ";
   const split = value.lastIndexOf(separator);
   if (split < 0) return truncate(value, width);
   const suffix = value.slice(split);
-  if (suffix.length > width - 2) return truncate(value, width);
-  return `${truncate(value.slice(0, split), width - suffix.length)}${suffix}`;
+  const suffixWidth = graphemes(suffix).length;
+  if (suffixWidth > width - 2) return truncate(value, width);
+  return `${truncate(value.slice(0, split), width - suffixWidth)}${suffix}`;
+}
+
+function graphemes(value: string): string[] {
+  return Array.from(graphemeSegmenter.segment(value), ({ segment }) => segment);
 }
 
 function escapeXml(value: string): string {

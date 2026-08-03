@@ -2,67 +2,51 @@
     <rect width="800" height="466" rx="28" fill="#101015"/>
     <svg x="88" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
-    <text x="14" y="28" font-family="Consolas" font-weight="700" font-size="20" fill="rgb(166 173 200)">1</text>
-    <text x="72" y="48" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">COMMAND</text>
-    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="26" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="72" dy="0">CONTINUE</tspan></text>
-    <text x="72" y="124" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS SEND</text>
+
+    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="24" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">CONTINUE</tspan></text>
+    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS SEND</text>
   </svg>
 <svg x="248" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
-    <text x="14" y="28" font-family="Consolas" font-weight="700" font-size="20" fill="rgb(166 173 200)">2</text>
-    <text x="72" y="48" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">COMMAND</text>
-    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="26" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="72" dy="0">STATUS</tspan></text>
-    <text x="72" y="124" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS SEND</text>
+
+    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="27" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">STATUS</tspan></text>
+    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS SEND</text>
   </svg>
 <svg x="408" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
-    <text x="14" y="28" font-family="Consolas" font-weight="700" font-size="20" fill="rgb(166 173 200)">3</text>
-    <text x="72" y="48" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">COMMAND</text>
-    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="26" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="72" dy="0">VERIFY</tspan></text>
-    <text x="72" y="124" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS SEND</text>
+
+    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="27" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">VERIFY</tspan></text>
+    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS SEND</text>
   </svg>
 <svg x="568" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
-    <circle cx="119" cy="22" r="11" fill="none" stroke="rgb(249 226 175)" stroke-width="3"/><text x="119" y="30" font-family="Consolas" font-weight="700" font-size="22" fill="rgb(249 226 175)" text-anchor="middle">?</text>
-
-    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="26" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="72" dy="0">INBOX</tspan></text>
-    <text x="72" y="124" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">2 NEED YOU</text><path d="M18 136H126" stroke="rgb(249 226 175)" stroke-width="6" stroke-linecap="round"/>
+    <rect x="3" y="12" width="6" height="120" rx="3" fill="rgb(249 226 175)"/>
+    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="28.5" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">INBOX</tspan></text>
+    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">2 NEED YOU</text>
   </svg>
 <svg x="88" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
-    <text x="14" y="28" font-family="Consolas" font-weight="700" font-size="20" fill="rgb(166 173 200)">4</text>
-    <text x="72" y="48" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">COMMAND</text>
-    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="26" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="72" dy="0">ZOOM</tspan></text>
-    <text x="72" y="124" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS SEND</text>
+
+    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="30" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">ZOOM</tspan></text>
+    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS SEND</text>
   </svg>
 <svg x="248" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
-    <text x="14" y="28" font-family="Consolas" font-weight="700" font-size="20" fill="rgb(166 173 200)">5</text>
-    <text x="72" y="48" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">COMMAND</text>
-    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="26" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="72" dy="0">—</tspan></text>
-    <text x="72" y="124" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">UNASSIGNED</text>
+
+    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="34.5" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">—</tspan></text>
+    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">UNASSIGNED</text>
   </svg>
 <svg x="408" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(243 139 168)" stroke-width="7"/>
-    <text x="14" y="28" font-family="Consolas" font-weight="700" font-size="20" fill="rgb(166 173 200)">6</text>
-    <text x="72" y="48" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">COMMAND</text>
-    <text x="72" y="70" font-family="Consolas" font-weight="700" font-size="26" fill="rgb(243 139 168)" text-anchor="middle"><tspan x="72" dy="0">STOP</tspan><tspan x="72" dy="29">AGAIN</tspan></text>
-    <text x="72" y="124" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS AGAIN</text>
+    <rect x="3" y="12" width="6" height="120" rx="3" fill="rgb(243 139 168)"/><rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(243 139 168)" stroke-width="5"/>
+    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="28.5" fill="rgb(243 139 168)" text-anchor="middle"><tspan x="76" dy="0">AGAIN</tspan></text>
+    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS AGAIN</text>
   </svg>
 <svg x="568" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(87 89 106)" stroke-width="2"/>
 
-    <text x="72" y="48" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">COMMAND</text>
-    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="26" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="72" dy="0">CANCEL</tspan></text>
-    <text x="72" y="124" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">REVIEW-SUI…</text>
+    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="27" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">CANCEL</tspan></text>
+    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">REVIEW-SUITE</text>
   </svg>
     <rect y="342" width="800" height="112" rx="10" fill="#050507"/>
     <svg x="0" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">

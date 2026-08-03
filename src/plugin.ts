@@ -311,9 +311,10 @@ class PinnedThreadAction extends SingletonAction {
     const pin = settings.pages[settings.pageIndex].pins[slot];
     const pane = resolvePin(pin, herdr.snapshot);
     const identity = paneIdentity(pane, herdr.snapshot, pin?.label || "");
+    const detail = !pin ? undefined : !pane ? "OFFLINE" : pane.agent_status === "blocked" ? "NEEDS YOU" : identity.context;
     return renderKey(action, keySvg({
       label: identity.primary,
-      context: identity.context,
+      detail,
       slot,
       status: pin ? pane?.agent_status ?? "offline" : undefined,
       selected: Boolean(pane?.focused),

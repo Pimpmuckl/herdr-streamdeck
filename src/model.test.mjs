@@ -100,18 +100,26 @@ red = "rgb(255, 85, 85)"
   assert.equal(themeFromHerdrConfig(`[theme] # palette\nname = 'nord' # TOML literal string`)?.name, "nord");
 
   const wrappedKey = keySvg({ label: "ABCDEFGHIJ" });
-  assert.match(wrappedKey, />ABCDEFGH<\/tspan>/);
-  assert.match(wrappedKey, />IJ<\/tspan>/);
+  assert.match(wrappedKey, />ABCDEFGHI<\/text>/);
+  assert.match(wrappedKey, />J<\/text>/);
   const mixedKey = keySvg({ label: "ABCDEFGHIJ-K" });
-  assert.match(mixedKey, />ABCDEFGH<\/tspan>/);
-  assert.match(mixedKey, />IJ K<\/tspan>/);
-  assert.match(keySvg({ label: "1234567😀" }), />1234567<\/tspan><tspan[^>]*>😀<\/tspan>/u);
-  assert.match(keySvg({ label: "1234567e\u0301" }), />1234567é<\/tspan>/u);
-  assert.match(keySvg({ label: "😀😀😀😀😀😀😀😀" }), />😀😀😀😀<\/tspan><tspan[^>]*>😀😀😀😀<\/tspan>/u);
-  assert.match(keySvg({ label: "1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣8️⃣" }), />1️⃣2️⃣3️⃣4️⃣<\/tspan><tspan[^>]*>5️⃣6️⃣7️⃣8️⃣<\/tspan>/u);
-  assert.match(keySvg({ label: "𠀀𠀀𠀀𠀀𠀀𠀀𠀀𠀀" }), />𠀀𠀀𠀀𠀀<\/tspan><tspan[^>]*>𠀀𠀀𠀀𠀀<\/tspan>/u);
-  assert.match(keySvg({ label: "PANE", context: "VOD RESEARCH › T5" }), />VOD R… › T5<\/text>/);
-  assert.match(keySvg({ label: "PANE", context: "WORK › IMPLEMENTATION" }), />IMPLEMENTA…<\/text>/);
+  assert.match(mixedKey, />ABCDEFGHI<\/text>/);
+  assert.match(mixedKey, />J-K<\/text>/);
+  assert.match(keySvg({ label: "1234567😀" }), />1234567😀<\/text>/u);
+  assert.match(keySvg({ label: "1234567e\u0301" }), />1234567é<\/text>/u);
+  assert.match(keySvg({ label: "😀😀😀😀😀😀😀😀" }), />😀😀😀😀<\/text>.*>😀😀😀😀<\/text>/su);
+  assert.match(keySvg({ label: "1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣8️⃣" }), />1️⃣2️⃣3️⃣4️⃣<\/text>.*>5️⃣6️⃣7️⃣8️⃣<\/text>/su);
+  assert.match(keySvg({ label: "𠀀𠀀𠀀𠀀𠀀𠀀𠀀𠀀" }), />𠀀𠀀𠀀𠀀<\/text>.*>𠀀𠀀𠀀𠀀<\/text>/su);
+  assert.match(keySvg({ label: "PANE", context: "VOD RESEARCH › T5" }), />VOD RE… · T5<\/text>/);
+  assert.match(keySvg({ label: "PANE", context: "WORK › IMPLEMENTATION" }), />IMPLEMENTAT…<\/text>/);
+
+  const threadKey = keySvg({ label: "research-vodint-graph", context: "VOD-INTELLIGENCE › T1", slot: 0, status: "working", selected: true });
+  assert.match(threadKey, /y="47"[^>]*>research-<\/text>.*y="76"[^>]*>vodint-<\/text>.*y="105"[^>]*>graph<\/text>/s);
+  assert.doesNotMatch(threadKey, /<tspan/);
+  assert.match(threadKey, /<rect x="3" y="12" width="6" height="120"/);
+  assert.match(threadKey, /<circle cx="124" cy="20" r="6"/);
+  assert.doesNotMatch(threadKey, />1<\/text>/);
+  assert.match(keySvg({ label: "", slot: 0, empty: true }), />1<\/text>/);
 
   const lowContrastTheme = {
     name: "custom", appearance: "light",
@@ -121,14 +129,14 @@ red = "rgb(255, 85, 85)"
   const customKey = keySvg({ label: "CUSTOM", detail: "DETAIL" }, lowContrastTheme);
   const hardwareDial = dialSvg("CURRENT", "review-suite", lowContrastTheme);
   assert.match(oledKey, /fill="#000000"/);
-  assert.match(customKey, /font-size="26"/);
+  assert.match(customKey, /font-size="27"/);
   assert.match(customKey, /font-size="18"/);
   assert.match(hardwareDial, /font-size="20"/);
   assert.match(hardwareDial, /font-size="28"/);
   assert.doesNotMatch(`${customKey}${hardwareDial}`, /<style|class=|font:/);
   assert.doesNotMatch(oledKey, /rgb\((?:10 10 10|20 20 20|157 0 6)\)/);
   assert.doesNotMatch(customKey, /rgb\((?:10 10 10|20 20 20)\)/);
-  const [, red, green, blue] = oledKey.match(/font-size="26" fill="rgb\((\d+) (\d+) (\d+)\)"/).map(Number);
+  const [, red, green, blue] = oledKey.match(/font-size="[^"]+" fill="rgb\((\d+) (\d+) (\d+)\)"/).map(Number);
   const luminance = [red, green, blue].map((channel) => {
     const value = channel / 255;
     return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;

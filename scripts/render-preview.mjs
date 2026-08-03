@@ -17,9 +17,9 @@ writeFileSync("artifacts/device-preview-stop-armed-dark.svg", cleanSvg(devicePre
 
 function devicePreview(activeTheme, mode = "dashboard") {
   const dashboardKeys = [
-    { label: "api-rewrite", context: "KRAKEN › T6", slot: 0, status: "blocked", selected: true },
+    { label: "research-vodint-graph", detail: "NEEDS YOU", slot: 0, status: "blocked", selected: true },
     { label: "review-suite", context: "TOOLS › T2", slot: 1, status: "working" },
-    { label: "kraken-backup", context: "AUDIT › T1", slot: 2, status: "done" },
+    { label: "kraken-backup", context: "AUDIT › T1", slot: 2, status: "idle" },
     { label: "INBOX", detail: "2 NEED YOU", status: "blocked", selected: mode === "attention" },
     { label: "", slot: 3, empty: true },
     { label: "daedalus", context: "DAEDALUS › T1", slot: 4, status: "idle" },

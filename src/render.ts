@@ -19,22 +19,31 @@ export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): str
   const text = palette && view.danger ? oledColor(palette.red) : oledForeground(theme, "text");
   const subtext = oledForeground(theme, "subtext");
   const statusVisual = statusAppearance(view.status, theme);
-  const border = palette ? oledColor(view.danger ? palette.red : view.selected ? palette.text : palette.surface1, 3) : (view.selected || view.danger ? "#ffffff" : "#34363f");
-  const lines = splitLabel(view.label, 8);
-  const slot = view.slot === undefined ? "" : `<text x="14" y="28" ${monoFont} font-size="20" fill="${subtext}">${view.slot + 1}</text>`;
-  const status = statusVisual ? statusMark(view.status, statusVisual.color) : "";
-  const rail = statusVisual ? `<path d="M18 136H126" stroke="${statusVisual.color}" stroke-width="6" stroke-linecap="round"/>` : "";
-  const empty = view.empty ? `<path d="M57 72H87M72 57V87" stroke="${subtext}" stroke-width="5" stroke-linecap="round"/>` : "";
-  const context = view.context ? `<text x="72" y="48" ${monoFont} font-size="18" fill="${subtext}" text-anchor="middle" letter-spacing=".1">${escapeXml(compactContext(view.context.toUpperCase(), 11))}</text>` : "";
-  const detail = view.detail ? `<text x="72" y="124" ${monoFont} font-size="18" fill="${subtext}" text-anchor="middle" letter-spacing=".1">${escapeXml(truncate(view.detail.toUpperCase(), 11))}</text>` : "";
-  const labelY = lines.length === 1 ? 84 : 70;
+  const lines = splitLabel(view.label, 9);
+  const labelSize = Math.max(24, 36 - Math.max(...lines.map(displayWidth)) * 1.5);
+  const railColor = view.danger
+    ? palette ? oledColor(palette.red) : "#ffffff"
+    : statusVisual?.color;
+  const slot = view.empty && view.slot !== undefined
+    ? `<text x="16" y="32" ${monoFont} font-size="26" fill="${subtext}">${view.slot + 1}</text>`
+    : "";
+  const focus = view.selected ? `<circle cx="124" cy="20" r="6" fill="${oledForeground(theme, "text")}"/>` : "";
+  const rail = railColor ? `<rect x="3" y="12" width="6" height="120" rx="3" fill="${railColor}"/>` : "";
+  const frame = view.danger ? `<rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="${railColor}" stroke-width="5"/>` : "";
+  const empty = view.empty ? `<path d="M57 76H87M72 61V91" stroke="${subtext}" stroke-width="6" stroke-linecap="round"/>` : "";
+  const footerValue = (view.detail || view.context)?.replaceAll(" › ", " · ");
+  const footer = footerValue
+    ? `<text x="76" y="130" ${monoFont} font-size="18" fill="${subtext}" text-anchor="middle" letter-spacing=".1">${escapeXml(compactContext(footerValue.toUpperCase(), 12))}</text>`
+    : "";
+  const labelY = lines.length === 1 ? 84 : lines.length === 2 ? 64 : 47;
+  const label = view.empty ? "" : lines.map((line, index) =>
+    `<text x="76" y="${labelY + index * 29}" ${monoFont} font-size="${labelSize}" fill="${text}" text-anchor="middle">${escapeXml(line)}</text>`
+  ).join("");
   return `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="${border}" stroke-width="${view.danger ? 7 : view.selected ? 5 : 2}"/>
-    ${slot}${status}
-    ${context}
-    ${view.empty ? "" : `<text x="72" y="${labelY}" ${monoFont} font-size="26" fill="${text}" text-anchor="middle">${lines.map((line, index) => `<tspan x="72" dy="${index ? 29 : 0}">${escapeXml(line)}</tspan>`).join("")}</text>`}
-    ${detail}${empty}${rail}
+    ${rail}${frame}${slot}${focus}
+    ${label}
+    ${footer}${empty}
   </svg>`;
 }
 
@@ -61,21 +70,8 @@ function statusAppearance(status: KeyView["status"], theme?: ResolvedThemeSnapsh
   switch (status) {
     case "blocked": return { color: palette ? oledColor(palette.yellow) : "#ffffff" };
     case "working": return { color: palette ? oledColor(palette.blue) : "#ffffff" };
-    case "done": return { color: palette ? oledColor(palette.green) : "#ffffff" };
-    case "idle": case "unknown": case "offline": return { color: palette ? oledColor(palette.overlay0) : "#9a9ca5" };
+    case "done": case "idle": case "unknown": case "offline": return { color: palette ? oledColor(palette.overlay0) : "#9a9ca5" };
     default: return null;
-  }
-}
-
-function statusMark(status: KeyView["status"], fill: string): string {
-  switch (status) {
-    case "blocked": return `<circle cx="119" cy="22" r="11" fill="none" stroke="${fill}" stroke-width="3"/><text x="119" y="30" ${monoFont} font-size="22" fill="${fill}" text-anchor="middle">?</text>`;
-    case "working": return `<path d="M113 12L129 22L113 32Z" fill="${fill}"/>`;
-    case "done": return `<path d="M110 22L117 30L130 13" fill="none" stroke="${fill}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
-    case "idle": return `<circle cx="119" cy="22" r="7" fill="${fill}"/>`;
-    case "unknown": return `<circle cx="119" cy="22" r="7" fill="none" stroke="${fill}" stroke-width="3"/>`;
-    case "offline": return `<path d="M112 15L126 29M126 15L112 29" stroke="${fill}" stroke-width="4" stroke-linecap="round"/>`;
-    default: return "";
   }
 }
 
@@ -125,16 +121,23 @@ function relativeLuminance(rgb: { r: number; g: number; b: number }): number {
 function splitLabel(value: string, width: number): string[] {
   const clean = value.trim() || "EMPTY";
   if (displayWidth(clean) <= width) return [clean];
-  const words = clean.split(/[-_\s]+/).filter(Boolean);
-  if (words.length === 1) {
-    const [first, rest] = splitAtWidth(clean, width);
-    return [first, truncate(rest, width)];
+  const parts = (clean.match(/[^-_\s]+(?:[-_]+|$)/g) || [clean]).flatMap((word) => {
+    const chunks: string[] = [];
+    while (displayWidth(word) > width) {
+      const [chunk, rest] = splitAtWidth(word, width);
+      chunks.push(chunk);
+      word = rest;
+    }
+    return word ? [...chunks, word] : chunks;
+  });
+  const lines: string[] = [];
+  for (const part of parts) {
+    const previous = lines.at(-1) || "";
+    const combined = `${previous}${previous && !/[-_]$/.test(previous) ? " " : ""}${part}`;
+    if (lines.length && displayWidth(combined) <= width) lines[lines.length - 1] = combined;
+    else lines.push(part);
   }
-  const first: string[] = [];
-  while (words.length && displayWidth(`${first.join(" ")} ${words[0]}`.trim()) <= width) first.push(words.shift()!);
-  if (first.length) return [first.join(" "), truncate(words.join(" "), width)];
-  const [firstPart, rest] = splitAtWidth(words.shift()!, width);
-  return [firstPart, truncate([rest, ...words].filter(Boolean).join(" "), width)];
+  return lines.length <= 3 ? lines : [...lines.slice(0, 2), truncate(lines.slice(2).join(" "), width)];
 }
 
 function truncate(value: string, width: number): string {
@@ -143,7 +146,8 @@ function truncate(value: string, width: number): string {
 
 function compactContext(value: string, width: number): string {
   if (displayWidth(value) <= width) return value;
-  const separator = " › ";
+  const separator = [" · ", " › "].find((candidate) => value.includes(candidate));
+  if (!separator) return truncate(value, width);
   const split = value.lastIndexOf(separator);
   if (split < 0) return truncate(value, width);
   const suffix = value.slice(split);

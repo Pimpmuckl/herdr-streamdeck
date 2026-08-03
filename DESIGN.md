@@ -24,20 +24,18 @@ typography:
     fontWeight: 700
     letterSpacing: "0.2px"
 rounded:
-  key-shell: "18px"
-  key-face: "14px"
+  key-outline: "16px"
 spacing:
-  key-inset: "7px"
+  key-inset: "3px"
   strip-content-inset: "18px"
 components:
-  key-shell:
+  key-canvas:
     width: "144px"
     height: "144px"
-    rounded: "{rounded.key-shell}"
-  key-face:
-    width: "130px"
-    height: "130px"
-    rounded: "{rounded.key-face}"
+  key-outline:
+    width: "138px"
+    height: "138px"
+    rounded: "{rounded.key-outline}"
   dial-region:
     width: "200px"
     height: "100px"
@@ -54,7 +52,7 @@ components:
 
 Herdr Stream Deck+ is a one-handed physical triage surface, not a miniature application. Eight fixed keys carry terse operational labels and state marks; four adjacent dial regions read as one continuous status strip. The visual hierarchy favors instant recognition, stable positions, and deliberate commits over decoration.
 
-The implementation is flat, compact, and terminal-like. Herdr supplies the resolved active palette at runtime, while this plugin supplies geometry, type scale, state hierarchy, and interaction marks. The matching wide Herdr logo sits across the strip at low opacity as a quiet shared underlay.
+The implementation is flat, compact, and terminal-like. Every unused OLED pixel is true black; Herdr supplies text, state, and focus colors while the plugin supplies geometry, type scale, and interaction marks.
 
 **Key Characteristics:**
 
@@ -72,12 +70,16 @@ The plugin has no independent palette. Until Herdr exposes its resolved runtime 
 
 ### Runtime roles
 
-- **Panel and surface roles:** `panel_bg`, `surface0`, and `surface1` define the shell, face, and resting border.
+- **OLED field:** every key and dial background is fixed `#000000`; theme surface colors never tint unused pixels.
+- **Surface role:** `surface1` defines only the resting key outline.
 - **Text roles:** `text` and `subtext0` separate primary labels from slot numbers, titles, and hints.
+- **Light-theme foregrounds:** `panel_bg` and `surface1` become primary and secondary foregrounds so the fixed black field retains readable contrast.
 - **State roles:** `yellow` marks attention, `blue` marks working, `green` marks completed, `overlay0` marks idle, unknown, or offline, and `red` marks the armed destructive state.
 - **Accent role:** `accent` anchors ordinary dial regions and non-destructive emphasis.
 
 **The Herdr Owns Color Rule.** Never add plugin palette settings or hand-maintained swatches. The temporary generated palette copy must remain mechanically derived from Herdr and disappear when a resolved-theme API exists.
+
+**The OLED Black Rule.** Keep every background pixel `#000000`. Theme roles color information only: text, state marks, rails, outlines, and dial bars.
 
 **The Meaning Is Redundant Rule.** Pair every runtime state color with a short label, a non-color mark, an outline, or a stable position; exact glyph artwork is not defined by this system.
 
@@ -98,27 +100,27 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 
 ## Layout
 
-The key bank is a fixed four-column, two-row arrangement of 144-by-144-pixel canvases. Each key face is inset by 7 pixels, leaving a 130-by-130-pixel inner surface. Slot metadata sits at the upper left, the state mark at the upper right, and the primary label remains centered.
+The key bank is a fixed four-column, two-row arrangement of full 144-by-144-pixel black canvases. A single outline sits 3 pixels from the edge; slot metadata sits at the upper left, the state mark at the upper right, and the primary label remains centered.
 
-The touch strip is one 800-by-100-pixel composition rendered through four adjacent 200-by-100-pixel regions. Every region aligns the same 800-by-100-pixel wide logo with a negative 200-pixel offset per column, so the underlay remains continuous across all four canvases. Titles and values share an 18-pixel left inset. Each region uses a 5-pixel full-height state bar at its left edge.
+The touch strip is one uninterrupted 800-by-100-pixel black composition rendered through four adjacent 200-by-100-pixel regions. Titles and values share an 18-pixel left inset. Each region uses a 5-pixel full-height state bar at its left edge.
 
 **The Fixed Geography Rule.** Preserve key and command positions across modes so one-handed muscle memory remains reliable.
 
 ## Elevation & Depth
 
-The system uses no shadows. Depth comes only from nested flat fills, a key-face border, and border-weight changes for selection or danger. The wide logo underlay is rendered at 10% opacity and must remain quieter than live text and state.
+The system uses no shadows, nested fills, or background artwork. Hierarchy comes only from type, state marks, rails, and border-weight changes for selection or danger.
 
 **The Flat Instrument Rule.** Do not add decorative chrome, gradients, gloss, or simulated physical depth.
 
 ## Shapes
 
-Keys use one recurring nested silhouette: an outer 18-pixel rounded shell and an inner 14-pixel rounded face. The dial strip is rectangular and continuous; individual regions must not read as detached cards. Resting key borders are 2 pixels, selected borders are 5 pixels, and armed destructive borders are 7 pixels.
+Keys use one 16-pixel-radius outline on the full black OLED field. The dial strip is rectangular and continuous; individual regions must not read as detached cards. Resting key borders are 2 pixels, selected borders are 5 pixels, and armed destructive borders are 7 pixels.
 
 ## Components
 
 ### Thread and action key
 
-- **Canvas:** 144 by 144 pixels with a 7-pixel inset face.
+- **Canvas:** full 144 by 144 pixels of deep black with a 3-pixel inset outline.
 - **Content:** slot number, compact workspace and tab context, the deepest useful pane identity, a state mark, and an optional short hint.
 - **Label behavior:** split labels at word separators when possible, cap lines at 9 characters, and truncate overflow with an ellipsis. The deepest useful identity gets the largest type.
 - **State:** focused keys use the stronger 5-pixel text-role border; ordinary keys use the 2-pixel surface-role border. A bottom rail and authored mark repeat state without relying on color alone.
@@ -129,7 +131,7 @@ Keys use one recurring nested silhouette: an outer 18-pixel rounded shell and an
 - **Canvas:** 200 by 100 pixels, one quarter of the coordinated strip.
 - **Content:** uppercase 15-pixel title at 18 by 30 pixels and 24-pixel primary value at 18 by 70 pixels.
 - **Label behavior:** dial values cap at 12 characters and truncate with an ellipsis.
-- **Identity:** use the appearance-matched wide logo as one aligned 800-by-100-pixel, 10%-opacity underlay across all four regions.
+- **Field:** keep the full strip background deep black; only information-bearing pixels may light.
 
 ### Command bank
 
@@ -148,7 +150,7 @@ Keys use one recurring nested silhouette: an outer 18-pixel rounded shell and an
 ### Do:
 
 - **Do** keep dashboard labels short enough to scan at physical-device size.
-- **Do** preserve the continuous four-region strip and aligned quiet logo underlay.
+- **Do** preserve the continuous true-black field across all four dial regions.
 - **Do** use border weight, wording, and stable position alongside runtime color.
 - **Do** keep turns as previews and presses as commits unless the control is direct thread scrolling.
 

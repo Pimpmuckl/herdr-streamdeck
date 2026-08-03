@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-
 import streamDeck, {
   action,
   type DialAction,
@@ -25,14 +23,10 @@ import {
   slotForCoordinates,
   wrappedIndex
 } from "./model.js";
-import { type BrandAssets, currentPane, dialSvg, keySvg } from "./render.js";
+import { currentPane, dialSvg, keySvg } from "./render.js";
 
 const HOLD_MS = 650;
 const herdr = new HerdrBridge();
-const brand: BrandAssets = {
-  light: pngData(new URL("../imgs/herdr_logo_wide.png", import.meta.url)),
-  dark: pngData(new URL("../imgs/herdr_logo_wide_dark.png", import.meta.url))
-};
 
 type Listener = () => void;
 
@@ -418,7 +412,7 @@ class PagesDialAction extends SingletonAction {
     const settings = await deck.get();
     const page = this.preview.get(action.id) ?? settings.pageIndex;
     const title = this.preview.has(action.id) ? "PAGE PREVIEW" : "PINNED PAGE";
-    await action.setFeedback({ "full-canvas": svgImage(dialSvg(0, title, settings.pages[page].name, theme, "accent", brand)) });
+    await action.setFeedback({ "full-canvas": svgImage(dialSvg(title, settings.pages[page].name, theme, "accent")) });
   }
 
   private async renderAll(): Promise<void> {
@@ -466,7 +460,7 @@ class AttentionDialAction extends SingletonAction {
     const index = this.preview.get(action.id) ?? 0;
     const pane = queue[Math.min(index, queue.length - 1)];
     const value = queue.length ? paneIdentity(pane, herdr.snapshot, "BLOCKED").primary : "CLEAR";
-    return action.setFeedback({ "full-canvas": svgImage(dialSvg(1, `ATTENTION ${queue.length}`, value, theme, queue.length ? "yellow" : "overlay0", brand)) });
+    return action.setFeedback({ "full-canvas": svgImage(dialSvg(`ATTENTION ${queue.length}`, value, theme, queue.length ? "yellow" : "overlay0")) });
   }
 
   private async renderAll(): Promise<void> {
@@ -489,10 +483,10 @@ class ThreadDialAction extends SingletonAction {
     const theme = herdr.theme;
     const snapshot = herdr.snapshot;
     if (command.active) {
-      return action.setFeedback({ "full-canvas": svgImage(dialSvg(2, "COMMAND TARGET", command.targetLabel, theme, "accent", brand)) });
+      return action.setFeedback({ "full-canvas": svgImage(dialSvg("COMMAND TARGET", command.targetLabel, theme, "accent")) });
     }
     const pane = currentPane(snapshot?.panes ?? [], snapshot?.focused_pane_id);
-    return action.setFeedback({ "full-canvas": svgImage(dialSvg(2, pane ? "CURRENT · LIVE" : "CURRENT", paneIdentity(pane, snapshot, "HERDR OFFLINE").primary, theme, pane?.agent_status === "working" ? "blue" : "accent", brand)) });
+    return action.setFeedback({ "full-canvas": svgImage(dialSvg(pane ? "CURRENT · LIVE" : "CURRENT", paneIdentity(pane, snapshot, "HERDR OFFLINE").primary, theme, pane?.agent_status === "working" ? "blue" : "accent")) });
   }
 
   private async renderAll(): Promise<void> {
@@ -525,7 +519,7 @@ class AnswerDialAction extends SingletonAction {
   private render(action: DialAction): Promise<void> {
     const theme = herdr.theme;
     const blocked = attentionPanes(herdr.snapshot)[0];
-    return action.setFeedback({ "full-canvas": svgImage(dialSvg(3, blocked ? "QUESTION" : "QUICK SELECT", blocked ? "FOCUS IN HERDR" : "NO QUESTION", theme, blocked ? "yellow" : "overlay0", brand)) });
+    return action.setFeedback({ "full-canvas": svgImage(dialSvg(blocked ? "QUESTION" : "QUICK SELECT", blocked ? "FOCUS IN HERDR" : "NO QUESTION", theme, blocked ? "yellow" : "overlay0")) });
   }
 
   private async renderAll(): Promise<void> {
@@ -540,10 +534,6 @@ function keySlot(action: KeyAction): number | null {
 
 async function renderKey(action: KeyAction, image: string): Promise<void> {
   await Promise.all([action.setImage(svgImage(image)), action.setTitle()]);
-}
-
-function pngData(url: URL): string {
-  return `data:image/png;base64,${readFileSync(url).toString("base64")}`;
 }
 
 function svgImage(svg: string): string {

@@ -14,7 +14,7 @@ import {
   wrappedIndex
 } from "./model.ts";
 import { themeFromHerdrConfig } from "../.preview/theme.js";
-import { keySvg } from "../.preview/render.js";
+import { dialSvg, keySvg } from "../.preview/render.js";
 
 test("device state keeps six pins and soft navigation wraps", () => {
   const settings = normalizeSettings({
@@ -24,8 +24,11 @@ test("device state keeps six pins and soft navigation wraps", () => {
   assert.equal(settings.pageIndex, 0);
   assert.equal(settings.pages[0].pins.length, 6);
   assert.deepEqual(settings.pages[0].pins[0], { paneId: "w1:p1", label: "api" });
-  assert.equal(slotForCoordinates(1, 1), 5);
-  assert.equal(slotForCoordinates(2, 1), null);
+  assert.equal(slotForCoordinates(2, 0), 2);
+  assert.equal(slotForCoordinates(0, 1), 3);
+  assert.equal(slotForCoordinates(2, 1), 5);
+  assert.equal(slotForCoordinates(3, 0), null);
+  assert.equal(slotForCoordinates(3, 1), null);
   assert.equal(wrappedIndex(0, -1, 3), 2);
   assert.deepEqual(
     attentionPanes({
@@ -116,10 +119,16 @@ red = "rgb(255, 85, 85)"
   };
   const oledKey = keySvg({ label: "STOP", detail: "CONFIRM", danger: true }, lowContrastTheme);
   const customKey = keySvg({ label: "CUSTOM", detail: "DETAIL" }, lowContrastTheme);
+  const hardwareDial = dialSvg("CURRENT", "review-suite", lowContrastTheme);
   assert.match(oledKey, /fill="#000000"/);
+  assert.match(customKey, /font-size="26"/);
+  assert.match(customKey, /font-size="18"/);
+  assert.match(hardwareDial, /font-size="20"/);
+  assert.match(hardwareDial, /font-size="28"/);
+  assert.doesNotMatch(`${customKey}${hardwareDial}`, /<style|class=|font:/);
   assert.doesNotMatch(oledKey, /rgb\((?:10 10 10|20 20 20|157 0 6)\)/);
   assert.doesNotMatch(customKey, /rgb\((?:10 10 10|20 20 20)\)/);
-  const [, red, green, blue] = oledKey.match(/\.label\{[^}]*fill:rgb\((\d+) (\d+) (\d+)\)/).map(Number);
+  const [, red, green, blue] = oledKey.match(/font-size="26" fill="rgb\((\d+) (\d+) (\d+)\)"/).map(Number);
   const luminance = [red, green, blue].map((channel) => {
     const value = channel / 255;
     return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;

@@ -100,15 +100,17 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 
 **The Physical Type Floor.** Informational device text never falls below 18 pixels on its authored key or dial canvas. Shorten, truncate, or omit secondary copy before reducing type.
 
+**The Device SVG Rule.** Put font family, weight, size, color, alignment, and tracking directly on every SVG text element. Do not depend on embedded CSS, classes, or font shorthand in device images.
+
 **The Operational Copy Rule.** Labels stay brief, literal, and free of implementation terminology; longer content belongs only in the coordinated Question surface.
 
 ## Layout
 
-The key bank is a fixed four-column, two-row arrangement of full 144-by-144-pixel black canvases. A single outline sits 3 pixels from the edge; slot metadata sits at the upper left, the state mark at the upper right, and the primary label remains centered.
+The key bank is a fixed four-column, two-row arrangement of full 144-by-144-pixel black canvases. Thread slots form a 3-by-2 block on the left; Inbox and Command form a persistent action rail on the right. A single outline sits 3 pixels from the edge; slot metadata sits at the upper left, the state mark at the upper right, and the primary label remains centered.
 
 The touch strip is one uninterrupted 800-by-100-pixel black composition rendered through four adjacent 200-by-100-pixel regions. Titles and values share an 18-pixel left inset. Each region uses a 5-pixel full-height state bar at its left edge.
 
-**The Fixed Geography Rule.** Preserve key and command positions across modes so one-handed muscle memory remains reliable.
+**The Fixed Geography Rule.** The rows remain `1 2 3 INBOX` and `4 5 6 COMMAND`. Preserve these positions across modes so one-handed muscle memory remains reliable.
 
 ## Elevation & Depth
 
@@ -139,7 +141,7 @@ Keys use one 16-pixel-radius outline on the full black OLED field. The dial stri
 
 ### Command bank
 
-- **Positions:** keys 1 through 6 remain `CONTINUE`, `STATUS`, `VERIFY`, `ZOOM`, unassigned, and `STOP`; the final two keys remain attention and cancel.
+- **Positions:** the six thread slots remain `CONTINUE`, `STATUS`, `VERIFY`, `ZOOM`, unassigned, and `STOP`; Inbox stays top-right and Command becomes Cancel at bottom-right.
 - **Target:** the third dial region identifies the frozen command target.
 - **Lifecycle:** entering Command mode swaps the six thread keys in place; one successful action acknowledges and returns to the dashboard.
 

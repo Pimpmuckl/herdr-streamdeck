@@ -19,15 +19,20 @@ function devicePreview(activeTheme, mode = "dashboard") {
     { label: "api-rewrite", context: "KRAKEN › T6", slot: 0, status: "blocked", selected: true },
     { label: "review-suite", context: "TOOLS › T2", slot: 1, status: "working" },
     { label: "kraken-backup", context: "AUDIT › T1", slot: 2, status: "done" },
+    { label: "INBOX", detail: "2 NEED YOU", status: "blocked" },
     { label: "", slot: 3, empty: true },
     { label: "daedalus", context: "DAEDALUS › T1", slot: 4, status: "idle" },
     { label: "vod-graph", context: "VOD RESEARCH › T5", slot: 5, status: "working" },
-    { label: "INBOX", detail: "2 NEED YOU", status: "blocked" },
     { label: "COMMAND", detail: "TAP ACTIONS" }
   ];
-  const commandKeys = ["CONTINUE", "STATUS", "VERIFY", "ZOOM", "—", mode === "stop" ? "STOP AGAIN" : "STOP"]
-    .map((label, slot) => ({ label, context: "COMMAND", detail: mode === "stop" && slot === 5 ? "PRESS AGAIN" : slot === 4 ? "UNASSIGNED" : "PRESS SEND", slot, danger: mode === "stop" && slot === 5 }))
-    .concat([{ label: "INBOX", detail: "2 NEED YOU", status: "blocked" }, { label: "CANCEL", context: "COMMAND", detail: "review-suite" }]);
+  const commandActions = ["CONTINUE", "STATUS", "VERIFY", "ZOOM", "—", mode === "stop" ? "STOP AGAIN" : "STOP"]
+    .map((label, slot) => ({ label, context: "COMMAND", detail: mode === "stop" && slot === 5 ? "PRESS AGAIN" : slot === 4 ? "UNASSIGNED" : "PRESS SEND", slot, danger: mode === "stop" && slot === 5 }));
+  const commandKeys = [
+    ...commandActions.slice(0, 3),
+    { label: "INBOX", detail: "2 NEED YOU", status: "blocked" },
+    ...commandActions.slice(3),
+    { label: "CANCEL", context: "COMMAND", detail: "review-suite" }
+  ];
   const keys = (mode === "dashboard" ? dashboardKeys : commandKeys).map((view) => keySvg(view, activeTheme));
   const dashboardDials = [
     dialSvg("PINNED PAGE", "WORK", activeTheme, "accent"),

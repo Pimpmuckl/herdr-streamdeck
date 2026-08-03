@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { dialSvg, keySvg } from "../.preview/render.js";
+import { copiedHerdrTheme } from "../.preview/herdr-themes.js";
 
 const pluginImages = resolve("dev.herdr.streamdeck.sdPlugin/imgs");
 const brand = {
@@ -9,9 +10,9 @@ const brand = {
   dark: pngData(resolve(pluginImages, "herdr_logo_wide_dark.png"))
 };
 
-const herdrThemeSource = readFileSync(resolve(process.env.HERDR_SOURCE || "../herdr/src/app/state.rs"), "utf8");
-const dark = themeFromHerdr("catppuccin", "dark");
-const light = themeFromHerdr("catppuccin_latte", "light");
+const dark = copiedHerdrTheme("catppuccin");
+const light = copiedHerdrTheme("catppuccin-latte");
+if (!dark || !light) throw new Error("Copied Herdr preview themes are missing");
 
 mkdirSync("artifacts", { recursive: true });
 for (const [name, value] of [["dark", dark], ["light", light]]) {
@@ -22,18 +23,18 @@ writeFileSync("artifacts/device-preview-stop-armed-dark.svg", cleanSvg(devicePre
 
 function devicePreview(activeTheme, mode = "dashboard") {
   const dashboardKeys = [
-    { label: "api-rewrite", slot: 0, status: "blocked", selected: true },
-    { label: "review-suite", slot: 1, status: "working" },
-    { label: "kraken-backup", slot: 2, status: "done" },
-    { label: "EMPTY", slot: 3, empty: true },
-    { label: "daedalus", slot: 4, status: "idle" },
-    { label: "vod-graph", slot: 5, status: "working" },
-    { label: "INBOX 2", status: "blocked" },
-    { label: "COMMAND" }
+    { label: "api-rewrite", context: "KRAKEN › T6", slot: 0, status: "blocked", selected: true },
+    { label: "review-suite", context: "TOOLS › T2", slot: 1, status: "working" },
+    { label: "kraken-backup", context: "AUDIT › T1", slot: 2, status: "done" },
+    { label: "", slot: 3, empty: true },
+    { label: "daedalus", context: "DAEDALUS › T1", slot: 4, status: "idle" },
+    { label: "vod-graph", context: "VOD RESEARCH › T5", slot: 5, status: "working" },
+    { label: "INBOX", detail: "2 NEED YOU", status: "blocked" },
+    { label: "COMMAND", detail: "TAP FOR ACTIONS" }
   ];
   const commandKeys = ["CONTINUE", "STATUS", "VERIFY", "ZOOM", "—", mode === "stop" ? "STOP AGAIN" : "STOP"]
-    .map((label, slot) => ({ label, slot, danger: mode === "stop" && slot === 5 }))
-    .concat([{ label: "INBOX 2", status: "blocked" }, { label: "CANCEL" }]);
+    .map((label, slot) => ({ label, context: "COMMAND", detail: mode === "stop" && slot === 5 ? "PRESS TO CONFIRM" : slot === 4 ? "UNASSIGNED" : "PRESS TO SEND", slot, danger: mode === "stop" && slot === 5 }))
+    .concat([{ label: "INBOX", detail: "2 NEED YOU", status: "blocked" }, { label: "CANCEL", context: "COMMAND", detail: "review-suite" }]);
   const keys = (mode === "dashboard" ? dashboardKeys : commandKeys).map((view) => keySvg(view, activeTheme));
   const dashboardDials = [
     dialSvg(0, "PINNED PAGE", "WORK", activeTheme, "accent", brand),
@@ -60,22 +61,6 @@ function devicePreview(activeTheme, mode = "dashboard") {
 
 function place(svg, x, y) {
   return svg.replace("<svg ", `<svg x="${x}" y="${y}" `);
-}
-
-function themeFromHerdr(functionName, appearance) {
-  const start = herdrThemeSource.indexOf(`pub fn ${functionName}()`);
-  const end = herdrThemeSource.indexOf("\n    pub fn ", start + 1);
-  if (start < 0 || end < 0) throw new Error(`Herdr theme not found: ${functionName}`);
-  const block = herdrThemeSource.slice(start, end);
-  const tokens = {};
-  for (const match of block.matchAll(/(\w+): Color::Rgb\((\d+),\s*(\d+),\s*(\d+)\)/g)) {
-    tokens[match[1]] = [Number(match[2]), Number(match[3]), Number(match[4])];
-  }
-  return {
-    name: functionName.replaceAll("_", "-"),
-    appearance,
-    palette: Object.fromEntries(Object.entries(tokens).map(([key, [r, g, b]]) => [key, { r, g, b }]))
-  };
 }
 
 function pngData(path) {

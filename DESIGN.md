@@ -65,7 +65,7 @@ The implementation is flat, compact, and terminal-like. Herdr supplies the resol
 
 ## Colors
 
-The plugin has no independent palette and no fixed color values. Every render consumes Herdr's resolved runtime palette, including appearance changes and custom overrides.
+The plugin has no independent palette. Until Herdr exposes its resolved runtime palette, rendering uses a generated compatibility copy of Herdr's 17 RGB built-in themes plus the saved theme name and custom RGB overrides from Herdr's config. The host-derived `terminal` palette falls back to monochrome.
 
 ### Runtime roles
 
@@ -74,7 +74,7 @@ The plugin has no independent palette and no fixed color values. Every render co
 - **State roles:** `yellow` marks attention, `blue` marks working, `green` marks completed, `overlay0` marks idle, unknown, or offline, and `red` marks the armed destructive state.
 - **Accent role:** `accent` anchors ordinary dial regions and non-destructive emphasis.
 
-**The Herdr Owns Color Rule.** Never add plugin palette settings, copied theme definitions, fallback swatches, or fixed preview colors.
+**The Herdr Owns Color Rule.** Never add plugin palette settings or hand-maintained swatches. The temporary generated palette copy must remain mechanically derived from Herdr and disappear when a resolved-theme API exists.
 
 **The Meaning Is Redundant Rule.** Pair every runtime state color with a short label, a non-color mark, an outline, or a stable position; exact glyph artwork is not defined by this system.
 
@@ -115,9 +115,10 @@ Keys use one recurring nested silhouette: an outer 18-pixel rounded shell and an
 ### Thread and action key
 
 - **Canvas:** 144 by 144 pixels with a 7-pixel inset face.
-- **Content:** one primary label, optional slot number, optional state mark, and an optional short hint.
-- **Label behavior:** trim empty input to `EMPTY`, split labels at word separators when possible, cap lines at 15 characters, and truncate overflow with an ellipsis.
-- **State:** focused keys use the stronger 5-pixel text-role border; ordinary keys use the 2-pixel surface-role border.
+- **Content:** slot number, compact workspace and tab context, the deepest useful pane identity, a state mark, and an optional short hint.
+- **Label behavior:** split labels at word separators when possible, cap lines at 13 characters, and truncate overflow with an ellipsis. The deepest useful identity gets the largest type.
+- **State:** focused keys use the stronger 5-pixel text-role border; ordinary keys use the 2-pixel surface-role border. A bottom rail and authored mark repeat state without relying on color alone.
+- **Empty slot:** show only its slot number and a quiet plus mark.
 
 ### Dial region
 
@@ -149,7 +150,7 @@ Keys use one recurring nested silhouette: an outer 18-pixel rounded shell and an
 
 ### Don't:
 
-- **Don't** introduce fixed colors, copied themes, manual appearance controls, or values sampled from preview images.
+- **Don't** introduce plugin theme settings, hand-maintained colors, manual appearance controls, or values sampled from preview images.
 - **Don't** turn the dial regions into separate cards or add decorative depth.
 - **Don't** use color alone to communicate focus, attention, completion, offline state, or danger.
 - **Don't** canonize the current Unicode status glyphs or system-installed font preferences as reusable design assets.

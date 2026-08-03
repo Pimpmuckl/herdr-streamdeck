@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "rollup -c",
-    "check": "node --experimental-strip-types --test src/model.test.mjs",
+    "check": "tsc --target ES2022 --module NodeNext --moduleResolution NodeNext --strict --skipLibCheck --outDir .preview src/model.ts src/herdr-themes.ts src/theme.ts && node --experimental-strip-types --test src/model.test.mjs",
     "typecheck": "tsc --noEmit",
-    "preview": "tsc --target ES2022 --module NodeNext --moduleResolution NodeNext --strict --skipLibCheck --outDir .preview src/model.ts src/render.ts && node scripts/render-preview.mjs",
+    "themes:sync": "node scripts/sync-herdr-themes.mjs",
+    "preview": "tsc --target ES2022 --module NodeNext --moduleResolution NodeNext --strict --skipLibCheck --outDir .preview src/model.ts src/herdr-themes.ts src/render.ts && node scripts/render-preview.mjs",
     "validate": "streamdeck validate dev.herdr.streamdeck.sdPlugin",
     "profile:check": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-profile.ps1 -DryRun",
     "package:dry-run": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package.ps1 -DryRun",

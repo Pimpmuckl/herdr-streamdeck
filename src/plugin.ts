@@ -19,6 +19,7 @@ import {
   type DeckSettings,
   normalizeSettings,
   type PaneSnapshot,
+  paneIdentity,
   paneLabel,
   resolvePin,
   slotForCoordinates,
@@ -32,7 +33,6 @@ const brand: BrandAssets = {
   light: pngData(new URL("../imgs/herdr_logo_wide.png", import.meta.url)),
   dark: pngData(new URL("../imgs/herdr_logo_wide_dark.png", import.meta.url))
 };
-const compatibilityImage = pngData(new URL("../imgs/action-icon@2x.png", import.meta.url));
 
 type Listener = () => void;
 
@@ -158,9 +158,7 @@ class PinnedThreadAction extends SingletonAction {
         else await event.action.showAlert();
       } else if (command.active) {
         if (await this.runCommand(slot, event.action)) {
-          const theme = herdr.theme;
-          if (theme) await event.action.setImage(keySvg({ label: "SENT", slot }, theme));
-          else await event.action.setTitle("SENT");
+          await renderKey(event.action, keySvg({ label: "SENT", context: "COMMAND", detail: "DELIVERED", slot, status: "done" }, herdr.theme));
           await delay(400);
           command.cancel();
         }
@@ -177,8 +175,7 @@ class PinnedThreadAction extends SingletonAction {
     } catch (error) {
       streamDeck.logger.error(`Pinned thread action failed: ${String(error)}`);
       if (command.active) {
-        if (herdr.theme) await event.action.setImage(keySvg({ label: "FAILED", slot, danger: true }, herdr.theme));
-        else await event.action.setTitle("FAILED");
+        await renderKey(event.action, keySvg({ label: "FAILED", context: "COMMAND", detail: "NOT SENT", slot, danger: true }, herdr.theme));
         await delay(600);
         await this.render(event.action);
         return;
@@ -256,24 +253,37 @@ class PinnedThreadAction extends SingletonAction {
     const settings = await deck.get();
     if (pinChooser.pane) {
       const occupied = settings.pages[settings.pageIndex].pins[slot];
-      return renderKey(action, theme && keySvg({ label: occupied ? "OCCUPIED" : "PIN HERE", slot, danger: Boolean(occupied) }, theme), occupied ? "OCCUPIED" : "PIN HERE");
+      return renderKey(action, keySvg({
+        label: occupied ? "OCCUPIED" : "PIN HERE",
+        context: `SLOT ${slot + 1}`,
+        detail: occupied ? "UNPIN FIRST" : "PRESS TO PLACE",
+        slot,
+        danger: Boolean(occupied)
+      }, theme));
     }
     if (command.active) {
       const labels = ["CONTINUE", "STATUS", "VERIFY", "ZOOM", "—", "STOP"];
       const armed = slot === 5 && command.stopArmed;
       const label = armed ? "STOP AGAIN" : labels[slot];
-      return renderKey(action, theme && keySvg({ label, slot, danger: armed }, theme), label);
+      return renderKey(action, keySvg({
+        label,
+        context: "COMMAND",
+        detail: armed ? "PRESS TO CONFIRM" : slot === 4 ? "UNASSIGNED" : "PRESS TO SEND",
+        slot,
+        danger: armed
+      }, theme));
     }
     const pin = settings.pages[settings.pageIndex].pins[slot];
     const pane = resolvePin(pin, herdr.snapshot);
-    const label = pin ? paneLabel(pane, pin.label) : "EMPTY";
-    return renderKey(action, theme && keySvg({
-      label,
+    const identity = paneIdentity(pane, herdr.snapshot, pin?.label || "");
+    return renderKey(action, keySvg({
+      label: identity.primary,
+      context: identity.context,
       slot,
       status: pin ? pane?.agent_status ?? "offline" : undefined,
       selected: Boolean(pane?.focused),
       empty: !pin
-    }, theme), label);
+    }, theme));
   }
 
   private async renderAll(): Promise<void> {
@@ -319,11 +329,11 @@ class AttentionAction extends SingletonAction {
   private render(action: KeyAction): Promise<void> {
     const theme = herdr.theme;
     const count = attentionPanes(herdr.snapshot).length;
-    const label = count ? `INBOX ${count}` : "INBOX CLEAR";
-    return renderKey(action, theme && keySvg({
-      label,
+    return renderKey(action, keySvg({
+      label: "INBOX",
+      detail: count ? `${count} NEED YOU` : "ALL CLEAR",
       status: count ? "blocked" : "idle"
-    }, theme), label);
+    }, theme));
   }
 
   private async renderAll(): Promise<void> {
@@ -355,13 +365,19 @@ class CommandAction extends SingletonAction {
     }
     const pane = currentPane(herdr.snapshot?.panes ?? [], herdr.snapshot?.focused_pane_id);
     if (!pane || pane.agent_status === "blocked") return event.action.showAlert();
-    command.enter(pane.pane_id, paneLabel(pane, pane.pane_id));
+    command.enter(pane.pane_id, paneIdentity(pane, herdr.snapshot, pane.pane_id).primary);
   }
 
   private render(action: KeyAction): Promise<void> {
     const theme = herdr.theme;
-    const label = pinChooser.pane ? "CANCEL PIN" : command.active ? "CANCEL" : "COMMAND";
-    return renderKey(action, theme && keySvg({ label }, theme), label);
+    if (pinChooser.pane) {
+      const identity = paneIdentity(pinChooser.pane, herdr.snapshot, pinChooser.pane.pane_id);
+      return renderKey(action, keySvg({ label: "CANCEL", context: "PIN MODE", detail: identity.primary }, theme));
+    }
+    if (command.active) return renderKey(action, keySvg({ label: "CANCEL", context: "COMMAND", detail: command.targetLabel }, theme));
+    const pane = currentPane(herdr.snapshot?.panes ?? [], herdr.snapshot?.focused_pane_id);
+    const available = pane && pane.agent_status !== "blocked";
+    return renderKey(action, keySvg({ label: "COMMAND", detail: available ? "TAP FOR ACTIONS" : "NO TARGET" }, theme));
   }
 
   private async renderAll(): Promise<void> {
@@ -399,7 +415,6 @@ class PagesDialAction extends SingletonAction {
 
   private async render(action: DialAction): Promise<void> {
     const theme = herdr.theme;
-    if (!theme) return renderCompatibilityDial(action);
     const settings = await deck.get();
     const page = this.preview.get(action.id) ?? settings.pageIndex;
     const title = this.preview.has(action.id) ? "PAGE PREVIEW" : "PINNED PAGE";
@@ -447,10 +462,10 @@ class AttentionDialAction extends SingletonAction {
 
   private render(action: DialAction): Promise<void> {
     const theme = herdr.theme;
-    if (!theme) return renderCompatibilityDial(action);
     const queue = attentionPanes(herdr.snapshot);
     const index = this.preview.get(action.id) ?? 0;
-    const value = queue.length ? paneLabel(queue[Math.min(index, queue.length - 1)], "BLOCKED") : "CLEAR";
+    const pane = queue[Math.min(index, queue.length - 1)];
+    const value = queue.length ? paneIdentity(pane, herdr.snapshot, "BLOCKED").primary : "CLEAR";
     return action.setFeedback({ "full-canvas": dialSvg(1, `ATTENTION ${queue.length}`, value, theme, queue.length ? "yellow" : "overlay0", brand) });
   }
 
@@ -472,13 +487,12 @@ class ThreadDialAction extends SingletonAction {
 
   private render(action: DialAction): Promise<void> {
     const theme = herdr.theme;
-    if (!theme) return renderCompatibilityDial(action);
     const snapshot = herdr.snapshot;
     if (command.active) {
       return action.setFeedback({ "full-canvas": dialSvg(2, "COMMAND TARGET", command.targetLabel, theme, "accent", brand) });
     }
     const pane = currentPane(snapshot?.panes ?? [], snapshot?.focused_pane_id);
-    return action.setFeedback({ "full-canvas": dialSvg(2, pane ? "CURRENT · LIVE" : "CURRENT", paneLabel(pane, "HERDR OFFLINE"), theme, pane?.agent_status === "working" ? "blue" : "accent", brand) });
+    return action.setFeedback({ "full-canvas": dialSvg(2, pane ? "CURRENT · LIVE" : "CURRENT", paneIdentity(pane, snapshot, "HERDR OFFLINE").primary, theme, pane?.agent_status === "working" ? "blue" : "accent", brand) });
   }
 
   private async renderAll(): Promise<void> {
@@ -510,7 +524,6 @@ class AnswerDialAction extends SingletonAction {
 
   private render(action: DialAction): Promise<void> {
     const theme = herdr.theme;
-    if (!theme) return renderCompatibilityDial(action);
     const blocked = attentionPanes(herdr.snapshot)[0];
     return action.setFeedback({ "full-canvas": dialSvg(3, blocked ? "QUESTION" : "QUICK SELECT", blocked ? "FOCUS IN HERDR" : "NO QUESTION", theme, blocked ? "yellow" : "overlay0", brand) });
   }
@@ -525,17 +538,8 @@ function keySlot(action: KeyAction): number | null {
   return coordinates ? slotForCoordinates(coordinates.column, coordinates.row) : null;
 }
 
-async function renderKey(action: KeyAction, image: string | null, fallbackTitle: string): Promise<void> {
-  await Promise.all(image
-    ? [action.setImage(image), action.setTitle()]
-    : [action.setImage(), action.setTitle(fallbackTitle)]);
-}
-
-async function renderCompatibilityDial(action: DialAction): Promise<void> {
-  await Promise.all([
-    action.setFeedback({ "full-canvas": compatibilityImage }),
-    action.setTitle("Herdr")
-  ]);
+async function renderKey(action: KeyAction, image: string): Promise<void> {
+  await Promise.all([action.setImage(image), action.setTitle()]);
 }
 
 function pngData(url: URL): string {

@@ -9,7 +9,7 @@ adaptive
 ## Stack
 
 - Stream Deck plugin: TypeScript with Elgato's official Node SDK.
-- Herdr capabilities: the smallest necessary changes to Herdr's existing Rust codebase.
+- Herdr capabilities: stock Herdr plugin and CLI APIs only; Herdr core remains out of scope.
 - Validate and ship Windows first. Preserve macOS and Linux as intended future targets.
 
 ## Users
@@ -105,11 +105,12 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 
 ### Status and display language
 
-- Normal display content remains operational and short: current page, focused thread, follow state, actionable counts, and brief acknowledgements.
+- Normal display content remains operational and short: workspace and tab context, the deepest useful pane identity, actionable counts, and brief acknowledgements.
 - Question Mode is the only mode that uses the full strip for longer content.
-- Herdr is the only theme source. The plugin queries Herdr's resolved active palette so built-in themes, custom overrides, and automatic light/dark changes stay synchronized 1:1.
-- The plugin has no theme settings, copied theme definitions, or manual light/dark override.
-- Palette changes redraw every visible key and encoder region. Light palettes use `herdr_logo_wide.png`; dark palettes use `herdr_logo_wide_dark.png`.
+- Herdr remains the only theme source. Until Herdr exposes its resolved palette, the plugin uses a generated compatibility copy of Herdr's 17 RGB built-in themes plus the saved theme name and custom RGB overrides in Herdr's config.
+- The plugin has no theme settings or manual light/dark override. `npm run themes:sync` refreshes the temporary generated copy from a local Herdr checkout.
+- Saved palette changes redraw every visible key and encoder region. The host-derived `terminal` palette, unsaved previews, and automatic appearance changes require a future resolved-theme API. Light palettes use `herdr_logo_wide.png`; dark palettes use `herdr_logo_wide_dark.png`.
+- Pinned keys read from parent to child as workspace, tab, then the deepest available pane or thread label. Empty slots stay almost blank.
 - Status colors are paired with a label or symbol:
   - amber: needs input;
   - red: explicit error;
@@ -150,7 +151,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - `herdr_logo_wide.png`: wide mark for light surfaces.
 - `herdr_logo_wide_dark.png`: wide mark for dark surfaces.
 - A runnable Stream Deck plugin slice and actual-resolution rendered previews now cover the dashboard, light/dark Herdr theme sync, one-shot Command Mode, and armed Stop state.
-- No physical-device usage or usability-test evidence exists yet. Future work must not fabricate it.
+- The dashboard, pin chooser, eight keys, and four encoder regions have been exercised on a physical Stream Deck+. Timing and legibility still require continued hardware iteration.
 
 ## Product Principles
 

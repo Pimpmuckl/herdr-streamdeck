@@ -19,73 +19,73 @@
     {
       "Name": "Pinned Thread",
       "UUID": "dev.herdr.streamdeck.pin",
-      "Icon": "imgs/action-icon",
+      "Icon": "imgs/herdr",
       "Tooltip": "Tap to focus. Hold to pin or unpin the focused Herdr thread.",
       "Controllers": ["Keypad"],
       "UserTitleEnabled": false,
-      "States": [{ "Image": "imgs/action-icon", "TitleAlignment": "middle" }]
+      "States": [{ "Image": "imgs/key", "TitleAlignment": "middle" }]
     },
     {
       "Name": "Attention",
       "UUID": "dev.herdr.streamdeck.attention",
-      "Icon": "imgs/action-icon",
+      "Icon": "imgs/herdr",
       "Tooltip": "Jump to the next Herdr item that needs attention.",
       "Controllers": ["Keypad"],
       "UserTitleEnabled": false,
-      "States": [{ "Image": "imgs/action-icon", "TitleAlignment": "middle" }]
+      "States": [{ "Image": "imgs/key", "TitleAlignment": "middle" }]
     },
     {
       "Name": "Command",
       "UUID": "dev.herdr.streamdeck.command",
-      "Icon": "imgs/action-icon",
+      "Icon": "imgs/herdr",
       "Tooltip": "Tap to enter one-shot thread commands. Tap again to cancel.",
       "Controllers": ["Keypad"],
       "UserTitleEnabled": false,
-      "States": [{ "Image": "imgs/action-icon", "TitleAlignment": "middle" }]
+      "States": [{ "Image": "imgs/key", "TitleAlignment": "middle" }]
     },
     {
       "Name": "Pinned Pages",
       "UUID": "dev.herdr.streamdeck.pages",
-      "Icon": "imgs/action-icon",
+      "Icon": "imgs/herdr",
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
         "TriggerDescription": { "Rotate": "Preview page", "Push": "Switch page" }
       },
-      "States": [{ "Image": "imgs/action-icon" }]
+      "States": [{ "Image": "imgs/key" }]
     },
     {
       "Name": "Attention Queue",
       "UUID": "dev.herdr.streamdeck.attention-dial",
-      "Icon": "imgs/action-icon",
+      "Icon": "imgs/herdr",
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
         "TriggerDescription": { "Rotate": "Preview item", "Push": "Open item" }
       },
-      "States": [{ "Image": "imgs/action-icon" }]
+      "States": [{ "Image": "imgs/key" }]
     },
     {
       "Name": "Current Thread",
       "UUID": "dev.herdr.streamdeck.thread",
-      "Icon": "imgs/action-icon",
+      "Icon": "imgs/herdr",
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
         "TriggerDescription": { "Rotate": "View only", "Push": "View only" }
       },
-      "States": [{ "Image": "imgs/action-icon" }]
+      "States": [{ "Image": "imgs/key" }]
     },
     {
       "Name": "Open Question",
       "UUID": "dev.herdr.streamdeck.answer",
-      "Icon": "imgs/action-icon",
+      "Icon": "imgs/herdr",
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
         "TriggerDescription": { "Rotate": "View only", "Push": "Focus in Herdr" }
       },
-      "States": [{ "Image": "imgs/action-icon" }]
+      "States": [{ "Image": "imgs/key" }]
     }
   ]
 }

@@ -21,22 +21,21 @@ export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): str
   const subtext = palette ? color(palette.subtext0) : "#9a9ca5";
   const statusVisual = statusAppearance(view.status, theme);
   const border = palette ? color(view.danger ? palette.red : view.selected ? palette.text : palette.surface1) : (view.selected || view.danger ? "#ffffff" : "#34363f");
-  const lines = splitLabel(view.label, 13);
-  const labelSize = Math.max(...lines.map((line) => line.length)) > 11 ? 16 : 19;
+  const lines = splitLabel(view.label, 9);
   const slot = view.slot === undefined ? "" : `<text x="14" y="23" class="meta">${view.slot + 1}</text>`;
   const status = statusVisual ? statusMark(view.status, statusVisual.color) : "";
   const rail = statusVisual ? `<path d="M22 132H122" stroke="${statusVisual.color}" stroke-width="6" stroke-linecap="round"/>` : "";
   const empty = view.empty ? `<path d="M57 72H87M72 57V87" stroke="${subtext}" stroke-width="5" stroke-linecap="round"/>` : "";
-  const context = view.context ? `<text x="72" y="45" class="context">${escapeXml(truncate(view.context.toUpperCase(), 20))}</text>` : "";
-  const detail = view.detail ? `<text x="72" y="116" class="detail">${escapeXml(truncate(view.detail.toUpperCase(), 19))}</text>` : "";
-  const labelY = view.context ? (lines.length === 1 ? 81 : 70) : (lines.length === 1 ? 80 : 69);
+  const context = view.context ? `<text x="72" y="45" class="context">${escapeXml(truncate(view.context.toUpperCase(), 17))}</text>` : "";
+  const detail = view.detail ? `<text x="72" y="117" class="detail">${escapeXml(truncate(view.detail.toUpperCase(), 17))}</text>` : "";
+  const labelY = view.context ? (lines.length === 1 ? 82 : 69) : (lines.length === 1 ? 81 : 68);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <style>.label{font:700 ${labelSize}px Consolas,'Cascadia Mono',monospace;fill:${text};text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:${subtext}}.context,.detail{font:700 10px Consolas,'Cascadia Mono',monospace;fill:${subtext};text-anchor:middle;letter-spacing:.35px}</style>
+    <style>.label{font:700 22px Consolas,'Cascadia Mono',monospace;fill:${text};text-anchor:middle}.meta{font:700 15px Consolas,'Cascadia Mono',monospace;fill:${subtext}}.context,.detail{font:700 12px Consolas,'Cascadia Mono',monospace;fill:${subtext};text-anchor:middle;letter-spacing:.2px}</style>
     <rect width="144" height="144" rx="18" fill="${background}"/>
     <rect x="7" y="7" width="130" height="130" rx="14" fill="${surface}" stroke="${border}" stroke-width="${view.danger ? 7 : view.selected ? 5 : 2}"/>
     ${slot}${status}
     ${context}
-    ${view.empty ? "" : `<text x="72" y="${labelY}" class="label">${lines.map((line, index) => `<tspan x="72" dy="${index ? 22 : 0}">${escapeXml(line)}</tspan>`).join("")}</text>`}
+    ${view.empty ? "" : `<text x="72" y="${labelY}" class="label">${lines.map((line, index) => `<tspan x="72" dy="${index ? 25 : 0}">${escapeXml(line)}</tspan>`).join("")}</text>`}
     ${detail}${empty}${rail}
   </svg>`;
 }
@@ -56,12 +55,12 @@ export function dialSvg(
   const accent = palette ? color(palette[accentToken]) : "#ffffff";
   const brandImage = theme ? brand?.[theme.appearance] : undefined;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">
-    <style>.title{font:700 12px Consolas,'Cascadia Mono',monospace;fill:${subtext};letter-spacing:.8px}.value{font:700 19px Consolas,'Cascadia Mono',monospace;fill:${text}}</style>
+    <style>.title{font:700 15px Consolas,'Cascadia Mono',monospace;fill:${subtext};letter-spacing:.4px}.value{font:700 24px Consolas,'Cascadia Mono',monospace;fill:${text}}</style>
     <rect width="200" height="100" fill="${background}"/>
     ${brandImage ? `<image href="${brandImage}" x="${column * -200}" y="0" width="800" height="100" opacity=".10"/>` : ""}
     <rect x="0" y="0" width="5" height="100" fill="${accent}"/>
-    <text x="18" y="31" class="title">${escapeXml(title.toUpperCase())}</text>
-    <text x="18" y="67" class="value">${escapeXml(truncate(value, 17))}</text>
+    <text x="18" y="30" class="title">${escapeXml(title.toUpperCase())}</text>
+    <text x="18" y="70" class="value">${escapeXml(truncate(value, 12))}</text>
   </svg>`;
 }
 

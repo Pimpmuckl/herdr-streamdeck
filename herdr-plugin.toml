@@ -1,0 +1,12 @@
+id = "dev.herdr.streamdeck"
+name = "Herdr Stream Deck+"
+version = "0.1.0"
+min_herdr_version = "0.7.5"
+description = "Send the focused Herdr pane to the Stream Deck slot picker."
+platforms = ["windows"]
+
+[[actions]]
+id = "pin-focused-pane"
+title = "Pin focused pane to Stream Deck"
+contexts = ["pane"]
+command = ["node", "herdr-plugin/pin-focused.mjs"]

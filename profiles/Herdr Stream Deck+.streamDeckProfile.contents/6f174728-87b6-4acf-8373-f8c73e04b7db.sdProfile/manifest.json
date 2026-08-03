@@ -1,0 +1,13 @@
+{
+  "Device": {
+    "Model": "20GBD9901",
+    "UUID": ""
+  },
+  "Name": "Herdr Stream Deck+",
+  "Pages": {
+    "Current": "3b132fd7-57e1-42fb-88ef-cadf026eeec9",
+    "Default": "3b132fd7-57e1-42fb-88ef-cadf026eeec9",
+    "Pages": ["3b132fd7-57e1-42fb-88ef-cadf026eeec9"]
+  },
+  "Version": "3.0"
+}

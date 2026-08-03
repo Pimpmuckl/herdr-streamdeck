@@ -1,0 +1,28 @@
+{
+  "Controllers": [
+    {
+      "Actions": {
+        "0,0": { "ActionID": "61B735DD-C255-4BA8-8A10-BD602D18C87C", "LinkedTitle": false, "Name": "Pinned Thread", "Plugin": { "Name": "Pinned Thread", "UUID": "dev.herdr.streamdeck.pin", "Version": "0.1.0.0" }, "Resources": null, "Settings": {}, "State": 0, "States": [{ "Title": "", "ShowTitle": false }], "UUID": "dev.herdr.streamdeck.pin" },
+        "1,0": { "ActionID": "62933158-9AB2-4435-8195-D7328E423349", "LinkedTitle": false, "Name": "Pinned Thread", "Plugin": { "Name": "Pinned Thread", "UUID": "dev.herdr.streamdeck.pin", "Version": "0.1.0.0" }, "Resources": null, "Settings": {}, "State": 0, "States": [{ "Title": "", "ShowTitle": false }], "UUID": "dev.herdr.streamdeck.pin" },
+        "2,0": { "ActionID": "F1DC9835-891B-450A-9005-A0BB0FF43BBD", "LinkedTitle": false, "Name": "Pinned Thread", "Plugin": { "Name": "Pinned Thread", "UUID": "dev.herdr.streamdeck.pin", "Version": "0.1.0.0" }, "Resources": null, "Settings": {}, "State": 0, "States": [{ "Title": "", "ShowTitle": false }], "UUID": "dev.herdr.streamdeck.pin" },
+        "3,0": { "ActionID": "75365B73-C2D7-4DA5-9227-06F5591543A4", "LinkedTitle": false, "Name": "Pinned Thread", "Plugin": { "Name": "Pinned Thread", "UUID": "dev.herdr.streamdeck.pin", "Version": "0.1.0.0" }, "Resources": null, "Settings": {}, "State": 0, "States": [{ "Title": "", "ShowTitle": false }], "UUID": "dev.herdr.streamdeck.pin" },
+        "0,1": { "ActionID": "3387E706-3457-4E29-9842-58E66763549F", "LinkedTitle": false, "Name": "Pinned Thread", "Plugin": { "Name": "Pinned Thread", "UUID": "dev.herdr.streamdeck.pin", "Version": "0.1.0.0" }, "Resources": null, "Settings": {}, "State": 0, "States": [{ "Title": "", "ShowTitle": false }], "UUID": "dev.herdr.streamdeck.pin" },
+        "1,1": { "ActionID": "D6AC9BF2-4B5A-462D-BDFC-29201019BD2C", "LinkedTitle": false, "Name": "Pinned Thread", "Plugin": { "Name": "Pinned Thread", "UUID": "dev.herdr.streamdeck.pin", "Version": "0.1.0.0" }, "Resources": null, "Settings": {}, "State": 0, "States": [{ "Title": "", "ShowTitle": false }], "UUID": "dev.herdr.streamdeck.pin" },
+        "2,1": { "ActionID": "E162E5D0-7858-4902-9E3B-EFE4C820268E", "LinkedTitle": false, "Name": "Attention", "Plugin": { "Name": "Attention", "UUID": "dev.herdr.streamdeck.attention", "Version": "0.1.0.0" }, "Resources": null, "Settings": {}, "State": 0, "States": [{ "Title": "", "ShowTitle": false }], "UUID": "dev.herdr.streamdeck.attention" },
+        "3,1": { "ActionID": "A77B1191-2EDB-45D8-8961-11BE99B53820", "LinkedTitle": false, "Name": "Command", "Plugin": { "Name": "Command", "UUID": "dev.herdr.streamdeck.command", "Version": "0.1.0.0" }, "Resources": null, "Settings": {}, "State": 0, "States": [{ "Title": "", "ShowTitle": false }], "UUID": "dev.herdr.streamdeck.command" }
+      },
+      "Type": "Keypad"
+    },
+    {
+      "Actions": {
+        "0,0": { "ActionID": "0F5D9404-1D40-49F8-A95C-16A19677021C", "Encoder": { "IconVisible": true }, "LinkedTitle": false, "Name": "Pinned Pages", "Plugin": { "Name": "Pinned Pages", "UUID": "dev.herdr.streamdeck.pages", "Version": "0.1.0.0" }, "Resources": null, "Settings": {}, "State": 0, "States": [{ "Title": "", "ShowTitle": false }], "UUID": "dev.herdr.streamdeck.pages" },
+        "1,0": { "ActionID": "68C4C36E-15AD-41BC-932C-2E1CC4577254", "Encoder": { "IconVisible": true }, "LinkedTitle": false, "Name": "Attention Queue", "Plugin": { "Name": "Attention Queue", "UUID": "dev.herdr.streamdeck.attention-dial", "Version": "0.1.0.0" }, "Resources": null, "Settings": {}, "State": 0, "States": [{ "Title": "", "ShowTitle": false }], "UUID": "dev.herdr.streamdeck.attention-dial" },
+        "2,0": { "ActionID": "8183617A-8932-4064-B4C6-A7092C89525A", "Encoder": { "IconVisible": true }, "LinkedTitle": false, "Name": "Current Thread", "Plugin": { "Name": "Current Thread", "UUID": "dev.herdr.streamdeck.thread", "Version": "0.1.0.0" }, "Resources": null, "Settings": {}, "State": 0, "States": [{ "Title": "", "ShowTitle": false }], "UUID": "dev.herdr.streamdeck.thread" },
+        "3,0": { "ActionID": "7CA1020D-2157-41CE-A0DA-5D1A0E1FD094", "Encoder": { "IconVisible": true }, "LinkedTitle": false, "Name": "Open Question", "Plugin": { "Name": "Open Question", "UUID": "dev.herdr.streamdeck.answer", "Version": "0.1.0.0" }, "Resources": null, "Settings": {}, "State": 0, "States": [{ "Title": "", "ShowTitle": false }], "UUID": "dev.herdr.streamdeck.answer" }
+      },
+      "Type": "Encoder"
+    }
+  ],
+  "Icon": "",
+  "Name": ""
+}

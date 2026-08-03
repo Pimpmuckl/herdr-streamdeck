@@ -1,0 +1,26 @@
+name: Release artifacts
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  package:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm run typecheck
+      - run: npm run package
+      - uses: actions/upload-artifact@v7
+        with:
+          name: herdr-streamdeck-${{ github.ref_name }}
+          path: |
+            dist/*.streamDeckPlugin
+            dist/*.streamDeckProfile
+          if-no-files-found: error

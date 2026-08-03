@@ -102,7 +102,9 @@ function splitLabel(value: string, width: number): string[] {
   if (words.length === 1) return [clean.slice(0, width), truncate(clean.slice(width), width)];
   const first: string[] = [];
   while (words.length && `${first.join(" ")} ${words[0]}`.trim().length <= width) first.push(words.shift()!);
-  return [first.join(" ") || truncate(clean, width), truncate(words.join(" "), width)];
+  if (first.length) return [first.join(" "), truncate(words.join(" "), width)];
+  const word = words.shift()!;
+  return [word.slice(0, width), truncate([word.slice(width), ...words].filter(Boolean).join(" "), width)];
 }
 
 function truncate(value: string, width: number): string {

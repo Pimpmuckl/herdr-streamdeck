@@ -99,4 +99,7 @@ red = "rgb(255, 85, 85)"
   const wrappedKey = keySvg({ label: "ABCDEFGHIJ" });
   assert.match(wrappedKey, />ABCDEFGHI<\/tspan>/);
   assert.match(wrappedKey, />J<\/tspan>/);
+  const mixedKey = keySvg({ label: "ABCDEFGHIJ-K" });
+  assert.match(mixedKey, />ABCDEFGHI<\/tspan>/);
+  assert.match(mixedKey, />J K<\/tspan>/);
 });

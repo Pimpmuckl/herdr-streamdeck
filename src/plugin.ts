@@ -185,7 +185,7 @@ class PinnedThreadAction extends SingletonAction {
     try {
       if (pinChooser.pane) {
         if (await this.pinSelected(slot)) await event.action.showOk();
-        else await event.action.showAlert();
+        else await showKeyError(event.action, "SLOT BUSY", "UNPIN FIRST", slot, () => this.render(event.action));
       } else if (command.active) {
         if (await this.runCommand(slot, event.action)) {
           await renderKey(event.action, keySvg({ label: "SENT", context: "COMMAND", detail: "DELIVERED", slot, status: "done" }, herdr.theme));
@@ -194,17 +194,17 @@ class PinnedThreadAction extends SingletonAction {
         }
       } else if (Date.now() - started >= HOLD_MS) {
         if (await this.togglePin(slot)) await event.action.showOk();
-        else await event.action.showAlert();
+        else await showKeyError(event.action, "NO THREAD", "FOCUS HERDR", slot, () => this.render(event.action));
       } else {
         const settings = await deck.get();
         const pin = settings.pages[settings.pageIndex].pins[slot];
         if (!pin) {
           if (await this.togglePin(slot)) await event.action.showOk();
-          else await event.action.showAlert();
+          else await showKeyError(event.action, "NO THREAD", "FOCUS HERDR", slot, () => this.render(event.action));
           return;
         }
         const pane = resolvePin(pin, herdr.snapshot);
-        if (!pane) return event.action.showAlert();
+        if (!pane) return showKeyError(event.action, "OFFLINE", "THREAD LOST", slot, () => this.render(event.action));
         await herdr.focusPane(pane.pane_id);
       }
     } catch (error) {
@@ -215,7 +215,7 @@ class PinnedThreadAction extends SingletonAction {
         await this.render(event.action);
         return;
       }
-      await event.action.showAlert();
+      await showKeyError(event.action, "FAILED", "TRY AGAIN", slot, () => this.render(event.action));
     }
   }
 
@@ -258,7 +258,7 @@ class PinnedThreadAction extends SingletonAction {
   private async runCommand(slot: number, action: KeyAction): Promise<boolean> {
     const paneId = command.targetPaneId;
     if (!paneId) {
-      await action.showAlert();
+      await showKeyError(action, "NO TARGET", "FOCUS THREAD", slot, () => this.render(action));
       return false;
     }
     const intent = commandIntent(slot, command.stopArmed);
@@ -276,7 +276,7 @@ class PinnedThreadAction extends SingletonAction {
         await herdr.prompt(paneId, intent.text);
         return true;
       case "unavailable":
-        await action.showAlert();
+        await showKeyError(action, "NO ACTION", "UNASSIGNED", slot, () => this.render(action));
         return false;
     }
   }
@@ -347,7 +347,7 @@ class AttentionAction extends SingletonAction {
   override async onKeyUp(event: KeyUpEvent): Promise<void> {
     const duration = Date.now() - (this.downAt.get(event.action.id) ?? Date.now());
     this.downAt.delete(event.action.id);
-    if (duration >= HOLD_MS) return event.action.showAlert();
+    if (duration >= HOLD_MS) return showKeyError(event.action, "TAP INBOX", "HOLD UNUSED", undefined, () => this.render(event.action));
     const queue = attentionPanes(herdr.snapshot);
     command.cancel();
     pinChooser.cancel();
@@ -362,7 +362,7 @@ class AttentionAction extends SingletonAction {
       await herdr.focusPane(pane.pane_id);
     } catch (error) {
       streamDeck.logger.error(`Attention action failed: ${String(error)}`);
-      await event.action.showAlert();
+      await showKeyError(event.action, "FAILED", "HERDR OFFLINE", undefined, () => this.render(event.action));
     }
   }
 
@@ -410,7 +410,8 @@ class CommandAction extends SingletonAction {
       return;
     }
     const pane = currentPane(herdr.snapshot?.panes ?? [], herdr.snapshot?.focused_pane_id);
-    if (!pane || pane.agent_status === "blocked") return event.action.showAlert();
+    if (!pane) return showKeyError(event.action, "NO TARGET", "FOCUS THREAD", undefined, () => this.render(event.action));
+    if (pane.agent_status === "blocked") return showKeyError(event.action, "NEEDS INPUT", "USE INBOX", undefined, () => this.render(event.action));
     inbox.cancel();
     command.enter(pane.pane_id, paneIdentity(pane, herdr.snapshot, pane.pane_id).primary);
   }
@@ -487,14 +488,17 @@ class AttentionDialAction extends SingletonAction {
 
   override async onDialDown(event: DialDownEvent): Promise<void> {
     const queue = attentionPanes(herdr.snapshot);
-    if (!queue.length) return event.action.showAlert();
+    if (!queue.length) {
+      inbox.open(null);
+      return;
+    }
     const pane = selectedAttentionPane() ?? queue[0];
     try {
       inbox.open(pane.pane_id);
       await herdr.focusPane(pane.pane_id);
     } catch (error) {
       streamDeck.logger.error(`Attention dial failed: ${String(error)}`);
-      await event.action.showAlert();
+      await showDialError(event.action, "FAILED", "HERDR OFFLINE", () => this.render(event.action));
     }
   }
 
@@ -554,12 +558,12 @@ class AnswerDialAction extends SingletonAction {
 
   override async onDialDown(event: DialDownEvent): Promise<void> {
     const blocked = selectedAttentionPane() ?? attentionPanes(herdr.snapshot)[0];
-    if (!blocked) return event.action.showAlert();
+    if (!blocked) return;
     try {
       await herdr.focusPane(blocked.pane_id);
     } catch (error) {
       streamDeck.logger.error(`Answer dial failed: ${String(error)}`);
-      await event.action.showAlert();
+      await showDialError(event.action, "FAILED", "HERDR OFFLINE", () => this.render(event.action));
     }
   }
 
@@ -589,6 +593,24 @@ function renderInboxDial(action: DialAction, region: number): Promise<void> {
     : [["INBOX", "ALL CLEAR"], ["QUEUE", "EMPTY"], ["NO ACTION", "NEEDED"], ["COMMAND", "BACK"]];
   const [title, value] = content[region];
   return action.setFeedback({ "full-canvas": svgImage(dialSvg(title, value, herdr.theme, queue.length ? "yellow" : "overlay0")) });
+}
+
+async function showKeyError(
+  action: KeyAction,
+  label: string,
+  detail: string,
+  slot: number | undefined,
+  restore: () => Promise<void>
+): Promise<void> {
+  await renderKey(action, keySvg({ label, detail, slot, danger: true }, herdr.theme));
+  await delay(700);
+  await restore();
+}
+
+async function showDialError(action: DialAction, title: string, value: string, restore: () => Promise<void>): Promise<void> {
+  await action.setFeedback({ "full-canvas": svgImage(dialSvg(title, value, herdr.theme, "red")) });
+  await delay(700);
+  await restore();
 }
 
 function keySlot(action: KeyAction): number | null {

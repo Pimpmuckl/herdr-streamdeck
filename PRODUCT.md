@@ -103,6 +103,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
   6. `STOP`: arm in red, then require a second press on the same key.
 - Prompt commands are unavailable while a structured question is active.
 - Every command acknowledges `SENT`, `QUEUED`, or `FAILED` before returning.
+- Failures render a short cause and recovery hint on the affected key or dial; the generic Stream Deck warning triangle is never used.
 
 ### Status and display language
 

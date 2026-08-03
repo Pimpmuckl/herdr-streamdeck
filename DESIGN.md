@@ -104,6 +104,8 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 
 **The Operational Copy Rule.** Labels stay brief, literal, and free of implementation terminology; longer content belongs only in the coordinated Question surface.
 
+**The Actionable Error Rule.** Never use the host warning triangle. Render a short cause and recovery hint on the affected key or dial, then restore its normal state.
+
 ## Layout
 
 The key bank is a fixed four-column, two-row arrangement of full 144-by-144-pixel black canvases. Thread slots form a 3-by-2 block on the left; Inbox and Command form a persistent action rail on the right. A single outline sits 3 pixels from the edge; slot metadata sits at the upper left, the state mark at the upper right, and the primary label remains centered.

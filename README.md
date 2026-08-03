@@ -35,10 +35,10 @@ In Herdr, open keyboard shortcut settings and assign a shortcut to **Pin focused
 
 | Control | Dashboard | Command mode |
 | --- | --- | --- |
-| Keys 1-6 | Focus pinned thread; hold to pin/unpin | Continue, Status, Verify, Zoom, unused, armed Stop |
-| Key 7 | Cycle attention items | Attention |
-| Key 8 | Enter/cancel Command mode | Cancel |
-| Dial 1 | Preview and select pinned page | Pinned page |
+| Thread keys 1-6 | Focus pinned thread; hold to pin/unpin | Continue, Status, Verify, Zoom, unused, armed Stop |
+| Inbox (top-right) | Cycle attention items | Attention |
+| Command (bottom-right) | Enter/cancel Command mode | Cancel |
+| Dial 1 | Switch pinned page immediately | Pinned page |
 | Dial 2 | Preview and open attention item | Attention queue |
 | Dial 3 | Show current thread | Frozen command target |
 | Dial 4 | Open the current question in Herdr | Open question |

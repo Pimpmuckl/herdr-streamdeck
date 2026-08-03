@@ -59,7 +59,7 @@ The implementation is flat, compact, and terminal-like. Every unused OLED pixel 
 - Fixed 4-by-2 key bank above one 800-by-100-pixel dial strip.
 - Short, bold monospaced labels with small uppercase strip titles.
 - Strong border changes for focus and armed destructive state.
-- Turns preview and presses commit, except direct thread scrolling.
+- Turns preview and presses commit, except direct page and thread navigation.
 - One-shot Command mode preserves fixed command positions.
 
 **Build limitations:** The current SVGs depend on Unicode status glyphs and prefer system-installed Consolas or Cascadia Mono. Those dependencies are shipped implementation constraints, not canonical iconography or typeface assets.
@@ -158,7 +158,7 @@ Keys use one 16-pixel-radius outline on the full black OLED field. The dial stri
 - **Do** keep dashboard labels short enough to scan at physical-device size.
 - **Do** preserve the continuous true-black field across all four dial regions.
 - **Do** use border weight, wording, and stable position alongside runtime color.
-- **Do** keep turns as previews and presses as commits unless the control is direct thread scrolling.
+- **Do** keep turns as previews and presses as commits unless the control directly navigates pages or threads.
 
 ### Don't:
 

@@ -11,7 +11,7 @@ related_targets: ["src/render.ts"]
 - **Chosen direction:** dense terminal instrument; eight fixed keys above one continuous four-dial status strip.
 - **Content:** workspace and tab context, the deepest useful pane identity, distinct status symbols, page and attention state, frozen command target, and explicit acknowledgements.
 - **Interaction:** turns preview unless the control is thread scrolling; presses commit; Command is one-shot; Stop arms before execution.
-- **Visual language:** the active resolved Herdr palette, flat terminal surfaces, monospaced labels, strong focus/armed outlines, and the matching supplied wide Herdr logo as a quiet strip underlay.
+- **Visual language:** true-black OLED fields, the active resolved Herdr palette on information-bearing pixels only, monospaced labels, and strong focus/armed outlines.
 
 ## Scope and mode
 
@@ -23,13 +23,13 @@ Herdr operators need to identify the thread that needs them, focus it, and issue
 
 ## Direction
 
-Herdr owns the visual world. Dense 144px keys prioritize the deepest useful identity, retain workspace and tab as compact context, and repeat status with both a mark and color. Empty slots remain almost blank. The four dial canvases read as one continuous strip, using the matching supplied light or dark wide Herdr logo as a quiet shared underlay.
+Herdr owns the information colors while every unused OLED pixel remains deep black. Dense 144px keys prioritize the deepest useful identity, retain workspace and tab as compact context, and repeat status with both a mark and color. Empty slots remain almost blank. The four dial canvases read as one uninterrupted black strip.
 
 The memorable moment is one-shot Command Mode: tap Command, the six thread keys become a compact action bank around a visibly frozen target, then one successful action acknowledges and returns to the dashboard. Stop becomes destructive only after its first press arms a red `STOP AGAIN` state.
 
 ## Constraints
 
-No independent Stream Deck themes, hand-maintained colors, long dashboard text, decorative chrome, hover-only meaning, or destructive single presses. A generated compatibility copy of Herdr's 17 RGB built-in palettes is allowed only until a resolved-theme API exists; the host-derived `terminal` palette uses monochrome. Color always has a label, symbol, or position cue.
+No tinted backgrounds, independent Stream Deck themes, hand-maintained information colors, long dashboard text, decorative chrome, hover-only meaning, or destructive single presses. A generated compatibility copy of Herdr's 17 RGB built-in palettes is allowed only until a resolved-theme API exists; the host-derived `terminal` palette uses monochrome. Color always has a label, symbol, or position cue.
 
 ## Unresolved
 

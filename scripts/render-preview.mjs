@@ -1,14 +1,7 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { mkdirSync, writeFileSync } from "node:fs";
 
 import { dialSvg, keySvg } from "../.preview/render.js";
 import { copiedHerdrTheme } from "../.preview/herdr-themes.js";
-
-const pluginImages = resolve("dev.herdr.streamdeck.sdPlugin/imgs");
-const brand = {
-  light: pngData(resolve(pluginImages, "herdr_logo_wide.png")),
-  dark: pngData(resolve(pluginImages, "herdr_logo_wide_dark.png"))
-};
 
 const dark = copiedHerdrTheme("catppuccin");
 const light = copiedHerdrTheme("catppuccin-latte");
@@ -37,16 +30,16 @@ function devicePreview(activeTheme, mode = "dashboard") {
     .concat([{ label: "INBOX", detail: "2 NEED YOU", status: "blocked" }, { label: "CANCEL", context: "COMMAND", detail: "review-suite" }]);
   const keys = (mode === "dashboard" ? dashboardKeys : commandKeys).map((view) => keySvg(view, activeTheme));
   const dashboardDials = [
-    dialSvg(0, "PINNED PAGE", "WORK", activeTheme, "accent", brand),
-    dialSvg(1, "ATTENTION 2", "api-rewrite", activeTheme, "yellow", brand),
-    dialSvg(2, "CURRENT · LIVE", "review-suite", activeTheme, "blue", brand),
-    dialSvg(3, "QUESTION", "OPEN HERDR", activeTheme, "yellow", brand)
+    dialSvg("PINNED PAGE", "WORK", activeTheme, "accent"),
+    dialSvg("ATTENTION 2", "api-rewrite", activeTheme, "yellow"),
+    dialSvg("CURRENT · LIVE", "review-suite", activeTheme, "blue"),
+    dialSvg("QUESTION", "OPEN HERDR", activeTheme, "yellow")
   ];
   const commandDials = [
-    dialSvg(0, "PINNED PAGE", "WORK", activeTheme, "accent", brand),
-    dialSvg(1, "ATTENTION 2", "api-rewrite", activeTheme, "yellow", brand),
-    dialSvg(2, "COMMAND TARGET", "review-suite", activeTheme, "accent", brand),
-    dialSvg(3, "QUICK SELECT", "NO QUESTION", activeTheme, "overlay0", brand)
+    dialSvg("PINNED PAGE", "WORK", activeTheme, "accent"),
+    dialSvg("ATTENTION 2", "api-rewrite", activeTheme, "yellow"),
+    dialSvg("COMMAND TARGET", "review-suite", activeTheme, "accent"),
+    dialSvg("QUICK SELECT", "NO QUESTION", activeTheme, "overlay0")
   ];
   const dials = mode === "dashboard" ? dashboardDials : commandDials;
   const placedKeys = keys.map((svg, index) => place(svg, 88 + (index % 4) * 160, 18 + Math.floor(index / 4) * 160)).join("\n");
@@ -61,10 +54,6 @@ function devicePreview(activeTheme, mode = "dashboard") {
 
 function place(svg, x, y) {
   return svg.replace("<svg ", `<svg x="${x}" y="${y}" `);
-}
-
-function pngData(path) {
-  return `data:image/png;base64,${readFileSync(path).toString("base64")}`;
 }
 
 function cleanSvg(svg) {

@@ -102,4 +102,20 @@ red = "rgb(255, 85, 85)"
   const mixedKey = keySvg({ label: "ABCDEFGHIJ-K" });
   assert.match(mixedKey, />ABCDEFGHI<\/tspan>/);
   assert.match(mixedKey, />J K<\/tspan>/);
+
+  const lowContrastTheme = {
+    name: "custom", appearance: "light",
+    palette: { ...palette, text: { r: 10, g: 10, b: 10 }, subtext0: { r: 20, g: 20, b: 20 }, red: { r: 157, g: 0, b: 6 } }
+  };
+  const oledKey = keySvg({ label: "STOP", detail: "CONFIRM", danger: true }, lowContrastTheme);
+  const customKey = keySvg({ label: "CUSTOM", detail: "DETAIL" }, lowContrastTheme);
+  assert.match(oledKey, /fill="#000000"/);
+  assert.doesNotMatch(oledKey, /rgb\((?:10 10 10|20 20 20|157 0 6)\)/);
+  assert.doesNotMatch(customKey, /rgb\((?:10 10 10|20 20 20)\)/);
+  const [, red, green, blue] = oledKey.match(/\.label\{[^}]*fill:rgb\((\d+) (\d+) (\d+)\)/).map(Number);
+  const luminance = [red, green, blue].map((channel) => {
+    const value = channel / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  });
+  assert.ok((0.2126 * luminance[0] + 0.7152 * luminance[1] + 0.0722 * luminance[2] + 0.05) / 0.05 >= 4.5);
 });

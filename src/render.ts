@@ -99,7 +99,7 @@ function splitLabel(value: string, width: number): string[] {
   const clean = value.trim() || "EMPTY";
   if (clean.length <= width) return [clean];
   const words = clean.split(/[-_\s]+/).filter(Boolean);
-  if (words.length === 1) return [truncate(clean, width), truncate(clean.slice(width), width)];
+  if (words.length === 1) return [clean.slice(0, width), truncate(clean.slice(width), width)];
   const first: string[] = [];
   while (words.length && `${first.join(" ")} ${words[0]}`.trim().length <= width) first.push(words.shift()!);
   return [first.join(" ") || truncate(clean, width), truncate(words.join(" "), width)];

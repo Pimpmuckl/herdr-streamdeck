@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "rollup -c",
-    "check": "tsc --target ES2022 --module NodeNext --moduleResolution NodeNext --strict --skipLibCheck --outDir .preview src/model.ts src/herdr-themes.ts src/theme.ts && node --experimental-strip-types --test src/model.test.mjs",
+    "check": "tsc --target ES2022 --module NodeNext --moduleResolution NodeNext --strict --skipLibCheck --outDir .preview src/model.ts src/herdr-themes.ts src/theme.ts src/render.ts && node --experimental-strip-types --test src/model.test.mjs",
     "typecheck": "tsc --noEmit",
     "themes:sync": "node scripts/sync-herdr-themes.mjs",
     "preview": "tsc --target ES2022 --module NodeNext --moduleResolution NodeNext --strict --skipLibCheck --outDir .preview src/model.ts src/herdr-themes.ts src/render.ts && node scripts/render-preview.mjs",

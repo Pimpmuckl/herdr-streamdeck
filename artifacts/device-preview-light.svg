@@ -4,7 +4,7 @@
     <style>.label{font:700 26px Consolas,'Cascadia Mono',monospace;fill:rgb(113 115 136);text-anchor:middle}.meta{font:700 20px Consolas,'Cascadia Mono',monospace;fill:rgb(113 116 137)}.context,.detail{font:700 18px Consolas,'Cascadia Mono',monospace;fill:rgb(113 116 137);text-anchor:middle;letter-spacing:.1px}</style>
     <rect width="144" height="144" fill="#000000"/>
     <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(85 88 113)" stroke-width="5"/>
-    <text x="14" y="28" class="meta">1</text><circle cx="119" cy="22" r="10" fill="none" stroke="rgb(223 142 29)" stroke-width="3"/><text x="119" y="29" text-anchor="middle" font-family="Consolas,monospace" font-size="18" font-weight="700" fill="rgb(223 142 29)">?</text>
+    <text x="14" y="28" class="meta">1</text><circle cx="119" cy="22" r="11" fill="none" stroke="rgb(223 142 29)" stroke-width="3"/><text x="119" y="30" text-anchor="middle" font-family="Consolas,monospace" font-size="22" font-weight="700" fill="rgb(223 142 29)">?</text>
     <text x="72" y="48" class="context">KRAKEN › T6</text>
     <text x="72" y="70" class="label"><tspan x="72" dy="0">api</tspan><tspan x="72" dy="29">rewrite</tspan></text>
     <path d="M18 136H126" stroke="rgb(223 142 29)" stroke-width="6" stroke-linecap="round"/>
@@ -58,7 +58,7 @@
     <style>.label{font:700 26px Consolas,'Cascadia Mono',monospace;fill:rgb(113 115 136);text-anchor:middle}.meta{font:700 20px Consolas,'Cascadia Mono',monospace;fill:rgb(113 116 137)}.context,.detail{font:700 18px Consolas,'Cascadia Mono',monospace;fill:rgb(113 116 137);text-anchor:middle;letter-spacing:.1px}</style>
     <rect width="144" height="144" fill="#000000"/>
     <rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="rgb(188 192 204)" stroke-width="2"/>
-    <circle cx="119" cy="22" r="10" fill="none" stroke="rgb(223 142 29)" stroke-width="3"/><text x="119" y="29" text-anchor="middle" font-family="Consolas,monospace" font-size="18" font-weight="700" fill="rgb(223 142 29)">?</text>
+    <circle cx="119" cy="22" r="11" fill="none" stroke="rgb(223 142 29)" stroke-width="3"/><text x="119" y="30" text-anchor="middle" font-family="Consolas,monospace" font-size="22" font-weight="700" fill="rgb(223 142 29)">?</text>
 
     <text x="72" y="84" class="label"><tspan x="72" dy="0">INBOX</tspan></text>
     <text x="72" y="124" class="detail">2 NEED YOU</text><path d="M18 136H126" stroke="rgb(223 142 29)" stroke-width="6" stroke-linecap="round"/>

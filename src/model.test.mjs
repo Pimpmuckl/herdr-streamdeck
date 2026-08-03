@@ -102,6 +102,7 @@ red = "rgb(255, 85, 85)"
   const mixedKey = keySvg({ label: "ABCDEFGHIJ-K" });
   assert.match(mixedKey, />ABCDEFGH<\/tspan>/);
   assert.match(mixedKey, />IJ K<\/tspan>/);
+  assert.match(keySvg({ label: "1234567😀" }), />1234567😀<\/tspan>/u);
   assert.match(keySvg({ label: "PANE", context: "VOD RESEARCH › T5" }), />VOD R… › T5<\/text>/);
 
   const lowContrastTheme = {

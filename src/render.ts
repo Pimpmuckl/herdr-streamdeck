@@ -68,7 +68,7 @@ function statusAppearance(status: KeyView["status"], theme?: ResolvedThemeSnapsh
 
 function statusMark(status: KeyView["status"], fill: string): string {
   switch (status) {
-    case "blocked": return `<circle cx="119" cy="22" r="10" fill="none" stroke="${fill}" stroke-width="3"/><text x="119" y="29" text-anchor="middle" font-family="Consolas,monospace" font-size="18" font-weight="700" fill="${fill}">?</text>`;
+    case "blocked": return `<circle cx="119" cy="22" r="11" fill="none" stroke="${fill}" stroke-width="3"/><text x="119" y="30" text-anchor="middle" font-family="Consolas,monospace" font-size="22" font-weight="700" fill="${fill}">?</text>`;
     case "working": return `<path d="M113 12L129 22L113 32Z" fill="${fill}"/>`;
     case "done": return `<path d="M110 22L117 30L130 13" fill="none" stroke="${fill}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
     case "idle": return `<circle cx="119" cy="22" r="7" fill="${fill}"/>`;
@@ -123,18 +123,22 @@ function relativeLuminance(rgb: { r: number; g: number; b: number }): number {
 
 function splitLabel(value: string, width: number): string[] {
   const clean = value.trim() || "EMPTY";
-  if (clean.length <= width) return [clean];
+  if ([...clean].length <= width) return [clean];
   const words = clean.split(/[-_\s]+/).filter(Boolean);
-  if (words.length === 1) return [clean.slice(0, width), truncate(clean.slice(width), width)];
+  if (words.length === 1) {
+    const characters = [...clean];
+    return [characters.slice(0, width).join(""), truncate(characters.slice(width).join(""), width)];
+  }
   const first: string[] = [];
-  while (words.length && `${first.join(" ")} ${words[0]}`.trim().length <= width) first.push(words.shift()!);
+  while (words.length && [...`${first.join(" ")} ${words[0]}`.trim()].length <= width) first.push(words.shift()!);
   if (first.length) return [first.join(" "), truncate(words.join(" "), width)];
-  const word = words.shift()!;
-  return [word.slice(0, width), truncate([word.slice(width), ...words].filter(Boolean).join(" "), width)];
+  const word = [...words.shift()!];
+  return [word.slice(0, width).join(""), truncate([word.slice(width).join(""), ...words].filter(Boolean).join(" "), width)];
 }
 
 function truncate(value: string, width: number): string {
-  return value.length <= width ? value : `${value.slice(0, Math.max(1, width - 1))}…`;
+  const characters = [...value];
+  return characters.length <= width ? value : `${characters.slice(0, Math.max(1, width - 1)).join("")}…`;
 }
 
 function compactContext(value: string, width: number): string {

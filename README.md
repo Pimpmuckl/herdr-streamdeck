@@ -18,12 +18,12 @@ npm ci
 npm run check
 npm run typecheck
 npm run build
-herdr plugin link --enabled (Get-Location)
+herdr plugin link (Get-Location) --enabled
 npx streamdeck link dev.herdr.streamdeck.sdPlugin
 npm run package
 ```
 
-For a non-development Herdr install from GitHub, use `herdr plugin install Pimpmuckl/herdr-streamdeck`; use `herdr plugin link --enabled (Get-Location)` only for a local checkout.
+For a non-development Herdr install from GitHub, use `herdr plugin install Pimpmuckl/herdr-streamdeck`; use `herdr plugin link (Get-Location) --enabled` only for a local checkout.
 
 Import `dist\Herdr-Stream-Deck-Plus-0.1.0.streamDeckProfile` in the Stream Deck app. The profile assigns pinned threads to keys 1-6, Attention to key 7, Command to key 8, and all four Herdr encoders. `scripts\install-local.ps1` performs the same local links; add `-OpenProfile` to open the generated profile for import.
 

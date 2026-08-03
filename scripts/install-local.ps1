@@ -8,8 +8,8 @@ try {
     npm run build
     herdr plugin link --enabled $root
     npx streamdeck link dev.herdr.streamdeck.sdPlugin
-    & "$PSScriptRoot\package-profile.ps1"
     $version = (Get-Content "package.json" -Raw | ConvertFrom-Json).version
+    & "$PSScriptRoot\package-profile.ps1" -Version $version
     $profile = Join-Path $root "dist\Herdr-Stream-Deck-Plus-$version.streamDeckProfile"
     if ($OpenProfile) {
         Start-Process $profile

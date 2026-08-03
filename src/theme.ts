@@ -33,7 +33,7 @@ export function themeFromHerdrConfig(source: string): ResolvedThemeSnapshot | nu
 
   for (const rawLine of source.split(/\r?\n/)) {
     const line = rawLine.trim();
-    const sectionMatch = line.match(/^\[([^\]]+)]$/);
+    const sectionMatch = line.match(/^\[([^\]]+)](?:\s*#.*)?$/);
     if (sectionMatch) {
       section = sectionMatch[1];
       continue;

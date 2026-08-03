@@ -93,5 +93,5 @@ red = "rgb(255, 85, 85)"
   assert.equal(themeFromHerdrConfig(`[theme]\nname = "tokyo-night-day"\nauto_switch = true`)?.name, "tokyo-night");
   assert.equal(themeFromHerdrConfig(`[theme]\nname = "not-a-theme"`)?.name, "catppuccin");
   assert.equal(themeFromHerdrConfig(`[theme]\nname = "terminal"`), null);
-  assert.equal(themeFromHerdrConfig(`[theme]\nname = 'nord' # TOML literal string`)?.name, "nord");
+  assert.equal(themeFromHerdrConfig(`[theme] # palette\nname = 'nord' # TOML literal string`)?.name, "nord");
 });

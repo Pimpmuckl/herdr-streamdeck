@@ -10,8 +10,11 @@ const paletteTokens = [
   "subtext0", "mauve", "green", "yellow", "red", "blue", "teal", "peach"
 ] as const satisfies ReadonlyArray<keyof ThemePalette>;
 
+const platformConfigRoot = process.platform === "win32"
+  ? process.env.APPDATA ?? join(homedir(), "AppData", "Roaming")
+  : join(homedir(), ".config");
 const configPath = process.env.HERDR_CONFIG_PATH
-  || join(process.env.APPDATA || join(homedir(), "AppData", "Roaming"), "herdr", "config.toml");
+  ?? join(process.env.XDG_CONFIG_HOME ?? platformConfigRoot, "herdr", "config.toml");
 
 export async function copiedThemeFromHerdrConfig(): Promise<ResolvedThemeSnapshot | null> {
   try {
@@ -35,13 +38,13 @@ export function themeFromHerdrConfig(source: string): ResolvedThemeSnapshot | nu
       section = sectionMatch[1];
       continue;
     }
-    const stringValue = line.match(/^([\w-]+)\s*=\s*"([^"]*)"/);
+    const stringValue = line.match(/^([\w-]+)\s*=\s*(['"])(.*?)\2(?:\s*#.*)?$/);
     const boolValue = line.match(/^([\w-]+)\s*=\s*(true|false)\b/);
-    if (section === "theme" && stringValue?.[1] === "name") name = stringValue[2];
-    if (section === "theme" && stringValue?.[1] === "dark_name") darkName = stringValue[2];
+    if (section === "theme" && stringValue?.[1] === "name") name = stringValue[3];
+    if (section === "theme" && stringValue?.[1] === "dark_name") darkName = stringValue[3];
     if (section === "theme" && boolValue?.[1] === "auto_switch") autoSwitch = boolValue[2] === "true";
     if (section === "theme.custom" && stringValue && paletteTokens.includes(stringValue[1] as keyof ThemePalette)) {
-      custom[stringValue[1] as keyof ThemePalette] = stringValue[2];
+      custom[stringValue[1] as keyof ThemePalette] = stringValue[3];
     }
   }
 

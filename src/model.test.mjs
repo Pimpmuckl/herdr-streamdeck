@@ -16,7 +16,7 @@ import {
 import { themeFromHerdrConfig } from "../.preview/theme.js";
 import { dialSvg, keySvg } from "../.preview/render.js";
 
-test("device state keeps six pins and soft navigation wraps", () => {
+test("device state keeps six pins and page navigation wraps", () => {
   const settings = normalizeSettings({
     pageIndex: 8,
     pages: [{ name: "WORK", pins: [{ paneId: "w1:p1", label: "api" }] }]

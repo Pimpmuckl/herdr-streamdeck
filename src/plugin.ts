@@ -32,6 +32,7 @@ type Listener = () => void;
 
 class DeckStore {
   private loadPromise: Promise<DeckSettings> | null = null;
+  private updatePromise = Promise.resolve();
   private readonly listeners = new Set<Listener>();
 
   get(): Promise<DeckSettings> {
@@ -39,12 +40,16 @@ class DeckStore {
     return this.loadPromise;
   }
 
-  async update(change: (settings: DeckSettings) => void): Promise<void> {
-    const settings = structuredClone(await this.get());
-    change(settings);
-    this.loadPromise = Promise.resolve(settings);
-    await streamDeck.settings.setGlobalSettings(settings);
-    for (const listener of this.listeners) listener();
+  update(change: (settings: DeckSettings) => void): Promise<void> {
+    const update = this.updatePromise.then(async () => {
+      const settings = structuredClone(await this.get());
+      change(settings);
+      this.loadPromise = Promise.resolve(settings);
+      await streamDeck.settings.setGlobalSettings(settings);
+      for (const listener of this.listeners) listener();
+    });
+    this.updatePromise = update.catch(() => undefined);
+    return update;
   }
 
   subscribe(listener: Listener): void {
@@ -381,8 +386,6 @@ class CommandAction extends SingletonAction {
 
 @action({ UUID: "dev.herdr.streamdeck.pages" })
 class PagesDialAction extends SingletonAction {
-  private readonly preview = new Map<string, number>();
-
   constructor() {
     super();
     herdr.subscribe(() => void this.renderAll());
@@ -394,25 +397,15 @@ class PagesDialAction extends SingletonAction {
   }
 
   override async onDialRotate(event: DialRotateEvent): Promise<void> {
-    const settings = await deck.get();
-    const current = this.preview.get(event.action.id) ?? settings.pageIndex;
-    this.preview.set(event.action.id, wrappedIndex(current, event.payload.ticks, settings.pages.length));
-    await this.render(event.action);
-  }
-
-  override async onDialDown(event: DialDownEvent): Promise<void> {
-    const page = this.preview.get(event.action.id);
-    if (page === undefined) return;
-    await deck.update((settings) => { settings.pageIndex = page; });
-    this.preview.delete(event.action.id);
+    await deck.update((settings) => {
+      settings.pageIndex = wrappedIndex(settings.pageIndex, event.payload.ticks, settings.pages.length);
+    });
   }
 
   private async render(action: DialAction): Promise<void> {
     const theme = herdr.theme;
     const settings = await deck.get();
-    const page = this.preview.get(action.id) ?? settings.pageIndex;
-    const title = this.preview.has(action.id) ? "PAGE PREVIEW" : "PINNED PAGE";
-    await action.setFeedback({ "full-canvas": svgImage(dialSvg(title, settings.pages[page].name, theme, "accent")) });
+    await action.setFeedback({ "full-canvas": svgImage(dialSvg("PINNED PAGE", settings.pages[settings.pageIndex].name, theme, "accent")) });
   }
 
   private async renderAll(): Promise<void> {

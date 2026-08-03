@@ -48,7 +48,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 ### Pin pages and six thread keys
 
 - Users may create and name pages of six pinned threads.
-- Dial 1 previews page names while turning and switches page only when pressed.
+- Turning dial 1 immediately switches the active page and redraws the six thread keys.
 - Stream Deck settings are the primary page manager for create, rename, reorder, and delete.
 - A single pin tap focuses its thread inside Herdr without stealing operating-system focus.
 - A second tap raises the existing Herdr client.
@@ -160,7 +160,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 
 1. Physical triage and control, not a second UI.
 2. One hand must complete every routine interaction.
-3. Turning previews; deliberate presses commit.
+3. Turns preview selections; page and thread navigation act immediately.
 4. Stable targets, explicit acknowledgement, and fail-closed answers prevent wrong-thread actions.
 5. Preserve muscle memory while allowing users to opt into named pages.
 

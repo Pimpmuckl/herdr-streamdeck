@@ -6,7 +6,7 @@
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
     <text x="14" y="23" class="meta">1</text>
     <text x="72" y="77" class="label"><tspan x="72" dy="0">CONTINUE</tspan></text>
-    
+
   </svg>
 <svg x="248" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
@@ -14,7 +14,7 @@
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
     <text x="14" y="23" class="meta">2</text>
     <text x="72" y="77" class="label"><tspan x="72" dy="0">STATUS</tspan></text>
-    
+
   </svg>
 <svg x="408" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
@@ -22,7 +22,7 @@
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
     <text x="14" y="23" class="meta">3</text>
     <text x="72" y="77" class="label"><tspan x="72" dy="0">VERIFY</tspan></text>
-    
+
   </svg>
 <svg x="568" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
@@ -30,7 +30,7 @@
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
     <text x="14" y="23" class="meta">4</text>
     <text x="72" y="77" class="label"><tspan x="72" dy="0">ZOOM</tspan></text>
-    
+
   </svg>
 <svg x="88" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
@@ -38,7 +38,7 @@
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
     <text x="14" y="23" class="meta">5</text>
     <text x="72" y="77" class="label"><tspan x="72" dy="0">—</tspan></text>
-    
+
   </svg>
 <svg x="248" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(243 139 168);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
@@ -46,7 +46,7 @@
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(243 139 168)" stroke-width="7"/>
     <text x="14" y="23" class="meta">6</text>
     <text x="72" y="77" class="label"><tspan x="72" dy="0">STOP AGAIN</tspan></text>
-    
+
   </svg>
 <svg x="408" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
@@ -54,15 +54,15 @@
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
     <text x="121" y="25" class="status" fill="rgb(249 226 175)">?</text>
     <text x="72" y="77" class="label"><tspan x="72" dy="0">INBOX 2</tspan></text>
-    
+
   </svg>
 <svg x="568" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <style>.label{font:700 19px Consolas,'Cascadia Mono',monospace;fill:rgb(205 214 244);text-anchor:middle}.meta{font:700 14px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200)}.hint{font:600 10px Consolas,'Cascadia Mono',monospace;fill:rgb(166 173 200);text-anchor:middle;letter-spacing:.4px}.status{font:700 20px Consolas,'Cascadia Mono',monospace;text-anchor:middle}</style>
     <rect width="144" height="144" rx="18" fill="rgb(24 24 37)"/>
     <rect x="7" y="7" width="130" height="130" rx="14" fill="rgb(49 50 68)" stroke="rgb(69 71 90)" stroke-width="2"/>
-    
+
     <text x="72" y="77" class="label"><tspan x="72" dy="0">CANCEL</tspan></text>
-    
+
   </svg>
     <rect y="342" width="800" height="112" rx="10" fill="#050507"/>
     <svg x="0" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">

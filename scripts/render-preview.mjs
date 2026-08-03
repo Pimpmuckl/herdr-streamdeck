@@ -15,10 +15,10 @@ const light = themeFromHerdr("catppuccin_latte", "light");
 
 mkdirSync("artifacts", { recursive: true });
 for (const [name, value] of [["dark", dark], ["light", light]]) {
-  writeFileSync(`artifacts/device-preview-${name}.svg`, devicePreview(value));
+  writeFileSync(`artifacts/device-preview-${name}.svg`, cleanSvg(devicePreview(value)));
 }
-writeFileSync("artifacts/device-preview-command-dark.svg", devicePreview(dark, "command"));
-writeFileSync("artifacts/device-preview-stop-armed-dark.svg", devicePreview(dark, "stop"));
+writeFileSync("artifacts/device-preview-command-dark.svg", cleanSvg(devicePreview(dark, "command")));
+writeFileSync("artifacts/device-preview-stop-armed-dark.svg", cleanSvg(devicePreview(dark, "stop")));
 
 function devicePreview(activeTheme, mode = "dashboard") {
   const dashboardKeys = [
@@ -80,4 +80,8 @@ function themeFromHerdr(functionName, appearance) {
 
 function pngData(path) {
   return `data:image/png;base64,${readFileSync(path).toString("base64")}`;
+}
+
+function cleanSvg(svg) {
+  return svg.replace(/[ \t]+$/gm, "");
 }

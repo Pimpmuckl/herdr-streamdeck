@@ -35,6 +35,7 @@ const KEY_ANIMATION_FRAMES = 240;
 const logoImage = svgImage(readFileSync(new URL("../imgs/herdr_logo.svg", import.meta.url), "utf8").replace("currentColor", "#959391"));
 const herdr = new HerdrBridge();
 const transientKeyFeedback = new Set<string>();
+const transientDialFeedback = new Set<string>();
 const motionVariants = [
   { id: "darken", name: "DARK SWOOSH" },
   { id: "lighten", name: "LIGHT SWOOSH" },
@@ -453,6 +454,7 @@ class AttentionAction extends SingletonAction {
   }
 
   private render(action: KeyAction): Promise<void> {
+    if (transientKeyFeedback.has(action.id)) return Promise.resolve();
     const theme = herdr.theme;
     const count = attentionPanes(herdr.snapshot).length;
     return renderKey(action, keySvg({
@@ -463,7 +465,9 @@ class AttentionAction extends SingletonAction {
   }
 
   private async renderAll(): Promise<void> {
-    await Promise.all(this.actions.toArray().flatMap((item) => item.isKey() ? [this.render(item)] : []));
+    await Promise.all(this.actions.toArray().flatMap((item) =>
+      item.isKey() && !transientKeyFeedback.has(item.id) ? [this.render(item)] : []
+    ));
   }
 }
 
@@ -502,6 +506,7 @@ class CommandAction extends SingletonAction {
   }
 
   private render(action: KeyAction): Promise<void> {
+    if (transientKeyFeedback.has(action.id)) return Promise.resolve();
     const theme = herdr.theme;
     if (pinChooser.pane) {
       const identity = paneIdentity(pinChooser.pane, herdr.snapshot, pinChooser.pane.pane_id);
@@ -513,7 +518,9 @@ class CommandAction extends SingletonAction {
   }
 
   private async renderAll(): Promise<void> {
-    await Promise.all(this.actions.toArray().flatMap((item) => item.isKey() ? [this.render(item)] : []));
+    await Promise.all(this.actions.toArray().flatMap((item) =>
+      item.isKey() && !transientKeyFeedback.has(item.id) ? [this.render(item)] : []
+    ));
   }
 }
 
@@ -553,7 +560,9 @@ class PagesDialAction extends SingletonAction {
   }
 
   private async renderAll(): Promise<void> {
-    await Promise.all(this.actions.toArray().flatMap((item) => item.isDial() ? [this.render(item)] : []));
+    await Promise.all(this.actions.toArray().flatMap((item) =>
+      item.isDial() && !transientDialFeedback.has(item.id) ? [this.render(item)] : []
+    ));
   }
 }
 
@@ -600,7 +609,9 @@ class AttentionDialAction extends SingletonAction {
   }
 
   private async renderAll(): Promise<void> {
-    await Promise.all(this.actions.toArray().flatMap((item) => item.isDial() ? [this.render(item)] : []));
+    await Promise.all(this.actions.toArray().flatMap((item) =>
+      item.isDial() && !transientDialFeedback.has(item.id) ? [this.render(item)] : []
+    ));
   }
 }
 
@@ -623,7 +634,9 @@ class ThreadDialAction extends SingletonAction {
   }
 
   private async renderAll(): Promise<void> {
-    await Promise.all(this.actions.toArray().flatMap((item) => item.isDial() ? [this.render(item)] : []));
+    await Promise.all(this.actions.toArray().flatMap((item) =>
+      item.isDial() && !transientDialFeedback.has(item.id) ? [this.render(item)] : []
+    ));
   }
 }
 
@@ -664,7 +677,9 @@ class AnswerDialAction extends SingletonAction {
   }
 
   private async renderAll(): Promise<void> {
-    await Promise.all(this.actions.toArray().flatMap((item) => item.isDial() ? [this.render(item)] : []));
+    await Promise.all(this.actions.toArray().flatMap((item) =>
+      item.isDial() && !transientDialFeedback.has(item.id) ? [this.render(item)] : []
+    ));
   }
 }
 
@@ -673,7 +688,9 @@ function selectedAttentionPane(): PaneSnapshot | undefined {
 }
 
 async function renderStrip(action: DialAction, region: number): Promise<void> {
+  if (transientDialFeedback.has(action.id)) return;
   const settings = await deck.get();
+  if (transientDialFeedback.has(action.id)) return;
   let view: StripView;
   if (inbox.active) {
     const queue = attentionPanes(herdr.snapshot);
@@ -746,8 +763,13 @@ async function showKeySuccess(
 }
 
 async function showDialError(action: DialAction, title: string, value: string, restore: () => Promise<void>): Promise<void> {
-  await action.setFeedback({ "full-canvas": svgImage(dialSvg(title, value, herdr.theme, "red")) });
-  await delay(700);
+  transientDialFeedback.add(action.id);
+  try {
+    await action.setFeedback({ "full-canvas": svgImage(dialSvg(title, value, herdr.theme, "red")) });
+    await delay(700);
+  } finally {
+    transientDialFeedback.delete(action.id);
+  }
   await restore();
 }
 

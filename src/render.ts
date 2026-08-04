@@ -22,7 +22,7 @@ type KeyView = {
 export type StripView =
   | { kind: "logo"; image: string }
   | { kind: "page"; name: string; position: string; summary: string }
-  | { kind: "attention"; label: string; position: string }
+  | { kind: "attention"; label: string; position: string; focused: boolean }
   | { kind: "clear" }
   | { kind: "command"; label: string }
   | { kind: "motion"; name: string; position: string };
@@ -110,7 +110,7 @@ export function stripRegionSvg(
         <text x="28" y="27" ${monoFont} font-size="19" fill="${yellow}">NEEDS YOU</text>
         <text x="28" y="70" ${monoFont} font-size="42" fill="${text}">${escapeXml(truncate(view.label, 16))}</text>
         <text x="772" y="27" ${monoFont} font-size="19" fill="${subtext}" text-anchor="end">${escapeXml(view.position)}</text>
-        <text x="772" y="70" ${monoFont} font-size="21" fill="${text}" text-anchor="end">PRESS OPEN</text>`;
+        <text x="772" y="70" ${monoFont} font-size="21" fill="${text}" text-anchor="end">${view.focused ? "QUESTION IN HERDR" : "PRESS DIAL 2"}</text>`;
       break;
     case "clear":
       content = `<text x="400" y="65" ${monoFont} font-size="42" fill="${text}" text-anchor="middle">ALL CLEAR</text>`;

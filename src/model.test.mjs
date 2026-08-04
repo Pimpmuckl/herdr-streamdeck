@@ -215,9 +215,10 @@ red = "rgb(255, 85, 85)"
   assert.match(pageStrip.join(""), /font-size="50"[^>]*>ONE<\/text>/);
   assert.match(stripRegionSvg(0, { kind: "logo", image: "logo.png" }, lowContrastTheme), /<image href="logo\.png" x="350" y="0" width="100" height="100"\/>/);
   assert.match(stripRegionSvg(0, { kind: "motion", name: "RAINBOW SWOOSH", position: "3 \/ 3" }, lowContrastTheme), />WORKING MOTION<\/text>.*>RAINBOW SWOOSH<\/text>/s);
-  const attentionStrip = stripRegionSvg(0, { kind: "attention", label: "api-rewrite", position: "1 \/ 2" }, lowContrastTheme);
+  const attentionStrip = stripRegionSvg(0, { kind: "attention", label: "api-rewrite", position: "1 \/ 2", focused: true }, lowContrastTheme);
   assert.match(attentionStrip, />NEEDS YOU<\/text>/);
-  assert.match(attentionStrip, />PRESS OPEN<\/text>/);
+  assert.match(attentionStrip, />QUESTION IN HERDR<\/text>/);
+  assert.match(stripRegionSvg(0, { kind: "attention", label: "api-rewrite", position: "1 \/ 2", focused: false }, lowContrastTheme), />PRESS DIAL 2<\/text>/);
   assert.doesNotMatch(`${pageStrip.join("")}${attentionStrip}`, /<style|class=|font:|<tspan/);
   const [, red, green, blue] = oledKey.match(/font-size="[^"]+" fill="rgb\((\d+) (\d+) (\d+)\)"/).map(Number);
   const luminance = [red, green, blue].map((channel) => {

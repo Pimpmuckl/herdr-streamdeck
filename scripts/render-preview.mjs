@@ -21,7 +21,7 @@ function devicePreview(activeTheme, mode = "dashboard") {
     { label: "research-vodint-graph", detail: "NEEDS YOU", slot: 0, status: "blocked", selected: true },
     { label: "review-suite", slot: 1, status: "working", workingFrame: 5, workingMotion: "lighten" },
     { label: "kraken-backup", slot: 2, status: "working", workingFrame: 5, workingMotion: "darken" },
-    { label: "INBOX", detail: "2", status: "blocked" },
+    { label: "INBOX", count: 2, status: "blocked" },
     { label: "", slot: 3, empty: true },
     { label: "daedalus", slot: 4, status: "idle" },
     { label: "vod-graph", slot: 5, status: "working", workingFrame: 5, workingMotion: "rainbow" },
@@ -31,13 +31,13 @@ function devicePreview(activeTheme, mode = "dashboard") {
     .map((label, slot) => ({ label, context: "COMMAND", detail: mode === "stop" && slot === 5 ? "PRESS AGAIN" : slot === 4 ? "UNASSIGNED" : "PRESS SEND", slot, danger: mode === "stop" && slot === 5 }));
   const commandKeys = [
     ...commandActions.slice(0, 3),
-    { label: "INBOX", detail: "2", status: "blocked" },
+    { label: "INBOX", count: 2, status: "blocked" },
     ...commandActions.slice(3),
     { label: "CANCEL", context: "COMMAND", detail: "review-suite" }
   ];
   const keys = (["command", "stop"].includes(mode) ? commandKeys : dashboardKeys).map((view) => keySvg(view, activeTheme));
   const strip = mode === "attention"
-    ? { kind: "attention", label: "api-rewrite", position: "1 / 2" }
+    ? { kind: "attention", label: "api-rewrite", position: "1 / 2", focused: true }
     : mode === "dashboard"
       ? { kind: "logo", image: logoImage }
       : { kind: "command", label: "review-suite" };

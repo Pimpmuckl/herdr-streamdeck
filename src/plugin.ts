@@ -660,18 +660,6 @@ class AnswerDialAction extends SingletonAction {
     strip.show("motion");
   }
 
-  override async onDialDown(event: DialDownEvent): Promise<void> {
-    if (!inbox.active) return;
-    const blocked = selectedAttentionPane() ?? attentionPanes(herdr.snapshot)[0];
-    if (!blocked) return;
-    try {
-      await herdr.focusPane(blocked.pane_id);
-    } catch (error) {
-      streamDeck.logger.error(`Answer dial failed: ${String(error)}`);
-      await showDialError(event.action, "FAILED", "HERDR OFFLINE", () => this.render(event.action));
-    }
-  }
-
   private render(action: DialAction): Promise<void> {
     return renderStrip(action, 3);
   }
@@ -697,7 +685,12 @@ async function renderStrip(action: DialAction, region: number): Promise<void> {
     const pane = selectedAttentionPane() ?? queue[0];
     const index = pane ? queue.findIndex((item) => item.pane_id === pane.pane_id) : -1;
     view = pane
-      ? { kind: "attention", label: paneIdentity(pane, herdr.snapshot, "BLOCKED").primary, position: `${index + 1} / ${queue.length}` }
+      ? {
+          kind: "attention",
+          label: paneIdentity(pane, herdr.snapshot, "BLOCKED").primary,
+          position: `${index + 1} / ${queue.length}`,
+          focused: pane.pane_id === herdr.snapshot?.focused_pane_id
+        }
       : { kind: "clear" };
   } else if (command.active) {
     view = { kind: "command", label: command.targetLabel };

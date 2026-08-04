@@ -21,8 +21,9 @@
 <svg x="568" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
     <rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="rgb(249 226 175)" stroke-width="5"/>
-    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="28.5" fill="rgb(205 214 244)" text-anchor="middle">INBOX</text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">2</text>
+    <text x="76" y="36" font-family="Consolas" font-weight="700" font-size="22" fill="rgb(205 214 244)" text-anchor="middle">INBOX</text>
+      <text x="76" y="116" font-family="Consolas" font-weight="700" font-size="72" fill="rgb(249 226 175)" text-anchor="middle">2</text>
+
   </svg>
 <svg x="88" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>

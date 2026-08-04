@@ -154,7 +154,7 @@ Keys use one rounded outline on the full black OLED field. The dial strip is rec
 ### Inbox takeover
 
 - **Entry:** tapping Inbox immediately replaces all four dial regions; no second press is required.
-- **Content:** show queue position, selected thread, needs-input state, and the available `OPEN` action.
+- **Content:** show queue position, selected thread, needs-input state, and either `PRESS DIAL 2` for a soft preview or `QUESTION IN HERDR` after focus. Never imply that dial 4 can open unsupported question content.
 - **Fallback:** when Herdr does not expose structured question content, never infer it from terminal text; identify the item and open it in Herdr.
 - **Exit:** Command returns to the dashboard. The takeover also returns to the Herdr logo after five seconds. An empty queue uses the same full-strip surface to report `ALL CLEAR`.
 

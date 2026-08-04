@@ -198,13 +198,13 @@ class InboxState {
 }
 
 class StripState {
-  takeover: "page" | "speed" | null = null;
+  takeover: "page" | null = null;
   idleFrame = 0;
   expiresAt = 0;
   private timer: ReturnType<typeof setTimeout> | undefined;
   private readonly listeners = new Map<number, () => Promise<void>>();
 
-  show(takeover: "page" | "speed"): void {
+  show(takeover: "page"): void {
     if (this.timer) clearTimeout(this.timer);
     this.takeover = takeover;
     this.expiresAt = Date.now() + LCD_PANEL_TIMEOUT_MS;
@@ -838,7 +838,7 @@ class AttentionDialAction extends SingletonAction {
 }
 
 @action({ UUID: "dev.herdr.streamdeck.thread" })
-class ThreadDialAction extends SingletonAction {
+class DisplayDialAction extends SingletonAction {
   constructor() {
     super();
     herdr.subscribe(() => void this.renderAll());
@@ -850,22 +850,6 @@ class ThreadDialAction extends SingletonAction {
 
   override onWillAppear(event: WillAppearEvent): Promise<void> | void {
     if (event.action.isDial()) return this.render(event.action);
-  }
-
-  override async onDialRotate(event: DialRotateEvent): Promise<void> {
-    if (settingsMenu.active || inbox.active || command.active) return;
-    await deck.update((settings) => {
-      settings.motionSpeed = adjustMotionSpeed(settings.motionSpeed, event.payload.ticks);
-    });
-    strip.show("speed");
-  }
-
-  override async onDialDown(): Promise<void> {
-    if (settingsMenu.active || inbox.active || command.active) return;
-    await deck.update((settings) => {
-      settings.idleLayout = idleLayouts[wrappedIndex(idleLayouts.indexOf(settings.idleLayout), 1, idleLayouts.length)];
-    });
-    strip.showIdle();
   }
 
   private render(action: DialAction): Promise<void> {
@@ -998,8 +982,6 @@ async function renderStrip(action: DialAction, region: number): Promise<void> {
       position: `${settings.pageIndex + 1} / ${visiblePageCount(settings)}`,
       ...baseline
     };
-  } else if (strip.takeover === "speed") {
-    view = { kind: "speed", value: `${(settings.motionSpeed / MOTION_BASE_SPEED).toFixed(1)}×` };
   } else {
     const focused = currentPane(snapshot?.panes ?? [], snapshot?.focused_pane_id);
     const page = settings.pages[settings.pageIndex];
@@ -1156,7 +1138,7 @@ streamDeck.actions.registerAction(new AttentionAction());
 streamDeck.actions.registerAction(new CommandAction());
 streamDeck.actions.registerAction(new PagesDialAction());
 streamDeck.actions.registerAction(new AttentionDialAction());
-streamDeck.actions.registerAction(new ThreadDialAction());
+streamDeck.actions.registerAction(new DisplayDialAction());
 streamDeck.actions.registerAction(new AnswerDialAction());
 streamDeck.connect();
 herdr.start();

@@ -27,10 +27,12 @@ Herdr owns the information colors while every unused OLED pixel remains deep bla
 
 The memorable moment is one-shot Command Mode: tap Command, the six thread keys become a compact action bank around a visibly frozen target, then one successful action acknowledges and returns to the dashboard. Stop becomes destructive only after its first press arms a red `STOP AGAIN` state.
 
+Dial 3 is input-inert. Its passive encoder action remains bound only so the third LCD region stays part of the continuous status strip; all motion and idle-layout controls live in Dial 4 Settings.
+
 ## Constraints
 
 No tinted backgrounds, independent Stream Deck themes, hand-maintained information colors, long dashboard text, decorative chrome, hover-only meaning, or destructive single presses. A generated compatibility copy of Herdr's 17 RGB built-in palettes is allowed only until a resolved-theme API exists; the host-derived `terminal` palette uses monochrome. Color always has a label, symbol, or position cue.
 
 ## Unresolved
 
-Structured Question Mode, dial-three scrolling, client activation, exact command copy, live automatic appearance switching, and physical-device timing calibration await the corresponding Herdr APIs or further hardware validation.
+Structured Question Mode, client activation, exact command copy, live automatic appearance switching, and physical-device timing calibration await the corresponding Herdr APIs or further hardware validation.

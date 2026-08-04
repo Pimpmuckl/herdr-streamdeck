@@ -69,12 +69,11 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Passive arrivals update status but never steal operating-system focus or replace the dashboard.
 - Dial 1 cycles attention items while Inbox is open. Dial 2 owns navigation and action within the selected question.
 
-### Working motion tuning
+### Working motion settings
 
-- In the dashboard, each dial 3 detent adjusts the working-border lap speed by `0.1×` from `0.2×` through `2.0×` without changing render FPS. The calibrated default is `1.0×`.
-- Turning dial 3 replaces the full strip for five seconds with `WORKING SPEED` and the exact persisted multiplier.
-- The Herdr logo stays flush-right. Pressing dial 3 cycles the persisted Triage, Focus, and Ambient Herd idle layouts, then reveals the selected layout immediately.
-- The working border defaults to the dark swoosh. Dial 4 continues to compare darkening, lightening, and rainbow treatments at the selected speed.
+- Dial 4 Settings owns idle layout, working speed, motion treatment, width, and intensity.
+- Dial 3 has no turn or press behavior. A passive encoder action remains in the bundled profile only to preserve its quarter of the continuous touch strip.
+- The working border defaults to the dark swoosh; lightening and rainbow remain available in Settings.
 
 ### Structured Question Mode and dial 2
 

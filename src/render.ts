@@ -39,7 +39,6 @@ export type StripView = (
   | { kind: "attention"; label: string; position: string; focused: boolean }
   | { kind: "clear" }
   | { kind: "command"; label: string }
-  | { kind: "speed"; value: string }
   | { kind: "settings"; editing: boolean; name: string; value: string; position: string }
 ) & { timeout?: number };
 
@@ -144,11 +143,6 @@ export function stripRegionSvg(
       content = `<rect width="6" height="100" fill="${accent}"/>
         <text x="28" y="27" ${monoFont} font-size="19" fill="${accent}">ACTIONS FOR</text>
         <text x="28" y="70" ${monoFont} font-size="42" fill="${text}">${escapeXml(truncate(view.label, 22))}</text>`;
-      break;
-    case "speed":
-      content = `<rect width="6" height="100" fill="${palette ? oledColor(palette.blue, 3) : "#ffffff"}"/>
-        <text x="400" y="27" ${monoFont} font-size="19" fill="${subtext}" text-anchor="middle">WORKING SPEED</text>
-        <text x="400" y="82" ${monoFont} font-size="56" fill="${text}" text-anchor="middle">${escapeXml(view.value)}</text>`;
       break;
     case "settings": {
       const control = view.editing

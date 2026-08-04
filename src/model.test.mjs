@@ -299,7 +299,6 @@ red = "rgb(255, 85, 85)"
     kind: "settings", editing: true, name: "FOCUS FEEDBACK", value: "ON", position: "4/4"
   }, lowContrastTheme);
   assert.match(settingsEdit, /viewBox="600 0 200 100".*>EDITING · 4\/4<\/text>.*>DIAL TURN<\/text><text[^>]*>CHANGE<\/text>.*>DIAL PRESS<\/text><text[^>]*>DONE<\/text>.*>DIAL HOLD<\/text><text[^>]*>EXIT<\/text>/s);
-  assert.match(stripRegionSvg(0, { kind: "speed", value: "0.7×" }, lowContrastTheme), /font-size="56"[^>]*>0\.7×<\/text>/);
   assert.match(stripRegionSvg(0, { kind: "command", label: "review-suite" }, lowContrastTheme), />ACTIONS FOR<\/text>.*>review-suite<\/text>/s);
   const attentionStrip = stripRegionSvg(0, { kind: "attention", label: "api-rewrite", position: "1 \/ 2", focused: true }, lowContrastTheme);
   assert.match(attentionStrip, />NEEDS YOU<\/text>/);

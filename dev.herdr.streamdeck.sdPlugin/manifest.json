@@ -79,13 +79,12 @@
       "States": [{ "Image": "imgs/key" }]
     },
     {
-      "Name": "Working Speed",
+      "Name": "Display Only",
       "UUID": "dev.herdr.streamdeck.thread",
       "Icon": "imgs/herdr",
       "Controllers": ["Encoder"],
       "Encoder": {
-        "layout": "$A0",
-        "TriggerDescription": { "Rotate": "Adjust working speed", "Push": "Switch idle display" }
+        "layout": "$A0"
       },
       "States": [{ "Image": "imgs/key" }]
     },

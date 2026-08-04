@@ -33,8 +33,9 @@ export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): str
   const text = palette && view.danger ? oledColor(palette.red) : oledForeground(theme, "text");
   const subtext = oledForeground(theme, "subtext");
   const statusVisual = statusAppearance(view.status, theme);
-  const lines = splitLabel(view.label, 8);
-  const labelSize = Math.max(24, 36 - Math.max(...lines.map(displayWidth)) * 1.5);
+  const labelColumns = displayWidth(view.label.trim() || "EMPTY") > 24 ? 12 : 8;
+  const lines = splitLabel(view.label, labelColumns);
+  const labelSize = Math.max(18, 36 - Math.max(...lines.map(displayWidth)) * 1.5);
   const outlineColor = view.danger
     ? palette ? oledColor(palette.red) : "#ffffff"
     : statusVisual?.color;
@@ -211,15 +212,19 @@ function relativeLuminance(rgb: { r: number; g: number; b: number }): number {
 function splitLabel(value: string, width: number): string[] {
   const clean = value.trim() || "EMPTY";
   if (displayWidth(clean) <= width) return [clean];
-  const [first, rest] = splitLabelLine(clean, width);
-  if (!rest) return [first];
-  if (displayWidth(rest) <= width) return [first, rest];
-  let [second, tail] = splitLabelLine(rest, width);
-  if (displayWidth(tail) > width && displayWidth(rest) <= width * 2) {
-    [second, tail] = splitAtWidth(rest, width);
-    tail = tail.replace(/^[-_\s]+/u, "").trim();
+  const lines: string[] = [];
+  let rest = clean;
+  for (let remainingLines = 3; remainingLines > 1 && displayWidth(rest) > width; remainingLines--) {
+    let [line, tail] = splitLabelLine(rest, width);
+    if (displayWidth(tail) > width * (remainingLines - 1)) {
+      [line, tail] = splitAtWidth(rest, width);
+      tail = tail.replace(/^[-_\s]+/u, "").trim();
+    }
+    lines.push(line);
+    rest = tail;
   }
-  return tail ? [first, second, truncate(tail, width)] : [first, second];
+  if (rest) lines.push(truncate(rest, width));
+  return lines;
 }
 
 function splitLabelLine(value: string, width: number): [string, string] {

@@ -95,7 +95,7 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 
 ### Hierarchy
 
-- **Primary label** (700, 24px minimum, 29px line step): key names use at most three centered lines.
+- **Primary label** (700, 24px default, 18px floor, 29px line step): key names use at most three centered lines and shrink only when the default 24-column capacity overflows.
 - **Attention count** (700, 72px): the dominant datum on the active Inbox key.
 - **Dial value** (700, 28px): the current page, thread, or question state.
 - **Status mark** (700, 22px): the compact upper-right state marker on a key.
@@ -139,7 +139,8 @@ Keys use one rounded outline on the OLED field. The dial strip is rectangular an
 
 - **Canvas:** full 144 by 144 pixels with a 3-pixel inset outline; only the selected thread changes from black to the fixed near-black field.
 - **Content:** the deepest useful pane identity, a border-carried state cue, and an optional short actionable footer. Slot numbers appear only when empty. Page and queue context use temporary full-strip takeovers; the idle strip remains the Herdr logo.
-- **Label behavior:** split labels at word separators when possible, use no more than three lines of 8 monospaced columns, and truncate only the third line with an ellipsis. Never squeeze the font below the physical type floor. The deepest useful identity gets the largest type.
+- **Label behavior:** split labels at word separators when possible and use no more than three centered lines. Keep the default 8-column measure at 24px or larger; names beyond its 24-column capacity may expand to 12 columns and shrink as far as the 18px physical type floor. Truncate only after that wider measure is exhausted. The deepest useful identity gets the largest type.
+- **Hold feedback:** crossing the 650ms pin threshold commits the change immediately. Keep `RELEASED · LET GO` visible after an unpin until the physical key is released, then restore the empty slot.
 - **State:** lifecycle color is repeated through border weight, border pattern, working motion, or a literal footer. Selection uses the near-black field plus the upper-right focus dot. Do not restore interior status glyphs or the removed bottom rail.
 - **Inbox exception:** when attention exists, place `INBOX` at the top and render the queue count as the dominant 72-pixel number. Do not add a footer or icon.
 - **Empty slot:** show only its slot number and a quiet plus mark.

@@ -206,7 +206,9 @@ herdr.subscribePinRequests((pane) => {
 
 @action({ UUID: "dev.herdr.streamdeck.pin" })
 class PinnedThreadAction extends SingletonAction {
-  private readonly downAt = new Map<string, number>();
+  private readonly downKeys = new Set<string>();
+  private readonly holdTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly holdTasks = new Map<string, Promise<void>>();
   private animationFrame = 0;
   private animationBusy = false;
 
@@ -224,12 +226,32 @@ class PinnedThreadAction extends SingletonAction {
   }
 
   override onKeyDown(event: KeyDownEvent): void {
-    this.downAt.set(event.action.id, Date.now());
+    this.downKeys.add(event.action.id);
+    if (pinChooser.pane || command.active) return;
+    const slot = keySlot(event.action);
+    if (slot === null) return;
+    this.holdTimers.set(event.action.id, setTimeout(() => {
+      this.holdTimers.delete(event.action.id);
+      this.holdTasks.set(event.action.id, this.commitHold(slot, event.action));
+    }, HOLD_MS));
   }
 
   override async onKeyUp(event: KeyUpEvent): Promise<void> {
-    const started = this.downAt.get(event.action.id) ?? Date.now();
-    this.downAt.delete(event.action.id);
+    const holdTimer = this.holdTimers.get(event.action.id);
+    if (holdTimer) clearTimeout(holdTimer);
+    this.holdTimers.delete(event.action.id);
+    this.downKeys.delete(event.action.id);
+    const holdTask = this.holdTasks.get(event.action.id);
+    if (holdTask) {
+      try {
+        await holdTask;
+      } finally {
+        this.holdTasks.delete(event.action.id);
+        transientKeyFeedback.delete(event.action.id);
+        await this.render(event.action);
+      }
+      return;
+    }
     const slot = keySlot(event.action);
     if (slot === null) return;
 
@@ -244,10 +266,6 @@ class PinnedThreadAction extends SingletonAction {
             await this.render(event.action);
           });
         }
-      } else if (Date.now() - started >= HOLD_MS) {
-        const change = await this.togglePin(slot);
-        if (change) await showKeySuccess(event.action, change === "pinned" ? "PINNED" : "UNPINNED", () => this.render(event.action));
-        else await showKeyError(event.action, "NO THREAD", "FOCUS HERDR", slot, () => this.render(event.action));
       } else {
         const settings = await deck.get();
         const pin = settings.pages[settings.pageIndex].pins[slot];
@@ -307,6 +325,25 @@ class PinnedThreadAction extends SingletonAction {
       }
     });
     return change;
+  }
+
+  private async commitHold(slot: number, action: KeyAction): Promise<void> {
+    transientKeyFeedback.add(action.id);
+    try {
+      const change = await this.togglePin(slot);
+      if (change) {
+        await renderKey(action, keySvg({
+          label: change === "unpinned" ? "RELEASED" : "PINNED",
+          detail: "LET GO",
+          status: "done"
+        }, herdr.theme));
+      } else {
+        await renderKey(action, keySvg({ label: "NO THREAD", detail: "FOCUS HERDR", slot, danger: true }, herdr.theme));
+      }
+    } catch (error) {
+      streamDeck.logger.error(`Pinned thread hold failed: ${String(error)}`);
+      await renderKey(action, keySvg({ label: "FAILED", detail: "LET GO", slot, danger: true }, herdr.theme));
+    }
   }
 
   private async runCommand(slot: number, action: KeyAction): Promise<boolean> {
@@ -392,7 +429,7 @@ class PinnedThreadAction extends SingletonAction {
       const settings = await deck.get();
       const page = settings.pages[settings.pageIndex];
       await Promise.all(this.actions.toArray().flatMap((item) => {
-        if (!item.isKey() || transientKeyFeedback.has(item.id) || this.downAt.has(item.id)) return [];
+        if (!item.isKey() || transientKeyFeedback.has(item.id) || this.downKeys.has(item.id)) return [];
         const slot = keySlot(item);
         const pin = slot === null ? null : page.pins[slot];
         const pane = resolvePin(pin, herdr.snapshot);

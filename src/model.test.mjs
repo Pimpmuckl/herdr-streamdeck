@@ -164,7 +164,8 @@ red = "rgb(255, 85, 85)"
   assert.match(mixedKey, />ABCDEFGH<\/text>/);
   assert.match(mixedKey, />IJ-K<\/text>/);
   assert.match(keySvg({ label: "nextide-saas-vod-kraken" }), />nextide-<\/text>.*>saas-vod<\/text>.*>kraken<\/text>/su);
-  assert.match(keySvg({ label: "ABCDEFGHIJKLMNOPQRSTUVWXY" }), />ABCDEFGH<\/text>.*>IJKLMNOP<\/text>.*>QRSTUVW…<\/text>/su);
+  assert.match(keySvg({ label: "ABCDEFGHIJKLMNOPQRSTUVWXY" }), /font-size="18"[^>]*>ABCDEFGHIJKL<\/text>.*>MNOPQRSTUVWX<\/text>.*>Y<\/text>/su);
+  assert.match(keySvg({ label: "nextide-saas-vod-intelligence" }), /font-size="18"[^>]*>nextide-<\/text>.*>saas-vod-<\/text>.*>intelligence<\/text>/su);
   assert.match(keySvg({ label: "1234567😀" }), />1234567<\/text>.*>😀<\/text>/su);
   assert.match(keySvg({ label: "1234567e\u0301" }), />1234567é<\/text>/u);
   assert.match(keySvg({ label: "😀😀😀😀😀😀😀😀" }), />😀😀😀😀<\/text>.*>😀😀😀😀<\/text>/su);
@@ -187,6 +188,7 @@ red = "rgb(255, 85, 85)"
   assert.match(keySvg({ label: "idle", status: "idle" }), /stroke-width="3"/);
   assert.match(keySvg({ label: "unknown", status: "unknown" }), /stroke-width="3" stroke-dasharray="10 8"/);
   assert.match(keySvg({ label: "done", status: "done" }), /stroke-width="7"/);
+  assert.match(keySvg({ label: "RELEASED", detail: "LET GO", status: "done" }), />RELEASED<\/text>.*>LET GO<\/text>/s);
   assert.match(keySvg({ label: "STOP", danger: true }), /stroke-width="7"/);
   assert.match(keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "darken" }), /stroke="#000000" stroke-opacity="\.72"[^>]*stroke-dashoffset="-25\.0"/);
   assert.match(keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "lighten" }), /pathLength="100"[^>]*stroke="#[a-f0-9]+"[^>]*stroke-dashoffset="-25\.0"/i);

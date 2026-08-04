@@ -234,7 +234,7 @@ function threadStatusIndicator(
   const color = statusAppearance(status, theme)?.color ?? oledForeground(theme, "subtext");
   if (status === "working") {
     const positions = [[30, 49], [43, 49], [43, 62], [43, 75], [30, 75], [30, 62]];
-    const head = Math.round(frame * 2) % positions.length;
+    const head = Math.floor(frame) % positions.length;
     return positions.map(([x, y], index) => {
       const distance = (head - index + positions.length) % positions.length;
       return `<circle cx="${x}" cy="${y}" r="4" fill="${color}" fill-opacity="${[1, 0.55, 0.25][distance] ?? 0.08}"/>`;

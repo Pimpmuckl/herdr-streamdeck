@@ -274,8 +274,10 @@ red = "rgb(255, 85, 85)"
   assert.match(triageStrip, />Page 1 · 1\/3<\/text>.*>herdr-streamdeck<\/text>.*>3 RUNNING<\/text>.*>2 NEED YOU<\/text>/s);
   assert.equal(triageStrip.match(/r="4"/g)?.length, 6);
   assert.doesNotMatch(triageStrip, />WORKING<\/text>/);
-  assert.match(triageStrip, /cx="30" cy="75" r="4"[^>]*fill-opacity="1"/);
-  assert.match(stripRegionSvg(0, { ...idleBase, mode: "triage", frame: 5.5 }, lowContrastTheme), /cx="30" cy="62" r="4"[^>]*fill-opacity="1"/);
+  assert.match(triageStrip, /cx="30" cy="62" r="4"[^>]*fill-opacity="1"/);
+  const indicatorFrames = Array.from({ length: 7 }, (_, frame) => stripRegionSvg(0, { ...idleBase, mode: "triage", frame }, lowContrastTheme));
+  assert.equal(new Set(indicatorFrames.slice(0, 6)).size, 6);
+  assert.equal(indicatorFrames[6], indicatorFrames[0]);
   const idleStrip = stripRegionSvg(0, { ...idleBase, mode: "triage", status: "idle" }, lowContrastTheme);
   assert.match(idleStrip, /d="M27\.5 62L34 68\.5L46 54\.5"/);
   assert.match(idleStrip, /<text x="60" y="75"[^>]*>herdr-streamdeck<\/text>/);

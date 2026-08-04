@@ -224,9 +224,9 @@ class StripState {
     void this.emit();
   }
 
-  tickIdle(regions: readonly number[]): Promise<void> {
-    this.idleFrame = (this.idleFrame + MOTION_BASE_SPEED) % 10000;
-    return this.emit(regions);
+  async tickIdle(regions: readonly number[]): Promise<void> {
+    await this.emit(regions);
+    this.idleFrame = (this.idleFrame + 1) % 660; // LCM of the 6-state indicator and 220-step ambient trail.
   }
 
   refresh(regions: readonly number[]): Promise<void> {

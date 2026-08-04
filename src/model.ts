@@ -82,22 +82,32 @@ export type Pin = {
   agentSession?: AgentSessionRef;
 };
 export type PinPage = { name: string; pins: Array<Pin | null> };
-export type LogoAlignment = "center" | "right";
-export const MOTION_BASE_SPEED = 0.5;
+export type IdleLayout = "triage" | "focus" | "ambient";
+export type WorkingMotion = "darken" | "lighten" | "rainbow";
+export const MOTION_BASE_SPEED = 0.35;
+export const MOTION_BASE_WIDTH = 1.4;
 export type DeckSettings = {
   pageIndex: number;
   pages: PinPage[];
   focusFeedback: boolean;
   motionSpeed: number;
-  logoAlignment: LogoAlignment;
+  workingMotion: WorkingMotion;
+  motionWidth: number;
+  motionIntensity: number;
+  motionTuningVersion: 1;
+  idleLayout: IdleLayout;
 };
 
 export const DEFAULT_SETTINGS: DeckSettings = {
   pageIndex: 0,
-  pages: ["ONE", "TWO", "THREE"].map((name) => ({ name, pins: Array(6).fill(null) })),
+  pages: [1, 2, 3].map((page) => ({ name: `Page ${page}`, pins: Array(6).fill(null) })),
   focusFeedback: false,
   motionSpeed: MOTION_BASE_SPEED,
-  logoAlignment: "right"
+  workingMotion: "darken",
+  motionWidth: 1,
+  motionIntensity: 1,
+  motionTuningVersion: 1,
+  idleLayout: "triage"
 };
 
 export function normalizeSettings(value: unknown): DeckSettings {
@@ -107,7 +117,7 @@ export function normalizeSettings(value: unknown): DeckSettings {
     ? input.pages.flatMap((page, index) => {
         if (!page || typeof page !== "object") return [];
         const raw = page as Partial<PinPage>;
-        const name = typeof raw.name === "string" && raw.name.trim() ? raw.name.trim() : `PAGE ${index + 1}`;
+        const name = normalizePageName(raw.name, index);
         const source = Array.isArray(raw.pins) ? raw.pins : [];
         const pins = Array.from({ length: 6 }, (_, slot) => normalizePin(source[slot]));
         return [{ name, pins }];
@@ -115,19 +125,34 @@ export function normalizeSettings(value: unknown): DeckSettings {
     : [];
   const safePages = pages.length ? pages : structuredClone(DEFAULT_SETTINGS.pages);
   const requested = Number.isInteger(input.pageIndex) ? Number(input.pageIndex) : 0;
+  const calibrated = input.motionTuningVersion === 1;
   return {
     pageIndex: Math.max(0, Math.min(requested, safePages.length - 1)),
     pages: safePages,
     focusFeedback: input.focusFeedback === true,
-    motionSpeed: typeof input.motionSpeed === "number" && Number.isFinite(input.motionSpeed)
+    motionSpeed: calibrated && typeof input.motionSpeed === "number" && Number.isFinite(input.motionSpeed)
       ? adjustMotionSpeed(input.motionSpeed, 0)
       : MOTION_BASE_SPEED,
-    logoAlignment: input.logoAlignment === "center" ? "center" : "right"
+    workingMotion: input.workingMotion === "lighten" || input.workingMotion === "rainbow" ? input.workingMotion : "darken",
+    motionWidth: calibrated && typeof input.motionWidth === "number" && Number.isFinite(input.motionWidth)
+      ? adjustMotionScale(input.motionWidth, 0)
+      : 1,
+    motionIntensity: calibrated && typeof input.motionIntensity === "number" && Number.isFinite(input.motionIntensity)
+      ? adjustMotionScale(input.motionIntensity, 0)
+      : 1,
+    motionTuningVersion: 1,
+    idleLayout: input.idleLayout === "focus" || input.idleLayout === "ambient" ? input.idleLayout : "triage"
   };
 }
 
 export function adjustMotionSpeed(speed: number, ticks: number): number {
-  return Math.max(0.1, Math.min(1, Math.round((speed + ticks * 0.05) * 20) / 20));
+  const step = MOTION_BASE_SPEED * 0.1;
+  const units = Math.max(2, Math.min(20, Math.round(speed / step) + ticks));
+  return Math.round(units * step * 1000) / 1000;
+}
+
+export function adjustMotionScale(value: number, ticks: number): number {
+  return Math.max(0.5, Math.min(2, Math.round((value + ticks * 0.1) * 10) / 10));
 }
 
 function normalizePin(value: unknown): Pin | null {
@@ -169,10 +194,16 @@ export function navigatePages(settings: DeckSettings, ticks: number): void {
     }
     if (settings.pageIndex >= lastUsedPageIndex(settings) + 1) return;
     if (settings.pageIndex === settings.pages.length - 1) {
-      settings.pages.push({ name: `PAGE ${settings.pages.length + 1}`, pins: Array(6).fill(null) });
+      settings.pages.push({ name: `Page ${settings.pages.length + 1}`, pins: Array(6).fill(null) });
     }
     settings.pageIndex++;
   }
+}
+
+function normalizePageName(value: unknown, index: number): string {
+  const name = typeof value === "string" && value.trim() ? value.trim() : `Page ${index + 1}`;
+  const legacy = ["ONE", "TWO", "THREE"][index];
+  return name === legacy || name.toUpperCase() === `PAGE ${index + 1}` ? `Page ${index + 1}` : name;
 }
 
 export function visiblePageCount(settings: DeckSettings): number {

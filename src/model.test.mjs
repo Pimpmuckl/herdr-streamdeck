@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  adjustMotionScale,
   adjustMotionSpeed,
   attentionPanes,
   commandIntent,
@@ -26,17 +27,27 @@ test("device state, pin identity, and device rendering stay coherent", () => {
   });
   assert.equal(settings.pageIndex, 0);
   assert.equal(settings.focusFeedback, false);
-  assert.equal(settings.motionSpeed, 0.5);
-  assert.equal(settings.logoAlignment, "right");
+  assert.equal(settings.motionSpeed, 0.35);
+  assert.equal(settings.workingMotion, "darken");
+  assert.equal(settings.motionWidth, 1);
+  assert.equal(settings.motionIntensity, 1);
+  assert.equal(settings.idleLayout, "triage");
+  assert.equal(normalizeSettings({}).pages[0].name, "Page 1");
   assert.equal(settings.pages[0].pins.length, 6);
   assert.deepEqual(settings.pages[0].pins[0], { paneId: "w1:p1", label: "api" });
   assert.equal(normalizeSettings({ focusFeedback: true }).focusFeedback, true);
-  assert.equal(normalizeSettings({ motionSpeed: 0.73 }).motionSpeed, 0.75);
-  assert.equal(normalizeSettings({ logoAlignment: "center" }).logoAlignment, "center");
-  assert.equal(normalizeSettings({ logoAlignment: "right" }).logoAlignment, "right");
-  assert.equal(adjustMotionSpeed(0.5, 2), 0.6);
-  assert.equal(adjustMotionSpeed(0.1, -1), 0.1);
-  assert.equal(adjustMotionSpeed(1, 1), 1);
+  assert.equal(normalizeSettings({ motionSpeed: 0.7 }).motionSpeed, 0.35);
+  assert.equal(normalizeSettings({ motionSpeed: 0.5, motionTuningVersion: 1 }).motionSpeed, 0.49);
+  assert.equal(normalizeSettings({ workingMotion: "rainbow" }).workingMotion, "rainbow");
+  assert.equal(normalizeSettings({ workingMotion: "nope" }).workingMotion, "darken");
+  assert.equal(normalizeSettings({ idleLayout: "focus" }).idleLayout, "focus");
+  assert.equal(normalizeSettings({ idleLayout: "ambient" }).idleLayout, "ambient");
+  assert.equal(adjustMotionSpeed(0.35, 2), 0.42);
+  assert.equal(adjustMotionSpeed(0.07, -1), 0.07);
+  assert.equal(adjustMotionSpeed(0.7, 1), 0.7);
+  assert.equal(adjustMotionScale(1, 3), 1.3);
+  assert.equal(adjustMotionScale(0.5, -1), 0.5);
+  assert.equal(adjustMotionScale(2, 1), 2);
   assert.equal(slotForCoordinates(2, 0), 2);
   assert.equal(slotForCoordinates(0, 1), 3);
   assert.equal(slotForCoordinates(2, 1), 5);
@@ -46,6 +57,7 @@ test("device state, pin identity, and device rendering stay coherent", () => {
   const paged = normalizeSettings({
     pages: [{ name: "ONE", pins: [{ paneId: "p1", label: "one" }] }]
   });
+  assert.equal(paged.pages[0].name, "Page 1");
   navigatePages(paged, 2);
   assert.equal(paged.pageIndex, 1);
   assert.equal(paged.pages.length, 2);
@@ -214,14 +226,22 @@ red = "rgb(255, 85, 85)"
   assert.match(keySvg({ label: "STOP", danger: true }), /stroke-width="7"/);
   const darkSwoosh = keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "darken" });
   const lightSwoosh = keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "lighten" });
-  assert.equal(darkSwoosh.match(/stroke="#000000" stroke-opacity=/g)?.length, 19);
-  assert.equal(lightSwoosh.match(/stroke-dasharray="4\.62 1021\.58"/g)?.length, 19);
-  assert.match(lightSwoosh, /stroke-opacity="0\.02"/);
-  assert.match(lightSwoosh, /stroke-opacity="0\.45"[^>]*stroke-dashoffset="-95\.4"/);
+  assert.equal(darkSwoosh.match(/stroke="#000000" stroke-opacity=/g)?.length, 27);
+  assert.equal(lightSwoosh.match(/stroke-dasharray="4\.62 1021\.58"/g)?.length, 27);
+  assert.match(darkSwoosh, /stroke-opacity="0\.59"/);
+  assert.match(lightSwoosh, /stroke-opacity="0\.90"/);
   assert.doesNotMatch(lightSwoosh, /pathLength=/);
   const rainbowKey = keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "rainbow" });
-  assert.equal(rainbowKey.match(/stroke-dasharray="4\.62 1021\.58"/g)?.length, 19);
-  for (const color of ["rgb(175 46 255)", "rgb(255 51 85)", "rgb(255 218 83)", "rgb(30 228 188)"]) assert.match(rainbowKey, new RegExp(`stroke="${color.replace(/[()]/g, "\\$&")}"`));
+  assert.equal(rainbowKey.match(/stroke-dasharray="4\.62 1021\.58"/g)?.length, 27);
+  assert.match(rainbowKey, /stroke-opacity="0\.72"/);
+  for (const color of ["rgb(175 46 255)", "rgb(30 228 188)"]) assert.match(rainbowKey, new RegExp(`stroke="${color.replace(/[()]/g, "\\$&")}"`));
+  assert.match(rainbowKey, /stroke="rgb\(255 \d+ 8[3-5]\)"/);
+  const narrowSwoosh = keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "rainbow", workingWidth: 0.5 });
+  const wideSwoosh = keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "rainbow", workingWidth: 2 });
+  const strongSwoosh = keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "rainbow", workingIntensity: 2 });
+  assert.equal(narrowSwoosh.match(/stroke-dasharray=/g)?.length, 13);
+  assert.equal(wideSwoosh.match(/stroke-dasharray=/g)?.length, 53);
+  assert.match(strongSwoosh, /stroke-opacity="1\.00"/);
   assert.match(keySvg({ label: "", slot: 0, empty: true }), />1<\/text>/);
 
   const lowContrastTheme = {
@@ -240,22 +260,50 @@ red = "rgb(255, 85, 85)"
   assert.doesNotMatch(oledKey, /rgb\((?:10 10 10|20 20 20|157 0 6)\)/);
   assert.doesNotMatch(customKey, /rgb\((?:10 10 10|20 20 20)\)/);
   const pageStrip = [0, 1, 2, 3].map((region) => stripRegionSvg(region, {
-    kind: "page", name: "ONE", position: "1 / 3", summary: "2 WORKING · 1 NEEDS YOU"
+    kind: "page", name: "Page 1", position: "1 / 3", image: "logo.png", blocked: 2, working: 3
   }, lowContrastTheme));
   assert.match(pageStrip[0], /viewBox="0 0 200 100"/);
   assert.match(pageStrip[1], /viewBox="200 0 200 100"/);
   assert.match(pageStrip[3], /viewBox="600 0 200 100"/);
-  assert.match(pageStrip.join(""), /font-size="50"[^>]*>ONE<\/text>/);
-  assert.match(stripRegionSvg(0, { kind: "logo", image: "logo.png", alignment: "center" }, lowContrastTheme), /<image href="logo\.png" x="350" y="0" width="100" height="100"\/>/);
-  assert.match(stripRegionSvg(0, { kind: "logo", image: "logo.png", alignment: "right" }, lowContrastTheme), /<image href="logo\.png" x="700" y="0" width="100" height="100"\/>/);
-  assert.match(stripRegionSvg(0, { kind: "motion", name: "RAINBOW SWOOSH", position: "3 \/ 3" }, lowContrastTheme), />WORKING MOTION<\/text>.*>RAINBOW SWOOSH<\/text>/s);
+  assert.match(pageStrip.join(""), />PINNED · 1 \/ 3<\/text>.*font-size="44"[^>]*>Page 1<\/text>.*>3 RUNNING<\/text>.*>2 NEED YOU<\/text>/s);
+  const idleBase = {
+    kind: "idle", image: "logo.png", page: "Page 1", position: "1/3", label: "herdr-streamdeck",
+    status: "working", blocked: 2, working: 3, frame: 5
+  };
+  const triageStrip = stripRegionSvg(0, { ...idleBase, mode: "triage" }, lowContrastTheme);
+  assert.match(triageStrip, />Page 1 · 1\/3<\/text>.*>herdr-streamdeck<\/text>.*>3 RUNNING<\/text>.*>2 NEED YOU<\/text>/s);
+  assert.equal(triageStrip.match(/r="4"/g)?.length, 6);
+  assert.doesNotMatch(triageStrip, />WORKING<\/text>/);
+  assert.match(triageStrip, /cx="30" cy="75" r="4"[^>]*fill-opacity="1"/);
+  assert.match(stripRegionSvg(0, { ...idleBase, mode: "triage", frame: 5.5 }, lowContrastTheme), /cx="30" cy="62" r="4"[^>]*fill-opacity="1"/);
+  const idleStrip = stripRegionSvg(0, { ...idleBase, mode: "triage", status: "idle" }, lowContrastTheme);
+  assert.match(idleStrip, /d="M27\.5 62L34 68\.5L46 54\.5"/);
+  assert.match(idleStrip, /<text x="60" y="75"[^>]*>herdr-streamdeck<\/text>/);
+  assert.match(stripRegionSvg(0, { ...idleBase, mode: "triage", status: "blocked" }, lowContrastTheme), /r="9"[^>]*fill="none".*r="3\.5"/s);
+  assert.match(stripRegionSvg(0, { ...idleBase, mode: "triage", status: "done" }, lowContrastTheme), /r="8"[^>]*fill="rgb/);
+  assert.match(stripRegionSvg(0, { ...idleBase, mode: "triage", status: "unknown" }, lowContrastTheme), /r="8"[^>]*fill="none"/);
+  assert.match(triageStrip, /<image href="logo\.png" x="700" y="0" width="100" height="100"\/>/);
+  assert.match(stripRegionSvg(0, { ...idleBase, mode: "focus" }, lowContrastTheme), />CURRENT<\/text>.*>herdr-streamdeck<\/text>.*>3 RUNNING<\/text>.*>2 NEED YOU<\/text>/s);
+  const ambientStrip = stripRegionSvg(0, { ...idleBase, mode: "ambient" }, lowContrastTheme);
+  assert.equal(ambientStrip.match(/r="4"/g)?.length, 3);
+  assert.equal(ambientStrip.match(/r="5"/g)?.length, 2);
+  assert.match(ambientStrip, />3 RUNNING<\/text>.*>2 NEED YOU<\/text>/s);
+  const settingsBrowse = stripRegionSvg(0, {
+    kind: "settings", editing: false, name: "WORKING MOTION", value: "RAINBOW", position: "3/4", timeout: 0.5
+  }, lowContrastTheme);
+  assert.match(settingsBrowse, />SETTINGS · 3\/4<\/text>.*>WORKING MOTION<\/text>.*>RAINBOW<\/text>.*>CONTROLS<\/text>.*>DIAL TURN<\/text><text[^>]*>BROWSE<\/text>.*>DIAL PRESS<\/text><text[^>]*>EDIT<\/text>.*>DIAL HOLD<\/text><text[^>]*>EXIT<\/text>/s);
+  assert.match(settingsBrowse, /<rect x="0" y="96" width="400\.0" height="4"/);
+  const settingsEdit = stripRegionSvg(3, {
+    kind: "settings", editing: true, name: "FOCUS FEEDBACK", value: "ON", position: "4/4"
+  }, lowContrastTheme);
+  assert.match(settingsEdit, /viewBox="600 0 200 100".*>EDITING · 4\/4<\/text>.*>DIAL TURN<\/text><text[^>]*>CHANGE<\/text>.*>DIAL PRESS<\/text><text[^>]*>DONE<\/text>.*>DIAL HOLD<\/text><text[^>]*>EXIT<\/text>/s);
   assert.match(stripRegionSvg(0, { kind: "speed", value: "0.7×" }, lowContrastTheme), /font-size="56"[^>]*>0\.7×<\/text>/);
   assert.match(stripRegionSvg(0, { kind: "command", label: "review-suite" }, lowContrastTheme), />ACTIONS FOR<\/text>.*>review-suite<\/text>/s);
   const attentionStrip = stripRegionSvg(0, { kind: "attention", label: "api-rewrite", position: "1 \/ 2", focused: true }, lowContrastTheme);
   assert.match(attentionStrip, />NEEDS YOU<\/text>/);
   assert.match(attentionStrip, />QUESTION IN HERDR<\/text>/);
   assert.match(stripRegionSvg(0, { kind: "attention", label: "api-rewrite", position: "1 \/ 2", focused: false }, lowContrastTheme), />PRESS DIAL 2<\/text>/);
-  assert.doesNotMatch(`${pageStrip.join("")}${attentionStrip}`, /<style|class=|font:|<tspan/);
+  assert.doesNotMatch(`${pageStrip.join("")}${attentionStrip}${settingsBrowse}${settingsEdit}`, /<style|class=|font:|<tspan/);
   const [, red, green, blue] = oledKey.match(/font-size="[^"]+" fill="rgb\((\d+) (\d+) (\d+)\)"/).map(Number);
   const luminance = [red, green, blue].map((channel) => {
     const value = channel / 255;

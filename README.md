@@ -40,7 +40,7 @@ In Herdr, open keyboard shortcut settings and assign a shortcut to **Pin focused
 | Command (bottom-right) | Enter/cancel Command mode | Cancel |
 | Dial 1 | Switch pinned page immediately; cycle items while Inbox is open | Navigation |
 | Dial 2 | Open the selected Inbox item; owns its structured question when available | Selected attention item |
-| Dial 3 | Turn for working-motion speed; press to toggle centered/right-aligned logo | Reserved |
+| Dial 3 | Turn for working-motion speed; press to cycle Triage, Focus, and Ambient Herd | Reserved |
 | Dial 4 | Compare working-motion variants; reserved in Inbox | Reserved |
 
 ## Herdr 0.8.0 capability matrix

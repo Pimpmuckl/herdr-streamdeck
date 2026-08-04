@@ -1,9 +1,8 @@
-import type { AgentStatus, LogoAlignment, PaneSnapshot, ResolvedThemeSnapshot } from "./model.js";
+import { MOTION_BASE_WIDTH, type AgentStatus, type IdleLayout, type PaneSnapshot, type ResolvedThemeSnapshot, type WorkingMotion } from "./model.js";
 
 const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
 const monoFont = `font-family="Consolas" font-weight="700"`;
 
-export type WorkingMotion = "darken" | "lighten" | "rainbow";
 export const MOTION_CYCLE_FRAMES = 21;
 
 type KeyView = {
@@ -19,16 +18,30 @@ type KeyView = {
   feedback?: "success";
   workingFrame?: number;
   workingMotion?: WorkingMotion;
+  workingWidth?: number;
+  workingIntensity?: number;
 };
 
-export type StripView =
-  | { kind: "logo"; image: string; alignment: LogoAlignment }
-  | { kind: "page"; name: string; position: string; summary: string }
+export type StripView = (
+  | {
+      kind: "idle";
+      mode: IdleLayout;
+      image: string;
+      page: string;
+      position: string;
+      label: string;
+      status: AgentStatus | "offline";
+      blocked: number;
+      working: number;
+      frame: number;
+    }
+  | { kind: "page"; name: string; position: string; image: string; blocked: number; working: number }
   | { kind: "attention"; label: string; position: string; focused: boolean }
   | { kind: "clear" }
   | { kind: "command"; label: string }
   | { kind: "speed"; value: string }
-  | { kind: "motion"; name: string; position: string };
+  | { kind: "settings"; editing: boolean; name: string; value: string; position: string }
+) & { timeout?: number };
 
 export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): string {
   const palette = theme?.palette;
@@ -108,14 +121,14 @@ export function stripRegionSvg(
   let content: string;
 
   switch (view.kind) {
-    case "logo":
-      content = `<image href="${view.image}" x="${view.alignment === "right" ? 700 : 350}" y="0" width="100" height="100"/>`;
+    case "idle":
+      content = idleStrip(view, theme);
       break;
     case "page":
       content = `<rect width="6" height="100" fill="${accent}"/>
-        <text x="28" y="61" ${monoFont} font-size="50" fill="${text}">${escapeXml(truncate(view.name.toUpperCase(), 16))}</text>
-        <text x="31" y="89" ${monoFont} font-size="19" fill="${subtext}">${escapeXml(view.summary)}</text>
-        <text x="772" y="31" ${monoFont} font-size="20" fill="${subtext}" text-anchor="end">${escapeXml(view.position)}</text>`;
+        <text x="28" y="27" ${monoFont} font-size="19" fill="${subtext}">${escapeXml(`PINNED · ${view.position}`)}</text>
+        <text x="28" y="74" ${monoFont} font-size="44" fill="${text}">${escapeXml(truncate(view.name, 17))}</text>
+        ${stripBaseline(view, theme)}`;
       break;
     case "attention":
       content = `<rect width="6" height="100" fill="${yellow}"/>
@@ -137,33 +150,121 @@ export function stripRegionSvg(
         <text x="400" y="27" ${monoFont} font-size="19" fill="${subtext}" text-anchor="middle">WORKING SPEED</text>
         <text x="400" y="82" ${monoFont} font-size="56" fill="${text}" text-anchor="middle">${escapeXml(view.value)}</text>`;
       break;
-    case "motion":
-      content = `<rect width="6" height="100" fill="${palette ? oledColor(palette.blue, 3) : "#ffffff"}"/>
-        <text x="28" y="27" ${monoFont} font-size="19" fill="${subtext}">WORKING MOTION</text>
-        <text x="28" y="70" ${monoFont} font-size="42" fill="${text}">${escapeXml(view.name)}</text>
-        <text x="772" y="29" ${monoFont} font-size="20" fill="${subtext}" text-anchor="end">${escapeXml(view.position)}</text>`;
+    case "settings": {
+      const control = view.editing
+        ? [["DIAL TURN", "CHANGE"], ["DIAL PRESS", "DONE"], ["DIAL HOLD", "EXIT"]]
+        : [["DIAL TURN", "BROWSE"], ["DIAL PRESS", "EDIT"], ["DIAL HOLD", "EXIT"]];
+      content = `<text x="24" y="27" ${monoFont} font-size="19" fill="${view.editing ? accent : subtext}">${view.editing ? "EDITING" : "SETTINGS"} · ${escapeXml(view.position)}</text>
+        <text x="24" y="72" ${monoFont} font-size="34" fill="${text}">${escapeXml(truncate(view.name, 17))}</text>
+        <text x="510" y="72" ${monoFont} font-size="34" fill="${view.editing ? accent : text}" text-anchor="end">${escapeXml(truncate(view.value, 12))}</text>
+        <line x1="575" y1="0" x2="575" y2="100" stroke="${subtext}" stroke-opacity=".45"/>
+        <text x="702" y="19" ${monoFont} font-size="18" fill="${subtext}" text-anchor="middle">CONTROLS</text>
+        <line x1="702" y1="29" x2="702" y2="92" stroke="${subtext}" stroke-opacity=".45"/>
+        ${control.map(([input, action], index) => `<text x="590" y="${42 + index * 23}" ${monoFont} font-size="18" fill="${subtext}">${input}</text><text x="716" y="${42 + index * 23}" ${monoFont} font-size="18" fill="${index === 0 ? text : subtext}">${action}</text>`).join("")}`;
       break;
+    }
   }
 
+  const timeoutBar = view.timeout
+    ? `<rect x="0" y="96" width="${(800 * view.timeout).toFixed(1)}" height="4" fill="${accent}"/>`
+    : "";
   return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="${region * 200} 0 200 100">
     <rect width="800" height="100" fill="#000000"/>
-    ${content}
+    ${content}${timeoutBar}
   </svg>`;
+}
+
+function idleStrip(view: Extract<StripView, { kind: "idle" }>, theme?: ResolvedThemeSnapshot | null): string {
+  const palette = theme?.palette;
+  const text = oledForeground(theme, "text");
+  const subtext = oledForeground(theme, "subtext");
+  const blue = palette ? oledColor(palette.blue, 3) : "#ffffff";
+  const yellow = palette ? oledColor(palette.yellow, 3) : "#ffffff";
+  const indicator = threadStatusIndicator(view.status, view.frame, theme);
+  const baseline = stripBaseline(view, theme);
+
+  if (view.mode === "triage") {
+    return `<text x="24" y="27" ${monoFont} font-size="19" fill="${subtext}">${escapeXml(`${truncate(view.page, 15)} · ${view.position}`)}</text>
+      ${indicator}<text x="60" y="75" ${monoFont} font-size="40" fill="${text}">${escapeXml(truncate(view.label, 19))}</text>
+      ${baseline}`;
+  }
+
+  if (view.mode === "focus") {
+    return `<text x="24" y="27" ${monoFont} font-size="19" fill="${subtext}">CURRENT</text>
+      ${indicator}<text x="60" y="75" ${monoFont} font-size="44" fill="${text}">${escapeXml(truncate(view.label, 17))}</text>
+      ${baseline}`;
+  }
+
+  const trailWidth = 440;
+  const runnerCount = Math.min(view.working, 4);
+  const runners = Array.from({ length: runnerCount }, (_, runner) => {
+    const head = (view.frame * 6 + runner * 103) % trailWidth;
+    const y = 18 + runner * 21;
+    return [0, 1, 2].map((dot) => {
+      const x = 24 + ((head - dot * 12 + trailWidth) % trailWidth);
+      return `<circle cx="${x}" cy="${y}" r="${dot ? 3 : 4}" fill="${blue}" fill-opacity="${[1, 0.55, 0.25][dot]}"/>`;
+    }).join("");
+  }).join("");
+  const blockers = Array.from({ length: Math.min(view.blocked, 3) }, (_, index) =>
+    `<circle cx="${480 + index * 14}" cy="50" r="5" fill="${yellow}"/>`
+  ).join("");
+  const empty = runnerCount ? "" : `<text x="244" y="59" ${monoFont} font-size="24" fill="${subtext}" text-anchor="middle">${view.status === "offline" ? "HERDR OFFLINE" : "HERD IDLE"}</text>`;
+  return `${runners}${blockers}${empty}
+    ${baseline}`;
+}
+
+function stripBaseline(
+  view: { image: string; blocked: number; working: number },
+  theme?: ResolvedThemeSnapshot | null
+): string {
+  const palette = theme?.palette;
+  const subtext = oledForeground(theme, "subtext");
+  const blue = palette ? oledColor(palette.blue, 3) : "#ffffff";
+  const yellow = palette ? oledColor(palette.yellow, 3) : "#ffffff";
+  return `<text x="676" y="34" ${monoFont} font-size="20" fill="${view.working ? blue : subtext}" text-anchor="end">${view.working ? `${view.working} RUNNING` : "HERD IDLE"}</text>
+    <text x="676" y="72" ${monoFont} font-size="20" fill="${view.blocked ? yellow : subtext}" text-anchor="end">${view.blocked ? `${view.blocked} NEED YOU` : "ALL CLEAR"}</text>
+    <image href="${view.image}" x="700" y="0" width="100" height="100"/>`;
+}
+
+function threadStatusIndicator(
+  status: AgentStatus | "offline",
+  frame: number,
+  theme?: ResolvedThemeSnapshot | null
+): string {
+  const color = statusAppearance(status, theme)?.color ?? oledForeground(theme, "subtext");
+  if (status === "working") {
+    const positions = [[30, 49], [43, 49], [43, 62], [43, 75], [30, 75], [30, 62]];
+    const head = Math.round(frame * 2) % positions.length;
+    return positions.map(([x, y], index) => {
+      const distance = (head - index + positions.length) % positions.length;
+      return `<circle cx="${x}" cy="${y}" r="4" fill="${color}" fill-opacity="${[1, 0.55, 0.25][distance] ?? 0.08}"/>`;
+    }).join("");
+  }
+  if (status === "blocked") {
+    return `<circle cx="36.5" cy="62" r="9" fill="none" stroke="${color}" stroke-width="4"/>
+      <circle cx="36.5" cy="62" r="3.5" fill="${color}"/>`;
+  }
+  if (status === "done") return `<circle cx="36.5" cy="62" r="8" fill="${color}"/>`;
+  if (status === "idle") return `<path d="M27.5 62L34 68.5L46 54.5" fill="none" stroke="${color}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  return `<circle cx="36.5" cy="62" r="8" fill="none" stroke="${color}" stroke-width="3"/>`;
 }
 
 function workingAnimation(view: KeyView, theme?: ResolvedThemeSnapshot | null): string {
   if (view.status !== "working" || view.workingFrame === undefined) return "";
   const frame = Math.max(0, view.workingFrame);
   const motion = view.workingMotion ?? "lighten";
+  const width = (view.workingWidth ?? 1) * MOTION_BASE_WIDTH;
+  const baseIntensity = motion === "darken" ? 1.3 : motion === "lighten" ? 2 : 1.6;
+  const intensityScale = (view.workingIntensity ?? 1) * baseIntensity;
   const outlinePerimeter = 400 + 36 * Math.PI;
   const center = ((frame % MOTION_CYCLE_FRAMES) / MOTION_CYCLE_FRAMES) * outlinePerimeter;
-  const segmentCount = 19;
+  const segmentCount = Math.round(19 * width);
   const segmentLength = outlinePerimeter * 0.009;
   const segmentSpacing = outlinePerimeter * 0.008;
   const rect = `${keyOutlineGeometry()} fill="none" stroke-width="5"`;
   return Array.from({ length: segmentCount }, (_, index) => {
     const progress = index / (segmentCount - 1);
-    const intensity = 0.02 + 0.43 * Math.sin(Math.PI * progress) ** 2;
+    const intensity = Math.min(1, (0.02 + 0.43 * Math.sin(Math.PI * progress) ** 2) * intensityScale);
     const position = (center + (index - (segmentCount - 1) / 2) * segmentSpacing + outlinePerimeter) % outlinePerimeter;
     const color = motion === "darken"
       ? "#000000"

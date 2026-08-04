@@ -111,11 +111,13 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 
 **The Authored Action Feedback Rule.** Every interactive key and dial owns its pending, success, failure, and restore behavior. A successful key acknowledgement uses a full green field with black text so it cannot be confused with normal lifecycle state. The optional pinned-thread `FOCUSED` acknowledgement defaults off because the selected ring already confirms the change. An immediate authored state change such as pinning, page navigation, Inbox, or Actions Mode needs no intermediate acknowledgement screen. Failures name the cause and recovery on the affected control. Never call Stream Deck's generic `showOk()` or `showAlert()` overlays, and never let a rejected action fall through to host-owned feedback.
 
+**The Latest Action Rule.** The touch strip always represents the latest physical action. A thread press cancels an active page, speed, or motion takeover immediately and restores the selected idle layout; an older timer must never overwrite or delay that response.
+
 **The Actionable Error Rule.** Never use the host warning triangle. Render a short cause and recovery hint on the affected key or dial, then restore its normal state.
 
 **The Working Motion Rule.** Keep working labels and the blue lifecycle outline static; animate only a soft 15% swoosh carried by that same outline, with overlay intensity rising toward its center and falling away at both ends. Complete one lap in 21 explicit SVG frames rendered every 128 milliseconds only on visible working keys. Use the rounded outline's measured 513-pixel perimeter for dash length and travel because the Stream Deck renderer does not honor normalized `pathLength` dash metrics; make each dash pattern span two measured perimeters so it cannot repeat. Motion never adds an interior ornament, replaces semantic color, or overwrites pressed, success, or failure feedback. Darkening is the default treatment; dial 4 keeps lightening and Nextide rainbow available for physical comparison.
 
-**The Motion Tuning Rule.** Dial 3 adjusts a persisted `0.2×` through `2.0×` lap-speed multiplier in `0.1×` detents while the 128-millisecond render cadence stays fixed; `1.0×` is the default calibrated speed. Turning it takes over the full strip for five seconds with a centered `WORKING SPEED` label and 56-pixel numeric multiplier. The idle logo defaults flush-right; pressing dial 3 toggles it between centered and flush-right, then returns directly to the logo for comparison. Dial 4 changes only the treatment, never the speed.
+**The Motion Tuning Rule.** Dial 3 adjusts a persisted `0.2×` through `2.0×` lap-speed multiplier in `0.1×` detents while the 128-millisecond render cadence stays fixed; `1.0×` is the default calibrated speed. Turning it takes over the full strip for five seconds with a centered `WORKING SPEED` label and 56-pixel numeric multiplier. Pressing dial 3 cycles the persisted Triage, Focus, and Ambient Herd idle layouts and immediately displays the selected layout. Dial 4 changes only the working-border treatment, never the speed or idle layout.
 
 ## Layout
 
@@ -140,7 +142,7 @@ Keys use one rounded lifecycle outline on the OLED field. The dial strip is rect
 ### Thread and action key
 
 - **Canvas:** full 144 by 144 pixels on fixed black; the selected thread adds an inset lifecycle-color ring inside the unchanged outer status outline.
-- **Content:** the deepest useful pane identity, a border-carried state cue, and an optional short actionable footer. Slot numbers appear only when empty. Page and queue context use temporary full-strip takeovers; the idle strip remains the Herdr logo.
+- **Content:** the deepest useful pane identity, a border-carried state cue, and an optional short actionable footer. Slot numbers appear only when empty. Page and queue context use temporary full-strip takeovers; the idle strip uses one of three persisted layouts with the Herdr logo fixed at the far right.
 - **Label behavior:** split labels at word separators when possible and use no more than three centered lines. Before accepting a third line of only one to three columns, retry as two balanced lines up to 12 columns wide and use that result only when it remains at least 20px. Lines nine columns or wider tighten to `-0.04em` so they remain clear of the selected-thread ring without changing size on focus. Remove a trailing hyphen only when it marks a rendered line break; preserve a hyphen at the end of the complete name. Keep the default 8-column measure at 24px or larger; names beyond its 24-column capacity may expand to 12 columns and shrink as far as the 18px physical type floor. Truncate only after that wider measure is exhausted. The deepest useful identity gets the largest type.
 - **Hold feedback:** crossing the 650ms threshold unpins only an occupied slot. Show `THREAD UNPINNED` on the full green success field for at least 500ms and until the physical key is released, then restore the empty slot. Holding an empty slot does nothing.
 - **Focus timing:** begin focus on key-down. Key release only resolves tap-versus-hold behavior and optional acknowledgement.
@@ -154,6 +156,14 @@ Keys use one rounded lifecycle outline on the OLED field. The dial strip is rect
 - **Content:** uppercase 20-pixel title at 18 by 32 pixels and 28-pixel primary value at 18 by 73 pixels.
 - **Label behavior:** dial values cap at 10 monospaced columns and truncate with an ellipsis.
 - **Field:** keep the full strip background deep black; only information-bearing pixels may light.
+
+### Idle strip layouts
+
+- **Shared:** the Herdr logo permanently owns the rightmost 100 pixels. The adjacent KPI field keeps exact running and needs-input totals stable. Triage, Focus, Ambient Herd, and page navigation use the remaining left field. Inbox, speed, motion, and Actions takeovers replace the full strip immediately.
+- **Triage:** show `Page N` and position above the focused thread. Permanently reserve a lifecycle gutter directly left of its name and keep the name anchored at `x=60` in every state. Working rotates a bright head and two fading predecessors through the fixed six-circle grid. Non-working states reuse Herdr's marks as authored SVG: blocked bullseye, done solid circle, idle checkmark, and unknown or offline outline circle. Do not repeat a `WORKING` label. This is the default layout.
+- **Focus:** make the focused thread the dominant datum and use the same inline working trail. The stable KPI field carries herd-wide state.
+- **Ambient Herd:** represent up to four working threads as independent three-dot trails moving through the left field, while exact running and needs-input counts remain fixed at the right. Extra working threads remain represented by the exact count. Blocked threads appear as stationary amber markers.
+- **Motion budget:** Ambient Herd and the selected-thread 2-by-3 indicator use a serialized six-state delivery loop. After one LCD frame finishes sending, hold it for the selected fixed interval, then send exactly the next state; never catch up, repeat, skip, or overlap states. Dial 3 changes that dwell interval. Triage and Focus redraw only the first dial region; Ambient redraws only its three animated regions. Working-key border rendering remains staggered on a separate clock. Takeovers do not pay animation render cost.
 
 ### Inbox takeover
 
@@ -174,9 +184,9 @@ Keys use one rounded lifecycle outline on the OLED field. The dial strip is rect
 
 ### Page takeover
 
-- **Entry:** outside Inbox, turning dial 1 immediately switches the six pinned keys and replaces the whole strip with the active page.
-- **Content:** show the page name, its position among currently reachable pages, and a terse status summary.
-- **Exit:** return to the Herdr logo five seconds after the latest page turn.
+- **Entry:** outside Inbox, turning dial 1 immediately switches the six pinned keys and replaces the left field with the active page.
+- **Content:** show `PINNED`, the page position, and the `Page N` name. Keep the herd KPIs and Herdr logo fixed at the right.
+- **Exit:** return to the selected idle layout five seconds after the latest page turn, or immediately after any thread press.
 - **Boundary:** expose every used page and exactly one empty next page; do not wrap or scroll through additional blanks.
 
 ### Actions bank

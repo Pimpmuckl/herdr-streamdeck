@@ -73,18 +73,18 @@
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
-        "TriggerDescription": { "Rotate": "Adjust working speed", "Push": "Toggle logo alignment" }
+        "TriggerDescription": { "Rotate": "Adjust working speed", "Push": "Switch idle display" }
       },
       "States": [{ "Image": "imgs/key" }]
     },
     {
-      "Name": "Open Question",
+      "Name": "Settings",
       "UUID": "dev.herdr.streamdeck.answer",
       "Icon": "imgs/herdr",
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
-        "TriggerDescription": { "Rotate": "Reserved", "Push": "Reserved" }
+        "TriggerDescription": { "Rotate": "Open, browse, or change a setting", "Push": "Open, edit, or finish" }
       },
       "States": [{ "Image": "imgs/key" }]
     }

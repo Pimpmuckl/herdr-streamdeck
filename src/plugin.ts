@@ -3,6 +3,7 @@ import streamDeck, {
   type DialAction,
   type DialDownEvent,
   type DialRotateEvent,
+  type DialUpEvent,
   type KeyAction,
   type KeyDownEvent,
   type KeyUpEvent,
@@ -13,10 +14,12 @@ import { readFileSync } from "node:fs";
 
 import { HerdrBridge } from "./herdr.js";
 import {
+  adjustMotionScale,
   adjustMotionSpeed,
   attentionPanes,
   commandIntent,
   type DeckSettings,
+  type IdleLayout,
   MOTION_BASE_SPEED,
   navigatePages,
   normalizeSettings,
@@ -26,6 +29,7 @@ import {
   resolvePin,
   slotForCoordinates,
   visiblePageCount,
+  type WorkingMotion,
   wrappedIndex
 } from "./model.js";
 import {
@@ -34,23 +38,27 @@ import {
   keySvg,
   MOTION_CYCLE_FRAMES,
   stripRegionSvg,
-  type StripView,
-  type WorkingMotion
+  type StripView
 } from "./render.js";
 
 const HOLD_MS = 650;
-const LCD_TAKEOVER_MS = 5000;
+const LCD_TIMEOUT_BAR_MS = 2000;
+const LCD_PANEL_TIMEOUT_MS = 5000;
+const LCD_SETTINGS_TIMEOUT_MS = 15000;
 const KEY_ANIMATION_MS = 128;
 const logoImage = svgImage(readFileSync(new URL("../imgs/herdr_logo.svg", import.meta.url), "utf8").replace("currentColor", "#959391"));
 const herdr = new HerdrBridge();
 const transientKeyFeedback = new Set<string>();
 const transientDialFeedback = new Set<string>();
 const motionVariants = [
-  { id: "darken", name: "DARK SWOOSH" },
-  { id: "lighten", name: "LIGHT SWOOSH" },
-  { id: "rainbow", name: "RAINBOW SWOOSH" }
+  { id: "darken", name: "DARK" },
+  { id: "lighten", name: "LIGHT" },
+  { id: "rainbow", name: "RAINBOW" }
 ] satisfies Array<{ id: WorkingMotion; name: string }>;
-let motionVariantIndex = 0;
+const idleLayouts = ["triage", "focus", "ambient"] as const satisfies readonly IdleLayout[];
+const settingNames = ["IDLE VIEW", "WORKING SPEED", "WORKING MOTION", "WORKING WIDTH", "WORKING INTENSITY", "FOCUS FEEDBACK"] as const;
+let pendingSettingsSave: DeckSettings | null = null;
+let settingsSaveTask: Promise<void> | null = null;
 
 type Listener = () => void;
 
@@ -154,6 +162,7 @@ class PinChooserState {
 class InboxState {
   active = false;
   paneId: string | null = null;
+  expiresAt = 0;
   private timer: ReturnType<typeof setTimeout> | undefined;
   private readonly listeners = new Set<Listener>();
 
@@ -161,16 +170,18 @@ class InboxState {
     if (this.timer) clearTimeout(this.timer);
     this.active = true;
     this.paneId = paneId;
+    this.expiresAt = Date.now() + LCD_PANEL_TIMEOUT_MS;
     this.emit();
     this.timer = setTimeout(() => {
       this.timer = undefined;
       this.cancel();
-    }, LCD_TAKEOVER_MS);
+    }, LCD_PANEL_TIMEOUT_MS);
   }
 
   cancel(): void {
     if (this.timer) clearTimeout(this.timer);
     this.timer = undefined;
+    this.expiresAt = 0;
     if (!this.active) return;
     this.active = false;
     this.paneId = null;
@@ -187,24 +198,105 @@ class InboxState {
 }
 
 class StripState {
-  takeover: "page" | "speed" | "motion" | null = null;
+  takeover: "page" | "speed" | null = null;
+  idleFrame = 0;
+  expiresAt = 0;
   private timer: ReturnType<typeof setTimeout> | undefined;
-  private readonly listeners = new Set<Listener>();
+  private readonly listeners = new Map<number, () => Promise<void>>();
 
-  show(takeover: "page" | "speed" | "motion"): void {
+  show(takeover: "page" | "speed"): void {
     if (this.timer) clearTimeout(this.timer);
     this.takeover = takeover;
-    this.emit();
+    this.expiresAt = Date.now() + LCD_PANEL_TIMEOUT_MS;
+    void this.emit();
     this.timer = setTimeout(() => {
       this.takeover = null;
-      this.emit();
-    }, LCD_TAKEOVER_MS);
+      this.expiresAt = 0;
+      void this.emit();
+    }, LCD_PANEL_TIMEOUT_MS);
   }
 
-  showLogo(): void {
+  showIdle(): void {
     if (this.timer) clearTimeout(this.timer);
     this.timer = undefined;
     this.takeover = null;
+    this.expiresAt = 0;
+    void this.emit();
+  }
+
+  tickIdle(regions: readonly number[]): Promise<void> {
+    this.idleFrame = (this.idleFrame + MOTION_BASE_SPEED) % 10000;
+    return this.emit(regions);
+  }
+
+  refresh(regions: readonly number[]): Promise<void> {
+    return this.emit(regions);
+  }
+
+  subscribe(region: number, listener: () => Promise<void>): void {
+    this.listeners.set(region, listener);
+  }
+
+  private async emit(regions?: readonly number[]): Promise<void> {
+    const listeners = regions
+      ? regions.flatMap((region) => this.listeners.get(region) ?? [])
+      : Array.from(this.listeners.values());
+    await Promise.all(listeners.map((listener) => listener()));
+  }
+}
+
+class SettingsMenuState {
+  active = false;
+  editing = false;
+  index = 0;
+  draft: DeckSettings | null = null;
+  expiresAt = 0;
+  private timer: ReturnType<typeof setTimeout> | undefined;
+  private readonly listeners = new Set<Listener>();
+
+  enter(): void {
+    this.active = true;
+    this.editing = false;
+    this.draft = null;
+    this.resetTimeout();
+    this.emit();
+  }
+
+  move(ticks: number): void {
+    this.index = Math.max(0, Math.min(settingNames.length - 1, this.index + ticks));
+    this.resetTimeout();
+    this.emit();
+  }
+
+  begin(settings: DeckSettings): void {
+    this.editing = true;
+    this.draft ??= structuredClone(settings);
+    this.resetTimeout();
+    this.emit();
+  }
+
+  change(ticks: number): DeckSettings | null {
+    if (!this.draft) return null;
+    adjustSetting(this.draft, this.index, ticks);
+    this.resetTimeout();
+    this.emit();
+    return structuredClone(this.draft);
+  }
+
+  done(): void {
+    this.editing = false;
+    this.resetTimeout();
+    this.emit();
+  }
+
+  exit(): void {
+    if (!this.active) return;
+    if (this.timer) clearTimeout(this.timer);
+    this.timer = undefined;
+    this.expiresAt = 0;
+    this.active = false;
+    this.editing = false;
+    this.draft = null;
     this.emit();
   }
 
@@ -215,6 +307,15 @@ class StripState {
   private emit(): void {
     for (const listener of this.listeners) listener();
   }
+
+  private resetTimeout(): void {
+    if (this.timer) clearTimeout(this.timer);
+    this.expiresAt = Date.now() + LCD_SETTINGS_TIMEOUT_MS;
+    this.timer = setTimeout(() => {
+      this.timer = undefined;
+      this.exit();
+    }, LCD_SETTINGS_TIMEOUT_MS);
+  }
 }
 
 const deck = new DeckStore();
@@ -222,7 +323,9 @@ const command = new CommandState();
 const pinChooser = new PinChooserState();
 const inbox = new InboxState();
 const strip = new StripState();
+const settingsMenu = new SettingsMenuState();
 herdr.subscribePinRequests((pane) => {
+  closeSettings();
   inbox.cancel();
   pinChooser.enter(pane);
 });
@@ -234,7 +337,8 @@ class PinnedThreadAction extends SingletonAction {
   private readonly holdTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly holdTasks = new Map<string, Promise<void>>();
   private animationFrame = 0;
-  private animationBusy = false;
+  private animationAt = performance.now();
+  private keyAnimationBusy = false;
 
   constructor() {
     super();
@@ -242,7 +346,8 @@ class PinnedThreadAction extends SingletonAction {
     deck.subscribe(() => void this.renderAll());
     command.subscribe(() => void this.renderAll());
     pinChooser.subscribe(() => void this.renderAll());
-    setInterval(() => void this.renderWorkingFrame(), KEY_ANIMATION_MS);
+    void this.runStripLoop();
+    setTimeout(() => setInterval(() => void this.renderWorkingKeys(), KEY_ANIMATION_MS), KEY_ANIMATION_MS / 2);
   }
 
   override onWillAppear(event: WillAppearEvent): Promise<void> | void {
@@ -251,9 +356,11 @@ class PinnedThreadAction extends SingletonAction {
 
   override onKeyDown(event: KeyDownEvent): void {
     this.downKeys.add(event.action.id);
+    if (settingsMenu.active) closeSettings();
     if (pinChooser.pane || command.active) return;
     const slot = keySlot(event.action);
     if (slot === null) return;
+    strip.showIdle();
     const focusTask = this.focusOnPress(slot);
     this.focusTasks.set(event.action.id, focusTask);
     void focusTask.catch(() => undefined);
@@ -459,12 +566,19 @@ class PinnedThreadAction extends SingletonAction {
     ));
   }
 
-  private async renderWorkingFrame(): Promise<void> {
-    if (this.animationBusy || command.active || pinChooser.pane) return;
-    this.animationBusy = true;
+  private async renderWorkingKeys(): Promise<void> {
+    if (this.keyAnimationBusy) return;
+    if (command.active || pinChooser.pane) {
+      this.animationAt = performance.now();
+      return;
+    }
+    this.keyAnimationBusy = true;
     try {
-      const settings = await deck.get();
-      this.animationFrame = (this.animationFrame + settings.motionSpeed) % MOTION_CYCLE_FRAMES;
+      const storedSettings = await deck.get();
+      const settings = settingsMenu.draft ?? storedSettings;
+      const now = performance.now();
+      this.animationFrame = (this.animationFrame + (now - this.animationAt) / KEY_ANIMATION_MS * settings.motionSpeed) % MOTION_CYCLE_FRAMES;
+      this.animationAt = now;
       const page = settings.pages[settings.pageIndex];
       await Promise.all(this.actions.toArray().flatMap((item) => {
         if (!item.isKey() || transientKeyFeedback.has(item.id) || this.downKeys.has(item.id)) return [];
@@ -479,12 +593,40 @@ class PinnedThreadAction extends SingletonAction {
           status: "working",
           selected: pane.focused,
           workingFrame: this.animationFrame,
-          workingMotion: motionVariants[motionVariantIndex].id
+          workingMotion: settings.workingMotion,
+          workingWidth: settings.motionWidth,
+          workingIntensity: settings.motionIntensity
         }, herdr.theme)))];
       }));
     } finally {
-      this.animationBusy = false;
+      this.keyAnimationBusy = false;
     }
+  }
+
+  private async runStripLoop(): Promise<void> {
+    let interval = KEY_ANIMATION_MS;
+    try {
+      const speed = await this.renderStripFrame();
+      interval = KEY_ANIMATION_MS * MOTION_BASE_SPEED / speed;
+    } catch (error) {
+      streamDeck.logger.error(`Strip animation failed: ${String(error)}`);
+    }
+    setTimeout(() => void this.runStripLoop(), interval);
+  }
+
+  private async renderStripFrame(): Promise<number> {
+    if (activeTimeoutProgress() > 0) await strip.refresh([0, 1, 2, 3]);
+    if (command.active || pinChooser.pane || settingsMenu.active) return MOTION_BASE_SPEED;
+    const settings = await deck.get();
+    const focused = currentPane(herdr.snapshot?.panes ?? [], herdr.snapshot?.focused_pane_id);
+    const animateIdle = !inbox.active && strip.takeover === null && (
+      settings.idleLayout === "ambient"
+        ? Boolean(herdr.snapshot?.panes.some((pane) => pane.agent_status === "working"))
+        : focused?.agent_status === "working"
+    );
+    if (!animateIdle) return MOTION_BASE_SPEED;
+    await strip.tickIdle(settings.idleLayout === "ambient" ? [0, 1, 2] : [0]);
+    return settings.motionSpeed;
   }
 }
 
@@ -504,6 +646,7 @@ class AttentionAction extends SingletonAction {
 
   override onKeyDown(event: KeyDownEvent): void {
     this.downAt.set(event.action.id, Date.now());
+    if (settingsMenu.active) closeSettings();
   }
 
   override async onKeyUp(event: KeyUpEvent): Promise<void> {
@@ -561,6 +704,7 @@ class CommandAction extends SingletonAction {
   }
 
   override async onKeyUp(event: KeyUpEvent): Promise<void> {
+    if (settingsMenu.active) closeSettings();
     if (inbox.active) {
       inbox.cancel();
       return;
@@ -607,7 +751,8 @@ class PagesDialAction extends SingletonAction {
     deck.subscribe(() => void this.renderAll());
     inbox.subscribe(() => void this.renderAll());
     command.subscribe(() => void this.renderAll());
-    strip.subscribe(() => void this.renderAll());
+    settingsMenu.subscribe(() => void this.renderAll());
+    strip.subscribe(0, () => this.renderAll());
   }
 
   override onWillAppear(event: WillAppearEvent): Promise<void> | void {
@@ -615,6 +760,7 @@ class PagesDialAction extends SingletonAction {
   }
 
   override async onDialRotate(event: DialRotateEvent): Promise<void> {
+    if (settingsMenu.active) return;
     if (inbox.active) {
       const queue = attentionPanes(herdr.snapshot);
       if (!queue.length) return;
@@ -630,7 +776,7 @@ class PagesDialAction extends SingletonAction {
   }
 
   override async onDialDown(): Promise<void> {
-    if (inbox.active) return;
+    if (settingsMenu.active || inbox.active) return;
     await deck.update((settings) => {
       settings.pageIndex = 0;
     });
@@ -655,7 +801,8 @@ class AttentionDialAction extends SingletonAction {
     herdr.subscribe(() => void this.renderAll());
     inbox.subscribe(() => void this.renderAll());
     command.subscribe(() => void this.renderAll());
-    strip.subscribe(() => void this.renderAll());
+    settingsMenu.subscribe(() => void this.renderAll());
+    strip.subscribe(1, () => this.renderAll());
   }
 
   override onWillAppear(event: WillAppearEvent): Promise<void> | void {
@@ -663,6 +810,7 @@ class AttentionDialAction extends SingletonAction {
   }
 
   override async onDialDown(event: DialDownEvent): Promise<void> {
+    if (settingsMenu.active) return;
     const queue = attentionPanes(herdr.snapshot);
     if (!queue.length) {
       inbox.open(null);
@@ -696,7 +844,8 @@ class ThreadDialAction extends SingletonAction {
     herdr.subscribe(() => void this.renderAll());
     inbox.subscribe(() => void this.renderAll());
     command.subscribe(() => void this.renderAll());
-    strip.subscribe(() => void this.renderAll());
+    settingsMenu.subscribe(() => void this.renderAll());
+    strip.subscribe(2, () => this.renderAll());
   }
 
   override onWillAppear(event: WillAppearEvent): Promise<void> | void {
@@ -704,7 +853,7 @@ class ThreadDialAction extends SingletonAction {
   }
 
   override async onDialRotate(event: DialRotateEvent): Promise<void> {
-    if (inbox.active || command.active) return;
+    if (settingsMenu.active || inbox.active || command.active) return;
     await deck.update((settings) => {
       settings.motionSpeed = adjustMotionSpeed(settings.motionSpeed, event.payload.ticks);
     });
@@ -712,11 +861,11 @@ class ThreadDialAction extends SingletonAction {
   }
 
   override async onDialDown(): Promise<void> {
-    if (inbox.active || command.active) return;
+    if (settingsMenu.active || inbox.active || command.active) return;
     await deck.update((settings) => {
-      settings.logoAlignment = settings.logoAlignment === "center" ? "right" : "center";
+      settings.idleLayout = idleLayouts[wrappedIndex(idleLayouts.indexOf(settings.idleLayout), 1, idleLayouts.length)];
     });
-    strip.showLogo();
+    strip.showIdle();
   }
 
   private render(action: DialAction): Promise<void> {
@@ -732,12 +881,16 @@ class ThreadDialAction extends SingletonAction {
 
 @action({ UUID: "dev.herdr.streamdeck.answer" })
 class AnswerDialAction extends SingletonAction {
+  private readonly holdTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  private readonly held = new Set<string>();
+
   constructor() {
     super();
     herdr.subscribe(() => void this.renderAll());
     inbox.subscribe(() => void this.renderAll());
     command.subscribe(() => void this.renderAll());
-    strip.subscribe(() => void this.renderAll());
+    settingsMenu.subscribe(() => void this.renderAll());
+    strip.subscribe(3, () => this.renderAll());
   }
 
   override onWillAppear(event: WillAppearEvent): Promise<void> | void {
@@ -745,9 +898,47 @@ class AnswerDialAction extends SingletonAction {
   }
 
   override async onDialRotate(event: DialRotateEvent): Promise<void> {
-    if (inbox.active || command.active) return;
-    motionVariantIndex = wrappedIndex(motionVariantIndex, event.payload.ticks, motionVariants.length);
-    strip.show("motion");
+    if (inbox.active || command.active || pinChooser.pane) return;
+    if (!settingsMenu.active) {
+      strip.showIdle();
+      settingsMenu.enter();
+      return;
+    }
+    if (!settingsMenu.editing) {
+      settingsMenu.move(event.payload.ticks);
+      return;
+    }
+    const draft = settingsMenu.change(event.payload.ticks);
+    if (draft) queueSettingsSave(draft);
+  }
+
+  override onDialDown(event: DialDownEvent): void {
+    if (inbox.active || command.active || pinChooser.pane) return;
+    this.holdTimers.set(event.action.id, setTimeout(() => {
+      this.holdTimers.delete(event.action.id);
+      this.held.add(event.action.id);
+      this.handleHold();
+    }, HOLD_MS));
+  }
+
+  override async onDialUp(event: DialUpEvent): Promise<void> {
+    const timer = this.holdTimers.get(event.action.id);
+    if (timer) clearTimeout(timer);
+    this.holdTimers.delete(event.action.id);
+    if (this.held.delete(event.action.id) || inbox.active || command.active || pinChooser.pane) return;
+    if (!settingsMenu.active) {
+      strip.showIdle();
+      settingsMenu.enter();
+    } else if (settingsMenu.editing) {
+      settingsMenu.done();
+    } else {
+      settingsMenu.begin(await deck.get());
+    }
+  }
+
+  private handleHold(): void {
+    if (!settingsMenu.active) return;
+    settingsMenu.exit();
   }
 
   private render(action: DialAction): Promise<void> {
@@ -767,19 +958,34 @@ function selectedAttentionPane(): PaneSnapshot | undefined {
 
 async function renderStrip(action: DialAction, region: number): Promise<void> {
   if (transientDialFeedback.has(action.id)) return;
-  const settings = await deck.get();
+  const storedSettings = await deck.get();
+  const settings = settingsMenu.draft ?? storedSettings;
   if (transientDialFeedback.has(action.id)) return;
+  const snapshot = herdr.snapshot;
+  const baseline = {
+    image: logoImage,
+    blocked: snapshot?.panes.filter((pane) => pane.agent_status === "blocked").length ?? 0,
+    working: snapshot?.panes.filter((pane) => pane.agent_status === "working").length ?? 0
+  };
   let view: StripView;
-  if (inbox.active) {
-    const queue = attentionPanes(herdr.snapshot);
+  if (settingsMenu.active) {
+    view = {
+      kind: "settings",
+      editing: settingsMenu.editing,
+      name: settingNames[settingsMenu.index],
+      value: settingValue(settings, settingsMenu.index),
+      position: `${settingsMenu.index + 1}/${settingNames.length}`
+    };
+  } else if (inbox.active) {
+    const queue = attentionPanes(snapshot);
     const pane = selectedAttentionPane() ?? queue[0];
     const index = pane ? queue.findIndex((item) => item.pane_id === pane.pane_id) : -1;
     view = pane
       ? {
           kind: "attention",
-          label: paneIdentity(pane, herdr.snapshot, "BLOCKED").primary,
+          label: paneIdentity(pane, snapshot, "BLOCKED").primary,
           position: `${index + 1} / ${queue.length}`,
-          focused: pane.pane_id === herdr.snapshot?.focused_pane_id
+          focused: pane.pane_id === snapshot?.focused_pane_id
         }
       : { kind: "clear" };
   } else if (command.active) {
@@ -790,29 +996,98 @@ async function renderStrip(action: DialAction, region: number): Promise<void> {
       kind: "page",
       name: page.name,
       position: `${settings.pageIndex + 1} / ${visiblePageCount(settings)}`,
-      summary: pageSummary(page.pins)
+      ...baseline
     };
   } else if (strip.takeover === "speed") {
     view = { kind: "speed", value: `${(settings.motionSpeed / MOTION_BASE_SPEED).toFixed(1)}×` };
-  } else if (strip.takeover === "motion") {
-    view = {
-      kind: "motion",
-      name: motionVariants[motionVariantIndex].name,
-      position: `${motionVariantIndex + 1} / ${motionVariants.length}`
-    };
   } else {
-    view = { kind: "logo", image: logoImage, alignment: settings.logoAlignment };
+    const focused = currentPane(snapshot?.panes ?? [], snapshot?.focused_pane_id);
+    const page = settings.pages[settings.pageIndex];
+    view = {
+      kind: "idle",
+      mode: settings.idleLayout,
+      ...baseline,
+      page: page.name,
+      position: `${settings.pageIndex + 1}/${visiblePageCount(settings)}`,
+      label: focused ? paneIdentity(focused, snapshot, focused.pane_id).primary : "NO THREAD",
+      status: focused?.agent_status ?? (snapshot ? "idle" : "offline"),
+      frame: strip.idleFrame
+    };
   }
+  view.timeout = activeTimeoutProgress();
   return action.setFeedback({ "full-canvas": svgImage(stripRegionSvg(region, view, herdr.theme)) });
 }
 
-function pageSummary(pins: DeckSettings["pages"][number]["pins"]): string {
-  const panes = pins.map((pin) => resolvePin(pin, herdr.snapshot)).filter((pane): pane is PaneSnapshot => Boolean(pane));
-  const parts = [
-    [panes.filter((pane) => pane.agent_status === "working").length, "WORKING"],
-    [panes.filter((pane) => pane.agent_status === "blocked").length, "NEEDS YOU"]
-  ].filter(([count]) => count);
-  return parts.length ? parts.map(([count, label]) => `${count} ${label}`).join(" · ") : `${pins.filter(Boolean).length} PINNED`;
+function activeTimeoutProgress(): number {
+  const expiresAt = settingsMenu.active
+    ? settingsMenu.expiresAt
+    : inbox.active
+      ? inbox.expiresAt
+      : strip.takeover
+        ? strip.expiresAt
+        : 0;
+  return expiresAt ? Math.max(0, Math.min(1, 1 - (expiresAt - Date.now()) / LCD_TIMEOUT_BAR_MS)) : 0;
+}
+
+function settingValue(settings: DeckSettings, index: number): string {
+  if (index === 0) return settings.idleLayout.toUpperCase();
+  if (index === 1) return `${(settings.motionSpeed / MOTION_BASE_SPEED).toFixed(1)}×`;
+  if (index === 2) return motionVariants.find((variant) => variant.id === settings.workingMotion)?.name ?? "DARK";
+  if (index === 3) return `${settings.motionWidth.toFixed(1)}×`;
+  if (index === 4) return `${Math.round(settings.motionIntensity * 100)}%`;
+  return settings.focusFeedback ? "ON" : "OFF";
+}
+
+function adjustSetting(settings: DeckSettings, index: number, ticks: number): void {
+  if (index === 0) {
+    settings.idleLayout = idleLayouts[wrappedIndex(idleLayouts.indexOf(settings.idleLayout), ticks, idleLayouts.length)];
+  } else if (index === 1) {
+    settings.motionSpeed = adjustMotionSpeed(settings.motionSpeed, ticks);
+  } else if (index === 2) {
+    const current = motionVariants.findIndex((variant) => variant.id === settings.workingMotion);
+    settings.workingMotion = motionVariants[wrappedIndex(Math.max(0, current), ticks, motionVariants.length)].id;
+  } else if (index === 3) {
+    settings.motionWidth = adjustMotionScale(settings.motionWidth, ticks);
+  } else if (index === 4) {
+    settings.motionIntensity = adjustMotionScale(settings.motionIntensity, ticks);
+  } else if (ticks) {
+    settings.focusFeedback = ticks > 0;
+  }
+}
+
+function closeSettings(): void {
+  settingsMenu.exit();
+}
+
+function queueSettingsSave(settings: DeckSettings): void {
+  pendingSettingsSave = settings;
+  settingsSaveTask ??= flushSettingsSaves();
+}
+
+async function flushSettingsSaves(): Promise<void> {
+  try {
+    while (pendingSettingsSave) {
+      const settings = pendingSettingsSave;
+      pendingSettingsSave = null;
+      await saveSettings(settings);
+    }
+  } catch (error) {
+    pendingSettingsSave = null;
+    streamDeck.logger.error(`Auto-saving settings failed: ${String(error)}`);
+  } finally {
+    settingsSaveTask = null;
+  }
+}
+
+function saveSettings(draft: DeckSettings): Promise<void> {
+  return deck.update((settings) => {
+    settings.idleLayout = draft.idleLayout;
+    settings.motionSpeed = draft.motionSpeed;
+    settings.workingMotion = draft.workingMotion;
+    settings.motionWidth = draft.motionWidth;
+    settings.motionIntensity = draft.motionIntensity;
+    settings.focusFeedback = draft.focusFeedback;
+  });
 }
 
 async function showKeyError(

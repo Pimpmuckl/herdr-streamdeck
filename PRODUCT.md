@@ -48,7 +48,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 ### Pin pages and six thread keys
 
 - Pages grow on demand without a fixed limit. Dial 1 exposes used pages plus exactly one empty next page; another page appears only after that page receives a pin.
-- Turning dial 1 immediately switches the active page and redraws the six thread keys.
+- Turning dial 1 immediately switches the active `Page N` and redraws the six thread keys.
 - Stream Deck settings are the primary page manager for create, rename, reorder, and delete.
 - Pressing a pinned key focuses its thread immediately on key-down without stealing operating-system focus. A long hold may therefore focus the thread before unpinning it.
 - A global `Show FOCUSED flash` setting controls the brief full-key acknowledgement and defaults off.
@@ -73,7 +73,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 
 - In the dashboard, each dial 3 detent adjusts the working-border lap speed by `0.1×` from `0.2×` through `2.0×` without changing render FPS. The calibrated default is `1.0×`.
 - Turning dial 3 replaces the full strip for five seconds with `WORKING SPEED` and the exact persisted multiplier.
-- The idle logo defaults flush-right. Pressing dial 3 toggles it between centered and flush-right, then reveals the logo immediately.
+- The Herdr logo stays flush-right. Pressing dial 3 cycles the persisted Triage, Focus, and Ambient Herd idle layouts, then reveals the selected layout immediately.
 - The working border defaults to the dark swoosh. Dial 4 continues to compare darkening, lightening, and rainbow treatments at the selected speed.
 
 ### Structured Question Mode and dial 2
@@ -117,7 +117,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Saved palette changes redraw every visible key and encoder region. The host-derived `terminal` palette, unsaved previews, and automatic appearance changes require a future resolved-theme API.
 - Every OLED background is fixed deep black. Herdr themes color text, lifecycle outlines, and dial bars; a second inset lifecycle-color ring marks the selected thread while the status border stays in its normal outer position.
 - Foreground colors retain their configured hue and are lifted only when required to meet the black-field contrast floor.
-- Pinned keys show only the deepest available pane or thread label; actionable status may temporarily use the footer. Page and queue context appear only during their full-strip takeovers; the idle strip remains the Herdr logo. Empty slots stay almost blank.
+- Pinned keys show only the deepest available pane or thread label; actionable status may temporarily use the footer. Queue context may take over the strip. Idle and page views keep herd KPIs beside the fixed right-hand Herdr logo. The focused thread always reserves one lifecycle gutter so its LCD name never shifts; working uses the six-circle animation while other states reuse Herdr's blocked, done, idle, and unknown marks. Empty slots stay almost blank.
 - Status colors are paired with a label, motion, or border geometry:
   - amber: needs-input label;
   - red: explicit error or offline label;

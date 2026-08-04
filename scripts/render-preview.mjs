@@ -15,10 +15,13 @@ for (const [name, value] of [["dark", dark], ["light", light]]) {
 writeFileSync("artifacts/device-preview-command-dark.svg", cleanSvg(devicePreview(dark, "command")));
 writeFileSync("artifacts/device-preview-attention-dark.svg", cleanSvg(devicePreview(dark, "attention")));
 writeFileSync("artifacts/device-preview-stop-armed-dark.svg", cleanSvg(devicePreview(dark, "stop")));
+writeFileSync("artifacts/device-preview-focus-dark.svg", cleanSvg(devicePreview(dark, "focus")));
+writeFileSync("artifacts/device-preview-ambient-dark.svg", cleanSvg(devicePreview(dark, "ambient")));
+writeFileSync("artifacts/device-preview-page-dark.svg", cleanSvg(devicePreview(dark, "page")));
 
 function devicePreview(activeTheme, mode = "dashboard") {
   const dashboardKeys = [
-    { label: "research-vodint-graph", detail: "NEEDS YOU", slot: 0, status: "blocked", selected: true },
+    { label: "herdr-streamdeck", slot: 0, status: "working", selected: true, workingFrame: 5, workingMotion: "darken" },
     { label: "review-suite", slot: 1, status: "working", workingFrame: 5, workingMotion: "lighten" },
     { label: "kraken-backup", slot: 2, status: "working", workingFrame: 5, workingMotion: "darken" },
     { label: "INBOX", count: 2, status: "blocked" },
@@ -38,8 +41,13 @@ function devicePreview(activeTheme, mode = "dashboard") {
   const keys = (["command", "stop"].includes(mode) ? commandKeys : dashboardKeys).map((view) => keySvg(view, activeTheme));
   const strip = mode === "attention"
     ? { kind: "attention", label: "api-rewrite", position: "1 / 2", focused: true }
-    : mode === "dashboard"
-      ? { kind: "logo", image: logoImage, alignment: "center" }
+    : mode === "page"
+      ? { kind: "page", name: "Page 1", position: "1 / 3", image: logoImage, blocked: 2, working: 3 }
+    : ["dashboard", "focus", "ambient"].includes(mode)
+      ? {
+          kind: "idle", mode: mode === "dashboard" ? "triage" : mode, image: logoImage, page: "Page 1", position: "1/3",
+          label: "herdr-streamdeck", status: "working", blocked: 2, working: 3, frame: 5
+        }
       : { kind: "command", label: "review-suite" };
   const dials = [0, 1, 2, 3].map((region) => stripRegionSvg(region, strip, activeTheme));
   const placedKeys = keys.map((svg, index) => place(svg, 88 + (index % 4) * 160, 18 + Math.floor(index / 4) * 160)).join("\n");

@@ -19,6 +19,8 @@ case "$(uname -s)" in
     staged_plugin="$staging/dev.herdr.streamdeck.sdPlugin"
     mkdir -p "$output"
     cp -R "$source_plugin" "$staged_plugin"
+    cp "$root/LICENSE" "$root/THIRD_PARTY_NOTICES.md" "$staged_plugin/"
+    cp -R "$root/licenses" "$staged_plugin/licenses"
     rm -rf "$staged_plugin/logs"
     printf '%s' "$herdr_path" > "$staged_plugin/herdr-path.txt"
     rm -f "$package"
@@ -50,8 +52,10 @@ case "$(uname -s)" in
     fi
 
     target="$opendeck_root/plugins/dev.herdr.streamdeck.sdPlugin"
-    mkdir -p "$target"
+    mkdir -p "$target/licenses"
     cp -R "$source_plugin/." "$target/"
+    cp "$root/LICENSE" "$root/THIRD_PARTY_NOTICES.md" "$target/"
+    cp -R "$root/licenses/." "$target/licenses/"
     printf '%s' "$herdr_path" > "$target/herdr-path.txt"
     echo "Installed Herdr for OpenDeck. Restart OpenDeck to load it."
     ;;

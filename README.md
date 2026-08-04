@@ -32,3 +32,7 @@ Focus a pane in Herdr, then tap an empty thread key to pin it. Tap a pinned thre
 | Dial 2 | Focus the selected Inbox thread |
 | Dial 3 | Adjust working-animation speed; press to change the idle display |
 | Dial 4 | Open and navigate settings; press to edit or finish, hold to exit |
+
+## License
+
+Plugin code is [MIT licensed](LICENSE). Herdr-derived themes and brand assets remain under Herdr's terms; see [third-party notices](THIRD_PARTY_NOTICES.md).

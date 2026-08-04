@@ -16,6 +16,8 @@ if (-not (Test-Path (Join-Path $source "bin\plugin.js"))) {
 New-Item -ItemType Directory -Force $output, $staging | Out-Null
 try {
     Copy-Item $source $stagedPlugin -Recurse
+    Copy-Item (Join-Path $root "LICENSE"), (Join-Path $root "THIRD_PARTY_NOTICES.md") $stagedPlugin
+    Copy-Item (Join-Path $root "licenses") (Join-Path $stagedPlugin "licenses") -Recurse
     Remove-Item -LiteralPath (Join-Path $stagedPlugin "logs") -Recurse -Force -ErrorAction SilentlyContinue
     [IO.File]::WriteAllText(
         (Join-Path $stagedPlugin "herdr-path.txt"),

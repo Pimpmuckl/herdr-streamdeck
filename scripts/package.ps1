@@ -15,6 +15,8 @@ try {
     $packSource = Join-Path $staging "dev.herdr.streamdeck.sdPlugin"
     New-Item -ItemType Directory $staging | Out-Null
     Copy-Item "dev.herdr.streamdeck.sdPlugin" $packSource -Recurse
+    Copy-Item "LICENSE", "THIRD_PARTY_NOTICES.md" $packSource
+    Copy-Item "licenses" (Join-Path $packSource "licenses") -Recurse
 
     try {
         if ($DryRun) {

@@ -577,7 +577,7 @@ class PinnedThreadAction extends SingletonAction {
       const storedSettings = await deck.get();
       const settings = settingsMenu.draft ?? storedSettings;
       const now = performance.now();
-      this.animationFrame = (this.animationFrame + (now - this.animationAt) / KEY_ANIMATION_MS * settings.motionSpeed) % MOTION_CYCLE_FRAMES;
+      this.animationFrame = (this.animationFrame + (now - this.animationAt) / KEY_ANIMATION_MS * settings.motionSpeed / MOTION_BASE_SPEED) % MOTION_CYCLE_FRAMES;
       this.animationAt = now;
       const page = settings.pages[settings.pageIndex];
       await Promise.all(this.actions.toArray().flatMap((item) => {

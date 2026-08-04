@@ -15,7 +15,7 @@
 <body>
   <label for="focus-feedback">
     <span>Show FOCUSED flash</span>
-    <input id="focus-feedback" type="checkbox">
+    <input id="focus-feedback" type="checkbox" disabled>
   </label>
   <p>Show a brief confirmation after switching threads.</p>
   <script>
@@ -34,6 +34,7 @@
         if (message.event !== "didReceiveGlobalSettings") return;
         settings = message.payload.settings ?? {};
         input.checked = settings.focusFeedback === true;
+        input.disabled = false;
       });
       input.addEventListener("change", () => {
         settings = { ...settings, focusFeedback: input.checked };

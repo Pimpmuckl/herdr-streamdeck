@@ -459,7 +459,7 @@ class AttentionAction extends SingletonAction {
     const count = attentionPanes(herdr.snapshot).length;
     return renderKey(action, keySvg({
       label: "INBOX",
-      detail: count ? String(count) : undefined,
+      count: count || undefined,
       status: count ? "blocked" : undefined
     }, theme));
   }

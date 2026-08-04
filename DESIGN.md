@@ -2,6 +2,9 @@
 name: Herdr Stream Deck+
 description: A dense, runtime-themed physical triage instrument for Herdr.
 typography:
+  attention-count:
+    fontSize: "72px"
+    fontWeight: 700
   primary-label:
     fontSize: "26px"
     fontWeight: 700
@@ -93,6 +96,7 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 ### Hierarchy
 
 - **Primary label** (700, 26px, 29px line step): key names use at most two centered lines.
+- **Attention count** (700, 72px): the dominant datum on the active Inbox key.
 - **Dial value** (700, 28px): the current page, thread, or question state.
 - **Status mark** (700, 22px): the compact upper-right state marker on a key.
 - **Meta label** (700, 20px): slot numbers and compact key metadata.
@@ -137,6 +141,7 @@ Keys use one rounded outline on the full black OLED field. The dial strip is rec
 - **Content:** the deepest useful pane identity, a border-carried state cue, and an optional short actionable footer. Slot numbers appear only when empty. Page and queue context use temporary full-strip takeovers; the idle strip remains the Herdr logo.
 - **Label behavior:** split labels at word separators when possible, use no more than two lines of 8 monospaced columns, and truncate the second line with an ellipsis. Never squeeze the font or leave an orphan third line. The deepest useful identity gets the largest type.
 - **State:** lifecycle color is repeated through border weight, border pattern, working motion, or a literal footer. Selection uses the separate upper-right focus dot. Do not restore interior status glyphs or the removed bottom rail.
+- **Inbox exception:** when attention exists, place `INBOX` at the top and render the queue count as the dominant 72-pixel number. Do not add a footer or icon.
 - **Empty slot:** show only its slot number and a quiet plus mark.
 
 ### Dial region

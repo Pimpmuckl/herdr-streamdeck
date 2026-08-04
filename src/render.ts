@@ -7,6 +7,7 @@ export type WorkingMotion = "darken" | "lighten" | "rainbow";
 
 type KeyView = {
   label: string;
+  count?: number;
   context?: string;
   detail?: string;
   slot?: number;
@@ -50,9 +51,12 @@ export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): str
     ? `<text x="76" y="130" ${monoFont} font-size="18" fill="${subtext}" text-anchor="middle" letter-spacing=".1">${escapeXml(compactContext(footerValue.toUpperCase(), 12))}</text>`
     : "";
   const labelY = lines.length === 1 ? 84 : lines.length === 2 ? 64 : 47;
-  const label = view.empty ? "" : lines.map((line, index) =>
-    `<text x="76" y="${labelY + index * 29}" ${monoFont} font-size="${labelSize}" fill="${text}" text-anchor="middle">${escapeXml(line)}</text>`
-  ).join("");
+  const label = view.empty ? "" : view.count === undefined
+    ? lines.map((line, index) =>
+        `<text x="76" y="${labelY + index * 29}" ${monoFont} font-size="${labelSize}" fill="${text}" text-anchor="middle">${escapeXml(line)}</text>`
+      ).join("")
+    : `<text x="76" y="36" ${monoFont} font-size="22" fill="${text}" text-anchor="middle">${escapeXml(view.label.toUpperCase())}</text>
+      <text x="76" y="116" ${monoFont} font-size="72" fill="${statusVisual?.color ?? text}" text-anchor="middle">${view.count}</text>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
     ${outline}${workingHighlight}${slot}${focus}

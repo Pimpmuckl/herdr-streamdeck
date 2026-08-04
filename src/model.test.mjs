@@ -177,6 +177,9 @@ red = "rgb(255, 85, 85)"
   assert.match(threadKey, /<rect x="4" y="4" width="136" height="136" rx="18"[^>]*stroke-width="5"/);
   assert.match(threadKey, /<circle cx="124" cy="20" r="6"/);
   assert.doesNotMatch(threadKey, />1<\/text>/);
+  const inboxKey = keySvg({ label: "INBOX", count: 12, status: "blocked" });
+  assert.match(inboxKey, /y="36"[^>]*font-size="22"[^>]*>INBOX<\/text>/);
+  assert.match(inboxKey, /y="116"[^>]*font-size="72"[^>]*>12<\/text>/);
   assert.match(keySvg({ label: "idle", status: "idle" }), /stroke-width="3"/);
   assert.match(keySvg({ label: "unknown", status: "unknown" }), /stroke-width="3" stroke-dasharray="10 8"/);
   assert.match(keySvg({ label: "done", status: "done" }), /stroke-width="7"/);

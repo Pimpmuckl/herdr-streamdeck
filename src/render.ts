@@ -212,7 +212,14 @@ function splitLabel(value: string, width: number): string[] {
   const clean = value.trim() || "EMPTY";
   if (displayWidth(clean) <= width) return [clean];
   const [first, rest] = splitLabelLine(clean, width);
-  return rest ? [first, truncate(rest, width)] : [first];
+  if (!rest) return [first];
+  if (displayWidth(rest) <= width) return [first, rest];
+  let [second, tail] = splitLabelLine(rest, width);
+  if (displayWidth(tail) > width && displayWidth(rest) <= width * 2) {
+    [second, tail] = splitAtWidth(rest, width);
+    tail = tail.replace(/^[-_\s]+/u, "").trim();
+  }
+  return tail ? [first, second, truncate(tail, width)] : [first, second];
 }
 
 function splitLabelLine(value: string, width: number): [string, string] {

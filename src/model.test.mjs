@@ -163,6 +163,8 @@ red = "rgb(255, 85, 85)"
   const mixedKey = keySvg({ label: "ABCDEFGHIJ-K" });
   assert.match(mixedKey, />ABCDEFGH<\/text>/);
   assert.match(mixedKey, />IJ-K<\/text>/);
+  assert.match(keySvg({ label: "nextide-saas-vod-kraken" }), />nextide-<\/text>.*>saas-vod<\/text>.*>kraken<\/text>/su);
+  assert.match(keySvg({ label: "ABCDEFGHIJKLMNOPQRSTUVWXY" }), />ABCDEFGH<\/text>.*>IJKLMNOP<\/text>.*>QRSTUVW…<\/text>/su);
   assert.match(keySvg({ label: "1234567😀" }), />1234567<\/text>.*>😀<\/text>/su);
   assert.match(keySvg({ label: "1234567e\u0301" }), />1234567é<\/text>/u);
   assert.match(keySvg({ label: "😀😀😀😀😀😀😀😀" }), />😀😀😀😀<\/text>.*>😀😀😀😀<\/text>/su);
@@ -172,7 +174,7 @@ red = "rgb(255, 85, 85)"
   assert.match(keySvg({ label: "PANE", context: "WORK › IMPLEMENTATION" }), />IMPLEMENTAT…<\/text>/);
 
   const threadKey = keySvg({ label: "research-vodint-graph", context: "VOD-INTELLIGENCE › T1", slot: 0, status: "working", selected: true });
-  assert.match(threadKey, /y="64"[^>]*>research<\/text>.*y="93"[^>]*>vodint-…<\/text>/s);
+  assert.match(threadKey, /y="47"[^>]*>research<\/text>.*y="76"[^>]*>vodint-<\/text>.*y="105"[^>]*>graph<\/text>/s);
   assert.doesNotMatch(threadKey, /<tspan/);
   assert.match(threadKey, /<rect x="4" y="4" width="136" height="136" rx="18"[^>]*stroke-width="5"/);
   assert.match(threadKey, /<circle cx="124" cy="20" r="6"/);

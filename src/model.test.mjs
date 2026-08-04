@@ -5,18 +5,20 @@ import {
   attentionPanes,
   commandIntent,
   hasResolvedTheme,
+  navigatePages,
   normalizeSettings,
   paneIdentity,
   resolvePin,
   resolvePinRequest,
   snapshotFromApi,
   slotForCoordinates,
+  visiblePageCount,
   wrappedIndex
 } from "./model.ts";
 import { themeFromHerdrConfig } from "../.preview/theme.js";
-import { dialSvg, keySvg } from "../.preview/render.js";
+import { dialSvg, keySvg, stripRegionSvg } from "../.preview/render.js";
 
-test("device state keeps six pins and page navigation wraps", () => {
+test("device state, pin identity, and device rendering stay coherent", () => {
   const settings = normalizeSettings({
     pageIndex: 8,
     pages: [{ name: "WORK", pins: [{ paneId: "w1:p1", label: "api" }] }]
@@ -30,6 +32,21 @@ test("device state keeps six pins and page navigation wraps", () => {
   assert.equal(slotForCoordinates(3, 0), null);
   assert.equal(slotForCoordinates(3, 1), null);
   assert.equal(wrappedIndex(0, -1, 3), 2);
+  const paged = normalizeSettings({
+    pages: [{ name: "ONE", pins: [{ paneId: "p1", label: "one" }] }]
+  });
+  navigatePages(paged, 2);
+  assert.equal(paged.pageIndex, 1);
+  assert.equal(paged.pages.length, 2);
+  assert.equal(visiblePageCount(paged), 2);
+  navigatePages(paged, 1);
+  assert.equal(paged.pageIndex, 1);
+  paged.pages[1].pins[0] = { paneId: "p2", label: "two" };
+  navigatePages(paged, 1);
+  assert.equal(paged.pageIndex, 2);
+  assert.equal(paged.pages.length, 3);
+  navigatePages(paged, -99);
+  assert.equal(paged.pageIndex, 0);
   assert.deepEqual(
     attentionPanes({
       panes: [
@@ -60,10 +77,41 @@ test("device state keeps six pins and page navigation wraps", () => {
       { pane_id: "new-2", terminal_id: "term-2", focused: false, agent_status: "working", agent_session: session }
     ]
   })?.pane_id, "new-2");
+  const renamedPane = resolvePin({ paneId: "old", label: "api", agentSession: session }, {
+    panes: [
+      { pane_id: "old", label: "renamed-api", focused: false, agent_status: "working", agent_session: session },
+      { pane_id: "other", label: "other", focused: false, agent_status: "idle", agent_session: session }
+    ]
+  });
+  assert.equal(renamedPane?.pane_id, "old");
+  assert.equal(paneIdentity(renamedPane, null, "api").primary, "renamed-api");
   assert.equal(resolvePin(pinned, {
     panes: [
       { pane_id: "old", terminal_id: "term-2", focused: false, agent_status: "working", agent_session: { ...session, value: "different" } }
     ]
+  })?.pane_id, "old");
+  assert.equal(resolvePin(pinned, {
+    panes: [{ pane_id: "shell", terminal_id: "term-2", focused: false, agent_status: "idle" }]
+  }), undefined);
+  assert.equal(resolvePin(pinned, {
+    panes: [{ pane_id: "reopened", terminal_id: "term-2", agent: "codex", focused: false, agent_status: "idle" }]
+  })?.pane_id, "reopened");
+  assert.equal(resolvePin(pinned, {
+    panes: [{
+      pane_id: "moved", terminal_id: "term-3", agent: "codex", terminal_title_stripped: "api",
+      focused: false, agent_status: "idle"
+    }]
+  })?.pane_id, "moved");
+  assert.equal(resolvePin(pinned, {
+    panes: ["one", "two"].map((pane_id) => ({
+      pane_id, agent: "codex", terminal_title_stripped: "api", focused: false, agent_status: "idle"
+    }))
+  }), undefined);
+  assert.equal(resolvePin(pinned, {
+    panes: [{
+      pane_id: "other-agent", terminal_id: "term-2", focused: false, agent_status: "working",
+      agent_session: { ...session, agent: "claude", value: "different" }
+    }]
   }), undefined);
   assert.equal(hasResolvedTheme(undefined), false);
   const palette = Object.fromEntries([
@@ -100,12 +148,12 @@ red = "rgb(255, 85, 85)"
   assert.equal(themeFromHerdrConfig(`[theme] # palette\nname = 'nord' # TOML literal string`)?.name, "nord");
 
   const wrappedKey = keySvg({ label: "ABCDEFGHIJ" });
-  assert.match(wrappedKey, />ABCDEFGHI<\/text>/);
-  assert.match(wrappedKey, />J<\/text>/);
+  assert.match(wrappedKey, />ABCDEFGH<\/text>/);
+  assert.match(wrappedKey, />IJ<\/text>/);
   const mixedKey = keySvg({ label: "ABCDEFGHIJ-K" });
-  assert.match(mixedKey, />ABCDEFGHI<\/text>/);
-  assert.match(mixedKey, />J-K<\/text>/);
-  assert.match(keySvg({ label: "1234567😀" }), />1234567😀<\/text>/u);
+  assert.match(mixedKey, />ABCDEFGH<\/text>/);
+  assert.match(mixedKey, />IJ-K<\/text>/);
+  assert.match(keySvg({ label: "1234567😀" }), />1234567<\/text>.*>😀<\/text>/su);
   assert.match(keySvg({ label: "1234567e\u0301" }), />1234567é<\/text>/u);
   assert.match(keySvg({ label: "😀😀😀😀😀😀😀😀" }), />😀😀😀😀<\/text>.*>😀😀😀😀<\/text>/su);
   assert.match(keySvg({ label: "1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣8️⃣" }), />1️⃣2️⃣3️⃣4️⃣<\/text>.*>5️⃣6️⃣7️⃣8️⃣<\/text>/su);
@@ -114,11 +162,16 @@ red = "rgb(255, 85, 85)"
   assert.match(keySvg({ label: "PANE", context: "WORK › IMPLEMENTATION" }), />IMPLEMENTAT…<\/text>/);
 
   const threadKey = keySvg({ label: "research-vodint-graph", context: "VOD-INTELLIGENCE › T1", slot: 0, status: "working", selected: true });
-  assert.match(threadKey, /y="47"[^>]*>research-<\/text>.*y="76"[^>]*>vodint-<\/text>.*y="105"[^>]*>graph<\/text>/s);
+  assert.match(threadKey, /y="64"[^>]*>research<\/text>.*y="93"[^>]*>vodint-…<\/text>/s);
   assert.doesNotMatch(threadKey, /<tspan/);
-  assert.match(threadKey, /<rect x="3" y="12" width="6" height="120"/);
+  assert.match(threadKey, /<rect x="4" y="4" width="136" height="136" rx="18"[^>]*stroke-width="5"/);
   assert.match(threadKey, /<circle cx="124" cy="20" r="6"/);
   assert.doesNotMatch(threadKey, />1<\/text>/);
+  assert.match(keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "darken" }), /stroke="#000000" stroke-opacity="\.72"[^>]*stroke-dashoffset="-25\.0"/);
+  assert.match(keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "lighten" }), /pathLength="100"[^>]*stroke="#[a-f0-9]+"[^>]*stroke-dashoffset="-25\.0"/i);
+  const rainbowKey = keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "rainbow" });
+  assert.equal(rainbowKey.match(/stroke-dasharray="3 97"/g)?.length, 4);
+  for (const color of ["#af2eff", "#ff3355", "#ffda53", "#1ee4bc"]) assert.match(rainbowKey, new RegExp(`stroke="${color}"`));
   assert.match(keySvg({ label: "", slot: 0, empty: true }), />1<\/text>/);
 
   const lowContrastTheme = {
@@ -136,6 +189,19 @@ red = "rgb(255, 85, 85)"
   assert.doesNotMatch(`${customKey}${hardwareDial}`, /<style|class=|font:/);
   assert.doesNotMatch(oledKey, /rgb\((?:10 10 10|20 20 20|157 0 6)\)/);
   assert.doesNotMatch(customKey, /rgb\((?:10 10 10|20 20 20)\)/);
+  const pageStrip = [0, 1, 2, 3].map((region) => stripRegionSvg(region, {
+    kind: "page", name: "ONE", position: "1 / 3", summary: "2 WORKING · 1 NEEDS YOU"
+  }, lowContrastTheme));
+  assert.match(pageStrip[0], /viewBox="0 0 200 100"/);
+  assert.match(pageStrip[1], /viewBox="200 0 200 100"/);
+  assert.match(pageStrip[3], /viewBox="600 0 200 100"/);
+  assert.match(pageStrip.join(""), /font-size="50"[^>]*>ONE<\/text>/);
+  assert.match(stripRegionSvg(0, { kind: "logo", image: "logo.png" }, lowContrastTheme), /<image href="logo\.png" x="350" y="0" width="100" height="100"\/>/);
+  assert.match(stripRegionSvg(0, { kind: "motion", name: "RAINBOW SWOOSH", position: "3 \/ 3" }, lowContrastTheme), />WORKING MOTION<\/text>.*>RAINBOW SWOOSH<\/text>/s);
+  const attentionStrip = stripRegionSvg(0, { kind: "attention", label: "api-rewrite", position: "1 \/ 2" }, lowContrastTheme);
+  assert.match(attentionStrip, />NEEDS YOU<\/text>/);
+  assert.match(attentionStrip, />PRESS OPEN<\/text>/);
+  assert.doesNotMatch(`${pageStrip.join("")}${attentionStrip}`, /<style|class=|font:|<tspan/);
   const [, red, green, blue] = oledKey.match(/font-size="[^"]+" fill="rgb\((\d+) (\d+) (\d+)\)"/).map(Number);
   const luminance = [red, green, blue].map((channel) => {
     const value = channel / 255;

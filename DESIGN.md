@@ -71,6 +71,7 @@ The plugin has no independent palette. Until Herdr exposes its resolved runtime 
 ### Runtime roles
 
 - **OLED field:** every key and dial background is fixed `#000000`; theme surface colors never tint unused pixels.
+- **Idle brand mark:** the exact Herdr vector uses `#959391` on the black dial strip so it stays quieter than live status content.
 - **Surface role:** `surface1` defines only the resting key outline.
 - **Text roles:** `text` and `subtext0` separate primary labels from slot numbers, titles, and hints.
 - **Contrast adaptation:** configured text and semantic roles retain their hue and are lifted toward white only when needed to remain legible on black.
@@ -104,7 +105,11 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 
 **The Operational Copy Rule.** Labels stay brief, literal, and free of implementation terminology; longer content belongs only in the coordinated Question surface.
 
+**The Authored Action Feedback Rule.** Every interactive key and dial owns its pending, success, failure, and restore behavior. An immediate authored state change such as focus, page, Inbox, or Command mode is sufficient acknowledgement; otherwise the affected control briefly renders a literal outcome such as `PINNED`, `UNPINNED`, `FOCUSED`, or `SENT`. Failures name the cause and recovery on the affected control. Never call Stream Deck's generic `showOk()` or `showAlert()` overlays, and never let a rejected action fall through to host-owned feedback.
+
 **The Actionable Error Rule.** Never use the host warning triangle. Render a short cause and recovery hint on the affected key or dial, then restore its normal state.
+
+**The Working Motion Rule.** Keep working labels and the blue lifecycle outline static; animate only a 12% swoosh carried by that same outline. Render explicit SVG frames every 128 milliseconds only on visible working keys. Motion never adds an interior ornament, replaces semantic color, or overwrites pressed, success, or failure feedback. Dial 4 compares darkening, lightening, and Nextide rainbow treatments on identical geometry and timing; the treatment remains under physical-device comparison and is not yet locked.
 
 ## Layout
 
@@ -130,7 +135,7 @@ Keys use one 16-pixel-radius outline on the full black OLED field. The dial stri
 
 - **Canvas:** full 144 by 144 pixels of deep black with a 3-pixel inset outline.
 - **Content:** slot number, compact workspace and tab context, the deepest useful pane identity, a state mark, and an optional short hint.
-- **Label behavior:** split labels at word separators when possible, cap lines at 8 monospaced columns, and truncate overflow with an ellipsis. Context caps at 11 columns and prioritizes its trailing tab identity, dropping the workspace first when both do not fit. The deepest useful identity gets the largest type.
+- **Label behavior:** split labels at word separators when possible, use no more than two lines of 8 monospaced columns, and truncate the second line with an ellipsis. Never squeeze the font or leave an orphan third line. Context caps at 11 columns and prioritizes its trailing tab identity, dropping the workspace first when both do not fit. The deepest useful identity gets the largest type.
 - **State:** focused keys use the stronger 5-pixel text-role border; ordinary keys use the 2-pixel surface-role border. A bottom rail and authored mark repeat state without relying on color alone.
 - **Empty slot:** show only its slot number and a quiet plus mark.
 
@@ -146,7 +151,14 @@ Keys use one 16-pixel-radius outline on the full black OLED field. The dial stri
 - **Entry:** tapping Inbox immediately replaces all four dial regions; no second press is required.
 - **Content:** show queue position, selected thread, needs-input state, and the available `OPEN` action.
 - **Fallback:** when Herdr does not expose structured question content, never infer it from terminal text; identify the item and open it in Herdr.
-- **Exit:** Command returns to the dashboard. An empty queue uses the same full-strip surface to report `ALL CLEAR`.
+- **Exit:** Command returns to the dashboard. The takeover also returns to the Herdr logo after five seconds. An empty queue uses the same full-strip surface to report `ALL CLEAR`.
+
+### Page takeover
+
+- **Entry:** turning dial 1 immediately switches the six pinned keys and replaces the whole strip with the active page.
+- **Content:** show the page name, its position among currently reachable pages, and a terse status summary.
+- **Exit:** return to the Herdr logo five seconds after the latest page turn.
+- **Boundary:** expose every used page and exactly one empty next page; do not wrap or scroll through additional blanks.
 
 ### Command bank
 

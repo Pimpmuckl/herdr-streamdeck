@@ -81,7 +81,7 @@ export class HerdrBridge {
         focused: snapshot.focused_pane_id,
         panes: snapshot.panes.map((pane) => [
           pane.pane_id, pane.agent_status, pane.focused, pane.label, pane.terminal_title_stripped,
-          pane.cwd, pane.workspace_id, pane.tab_id
+          pane.cwd, pane.workspace_id, pane.tab_id, pane.terminal_id, pane.agent, pane.agent_session
         ]),
         tabs: snapshot.tabs,
         workspaces: snapshot.workspaces,

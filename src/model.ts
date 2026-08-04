@@ -34,6 +34,7 @@ export type AgentStatus = "idle" | "working" | "blocked" | "done" | "unknown";
 
 export type PaneSnapshot = {
   pane_id: string;
+  agent?: string;
   workspace_id?: string;
   tab_id?: string;
   terminal_id?: string;
@@ -136,6 +137,26 @@ export function wrappedIndex(index: number, ticks: number, length: number): numb
   return ((index + ticks) % length + length) % length;
 }
 
+export function navigatePages(settings: DeckSettings, ticks: number): void {
+  const direction = Math.sign(ticks);
+  for (let step = 0; step < Math.abs(ticks); step++) {
+    if (direction < 0) {
+      settings.pageIndex = Math.max(0, settings.pageIndex - 1);
+      continue;
+    }
+    if (!settings.pages[settings.pageIndex].pins.some(Boolean)) return;
+    if (settings.pageIndex === settings.pages.length - 1) {
+      settings.pages.push({ name: `PAGE ${settings.pages.length + 1}`, pins: Array(6).fill(null) });
+    }
+    settings.pageIndex++;
+  }
+}
+
+export function visiblePageCount(settings: DeckSettings): number {
+  const firstEmpty = settings.pages.findIndex((page) => !page.pins.some(Boolean));
+  return Math.max(settings.pageIndex + 1, firstEmpty < 0 ? settings.pages.length : firstEmpty + 1);
+}
+
 export function attentionPanes(snapshot: HerdrSnapshot | null): PaneSnapshot[] {
   return snapshot?.panes.filter((pane) => pane.agent_status === "blocked") ?? [];
 }
@@ -195,7 +216,17 @@ export function resolvePin(pin: Pin | null, snapshot: HerdrSnapshot | null): Pan
   if (agentSession) {
     const matches = snapshot.panes.filter((pane) => sameSession(pane.agent_session, agentSession));
     if (matches.length === 1) return matches[0];
-    if (matches.length === 0) return undefined;
+    const samePane = matches.find((pane) => pane.pane_id === pin.paneId);
+    if (samePane) return samePane;
+    if (pin.terminalId) {
+      const replacements = snapshot.panes.filter((pane) => pane.terminal_id === pin.terminalId
+        && (sameAgent(pane.agent_session, agentSession) || (!pane.agent_session && pane.agent === agentSession.agent)));
+      if (replacements.length === 1) return replacements[0];
+    }
+    const labelMatches = snapshot.panes.filter((pane) => paneLabel(pane, pane.pane_id) === pin.label
+      && (sameAgent(pane.agent_session, agentSession) || (!pane.agent_session && pane.agent === agentSession.agent)));
+    if (labelMatches.length === 1) return labelMatches[0];
+    return undefined;
   }
   if (pin.terminalId) {
     const matches = snapshot.panes.filter((pane) => pane.terminal_id === pin.terminalId);
@@ -210,11 +241,11 @@ export function hasResolvedTheme(theme: ThemeSnapshot | undefined): theme is Res
 }
 
 function sameSession(left: AgentSessionRef | undefined, right: AgentSessionRef): boolean {
-  return Boolean(left
-    && left.source === right.source
-    && left.agent === right.agent
-    && left.kind === right.kind
-    && left.value === right.value);
+  return sameAgent(left, right) && left?.value === right.value;
+}
+
+function sameAgent(left: AgentSessionRef | undefined, right: AgentSessionRef): boolean {
+  return Boolean(left && left.source === right.source && left.agent === right.agent && left.kind === right.kind);
 }
 
 function cleanLabel(value: string | undefined): string | undefined {

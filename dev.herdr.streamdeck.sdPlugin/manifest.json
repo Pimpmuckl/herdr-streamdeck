@@ -50,7 +50,7 @@
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
-        "TriggerDescription": { "Rotate": "Preview page", "Push": "Switch page" }
+        "TriggerDescription": { "Rotate": "Switch page", "Push": "Return to page one" }
       },
       "States": [{ "Image": "imgs/key" }]
     },
@@ -61,7 +61,7 @@
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
-        "TriggerDescription": { "Rotate": "Preview item", "Push": "Open item" }
+        "TriggerDescription": { "Rotate": "Reserved", "Push": "Reserved" }
       },
       "States": [{ "Image": "imgs/key" }]
     },
@@ -72,7 +72,7 @@
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
-        "TriggerDescription": { "Rotate": "View only", "Push": "View only" }
+        "TriggerDescription": { "Rotate": "Reserved", "Push": "Reserved" }
       },
       "States": [{ "Image": "imgs/key" }]
     },
@@ -83,7 +83,7 @@
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
-        "TriggerDescription": { "Rotate": "View only", "Push": "Focus in Herdr" }
+        "TriggerDescription": { "Rotate": "Reserved", "Push": "Open in Herdr" }
       },
       "States": [{ "Image": "imgs/key" }]
     }

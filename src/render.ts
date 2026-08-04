@@ -3,6 +3,8 @@ import type { AgentStatus, PaneSnapshot, ResolvedThemeSnapshot } from "./model.j
 const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
 const monoFont = `font-family="Consolas" font-weight="700"`;
 
+export type WorkingMotion = "darken" | "lighten" | "rainbow";
+
 type KeyView = {
   label: string;
   context?: string;
@@ -12,24 +14,34 @@ type KeyView = {
   selected?: boolean;
   empty?: boolean;
   danger?: boolean;
+  workingFrame?: number;
+  workingMotion?: WorkingMotion;
 };
+
+export type StripView =
+  | { kind: "logo"; image: string }
+  | { kind: "page"; name: string; position: string; summary: string }
+  | { kind: "attention"; label: string; position: string }
+  | { kind: "clear" }
+  | { kind: "command"; label: string }
+  | { kind: "motion"; name: string; position: string };
 
 export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): string {
   const palette = theme?.palette;
   const text = palette && view.danger ? oledColor(palette.red) : oledForeground(theme, "text");
   const subtext = oledForeground(theme, "subtext");
   const statusVisual = statusAppearance(view.status, theme);
-  const lines = splitLabel(view.label, 9);
+  const lines = splitLabel(view.label, 8);
   const labelSize = Math.max(24, 36 - Math.max(...lines.map(displayWidth)) * 1.5);
-  const railColor = view.danger
+  const outlineColor = view.danger
     ? palette ? oledColor(palette.red) : "#ffffff"
     : statusVisual?.color;
   const slot = view.empty && view.slot !== undefined
     ? `<text x="16" y="32" ${monoFont} font-size="26" fill="${subtext}">${view.slot + 1}</text>`
     : "";
   const focus = view.selected ? `<circle cx="124" cy="20" r="6" fill="${oledForeground(theme, "text")}"/>` : "";
-  const rail = railColor ? `<rect x="3" y="12" width="6" height="120" rx="3" fill="${railColor}"/>` : "";
-  const frame = view.danger ? `<rect x="3" y="3" width="138" height="138" rx="16" fill="none" stroke="${railColor}" stroke-width="5"/>` : "";
+  const outline = outlineColor ? `<rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="${outlineColor}" stroke-width="5"/>` : "";
+  const workingHighlight = workingAnimation(view, theme);
   const empty = view.empty ? `<path d="M57 76H87M72 61V91" stroke="${subtext}" stroke-width="6" stroke-linecap="round"/>` : "";
   const footerValue = (view.detail || view.context)?.replaceAll(" › ", " · ");
   const footer = footerValue
@@ -41,7 +53,7 @@ export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): str
   ).join("");
   return `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    ${rail}${frame}${slot}${focus}
+    ${outline}${workingHighlight}${slot}${focus}
     ${label}
     ${footer}${empty}
   </svg>`;
@@ -65,12 +77,82 @@ export function dialSvg(
   </svg>`;
 }
 
+export function stripRegionSvg(
+  region: number,
+  view: StripView,
+  theme?: ResolvedThemeSnapshot | null
+): string {
+  const palette = theme?.palette;
+  const text = oledForeground(theme, "text");
+  const subtext = oledForeground(theme, "subtext");
+  const accent = palette ? oledColor(palette.accent, 3) : "#ffffff";
+  const yellow = palette ? oledColor(palette.yellow, 3) : "#ffffff";
+  let content: string;
+
+  switch (view.kind) {
+    case "logo":
+      content = `<image href="${view.image}" x="350" y="0" width="100" height="100"/>`;
+      break;
+    case "page":
+      content = `<rect width="6" height="100" fill="${accent}"/>
+        <text x="28" y="61" ${monoFont} font-size="50" fill="${text}">${escapeXml(truncate(view.name.toUpperCase(), 16))}</text>
+        <text x="31" y="89" ${monoFont} font-size="19" fill="${subtext}">${escapeXml(view.summary)}</text>
+        <text x="772" y="31" ${monoFont} font-size="20" fill="${subtext}" text-anchor="end">${escapeXml(view.position)}</text>`;
+      break;
+    case "attention":
+      content = `<rect width="6" height="100" fill="${yellow}"/>
+        <text x="28" y="27" ${monoFont} font-size="19" fill="${yellow}">NEEDS YOU</text>
+        <text x="28" y="70" ${monoFont} font-size="42" fill="${text}">${escapeXml(truncate(view.label, 16))}</text>
+        <text x="772" y="27" ${monoFont} font-size="19" fill="${subtext}" text-anchor="end">${escapeXml(view.position)}</text>
+        <text x="772" y="70" ${monoFont} font-size="21" fill="${text}" text-anchor="end">PRESS OPEN</text>`;
+      break;
+    case "clear":
+      content = `<text x="400" y="65" ${monoFont} font-size="42" fill="${text}" text-anchor="middle">ALL CLEAR</text>`;
+      break;
+    case "command":
+      content = `<rect width="6" height="100" fill="${accent}"/>
+        <text x="28" y="27" ${monoFont} font-size="19" fill="${accent}">COMMAND</text>
+        <text x="28" y="70" ${monoFont} font-size="42" fill="${text}">${escapeXml(truncate(view.label, 22))}</text>`;
+      break;
+    case "motion":
+      content = `<rect width="6" height="100" fill="${palette ? oledColor(palette.blue, 3) : "#ffffff"}"/>
+        <text x="28" y="27" ${monoFont} font-size="19" fill="${subtext}">WORKING MOTION</text>
+        <text x="28" y="70" ${monoFont} font-size="42" fill="${text}">${escapeXml(view.name)}</text>
+        <text x="772" y="29" ${monoFont} font-size="20" fill="${subtext}" text-anchor="end">${escapeXml(view.position)}</text>`;
+      break;
+  }
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="${region * 200} 0 200 100">
+    <rect width="800" height="100" fill="#000000"/>
+    ${content}
+  </svg>`;
+}
+
+function workingAnimation(view: KeyView, theme?: ResolvedThemeSnapshot | null): string {
+  if (view.status !== "working" || view.workingFrame === undefined) return "";
+  const frame = Math.max(0, view.workingFrame);
+  const offset = -((frame % 16) / 16) * 100;
+  const rect = `x="4" y="4" width="136" height="136" rx="18" pathLength="100" fill="none" stroke-linecap="round" stroke-width="5"`;
+  switch (view.workingMotion ?? "lighten") {
+    case "darken":
+      return `<rect ${rect} stroke="#000000" stroke-opacity=".72" stroke-dasharray="12 88" stroke-dashoffset="${offset.toFixed(1)}"/>`;
+    case "lighten":
+      return `<rect ${rect} stroke="${oledForeground(theme, "text")}" stroke-dasharray="12 88" stroke-dashoffset="${offset.toFixed(1)}"/>`;
+    case "rainbow":
+      return ["#af2eff", "#ff3355", "#ffda53", "#1ee4bc"].map((color, index) =>
+        `<rect ${rect} stroke="${color}" stroke-dasharray="3 97" stroke-dashoffset="${(offset - index * 3).toFixed(1)}"/>`
+      ).join("");
+  }
+}
+
 function statusAppearance(status: KeyView["status"], theme?: ResolvedThemeSnapshot | null): { color: string } | null {
   const palette = theme?.palette;
   switch (status) {
     case "blocked": return { color: palette ? oledColor(palette.yellow) : "#ffffff" };
     case "working": return { color: palette ? oledColor(palette.blue) : "#ffffff" };
-    case "done": case "idle": case "unknown": case "offline": return { color: palette ? oledColor(palette.overlay0) : "#9a9ca5" };
+    case "done": return { color: palette ? oledColor(palette.green) : "#ffffff" };
+    case "offline": return { color: palette ? oledColor(palette.red) : "#ffffff" };
+    case "idle": case "unknown": return { color: palette ? oledColor(palette.overlay0) : "#9a9ca5" };
     default: return null;
   }
 }
@@ -121,23 +203,31 @@ function relativeLuminance(rgb: { r: number; g: number; b: number }): number {
 function splitLabel(value: string, width: number): string[] {
   const clean = value.trim() || "EMPTY";
   if (displayWidth(clean) <= width) return [clean];
-  const parts = (clean.match(/[^-_\s]+(?:[-_]+|$)/g) || [clean]).flatMap((word) => {
-    const chunks: string[] = [];
-    while (displayWidth(word) > width) {
-      const [chunk, rest] = splitAtWidth(word, width);
-      chunks.push(chunk);
-      word = rest;
+  const [first, rest] = splitLabelLine(clean, width);
+  return rest ? [first, truncate(rest, width)] : [first];
+}
+
+function splitLabelLine(value: string, width: number): [string, string] {
+  const characters = graphemes(value);
+  const [hardLine] = splitAtWidth(value, width);
+  const hardLength = graphemes(hardLine).length;
+  let breakAt = -1;
+  for (let index = hardLength - 1; index >= 0; index--) {
+    if (/[-_\s]/u.test(characters[index])) {
+      breakAt = index;
+      break;
     }
-    return word ? [...chunks, word] : chunks;
-  });
-  const lines: string[] = [];
-  for (const part of parts) {
-    const previous = lines.at(-1) || "";
-    const combined = `${previous}${previous && !/[-_]$/.test(previous) ? " " : ""}${part}`;
-    if (lines.length && displayWidth(combined) <= width) lines[lines.length - 1] = combined;
-    else lines.push(part);
   }
-  return lines.length <= 3 ? lines : [...lines.slice(0, 2), truncate(lines.slice(2).join(" "), width)];
+  if (breakAt > 0) {
+    const keepSeparator = !/\s/u.test(characters[breakAt]);
+    return [
+      characters.slice(0, breakAt + Number(keepSeparator)).join("").trim(),
+      characters.slice(breakAt + 1).join("").trim()
+    ];
+  }
+  const rest = characters.slice(hardLength);
+  if (rest[0] && /[-_\s]/u.test(rest[0])) rest.shift();
+  return [hardLine, rest.join("").trim()];
 }
 
 function truncate(value: string, width: number): string {

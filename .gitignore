@@ -2,6 +2,7 @@ node_modules/
 .preview/
 dist/
 dev.herdr.streamdeck.sdPlugin/bin/
+dev.herdr.streamdeck.sdPlugin/logs/
 dev.herdr.streamdeck.sdPlugin/profiles/
 *.streamDeckPlugin
 *.streamDeckProfile

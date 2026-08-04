@@ -47,14 +47,14 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 
 ### Pin pages and six thread keys
 
-- Users may create and name pages of six pinned threads.
+- Pages grow on demand without a fixed limit. Dial 1 exposes used pages plus exactly one empty next page; another page appears only after that page receives a pin.
 - Turning dial 1 immediately switches the active page and redraws the six thread keys.
 - Stream Deck settings are the primary page manager for create, rename, reorder, and delete.
 - A single pin tap focuses its thread inside Herdr without stealing operating-system focus.
 - Tapping an empty slot pins Herdr's focused thread.
 - A second tap raises the existing Herdr client.
 - Holding an occupied slot unpins it. Replacement requires unpinning first.
-- Offline pins remain visible and dim. They are never silently reassigned or resumed.
+- Offline pins remain visible. A restarted agent reconnects by exact session, then the same terminal and agent, then one unique exact label for that agent. Ambiguous or different agents stay offline.
 - Herdr should expose `Pin to Stream Deck...` on a thread. It opens a compact page-and-slot map that shows occupied slots and allows direct placement.
 - Both configuration surfaces operate on one shared pin and page model.
 
@@ -151,7 +151,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 
 ## Evidence on Hand
 
-- `herdr_logo.png`: primary square Herdr mark.
+- `herdr_logo.svg`: primary square Herdr mark and OLED baseline source.
 - `herdr_logo_wide.png`: wide mark for light surfaces.
 - `herdr_logo_wide_dark.png`: wide mark for dark surfaces.
 - A runnable Stream Deck plugin slice and actual-resolution rendered previews now cover the dashboard, light/dark Herdr theme sync, one-shot Command Mode, and armed Stop state.

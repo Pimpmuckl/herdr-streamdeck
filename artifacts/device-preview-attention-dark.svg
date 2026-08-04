@@ -2,27 +2,27 @@
     <rect width="800" height="466" rx="28" fill="#101015"/>
     <svg x="88" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="12" width="6" height="120" rx="3" fill="rgb(249 226 175)"/><circle cx="124" cy="20" r="6" fill="rgb(205 214 244)"/>
-    <text x="76" y="47" font-family="Consolas" font-weight="700" font-size="24" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">research-</tspan><tspan x="76" dy="29">vodint-</tspan><tspan x="76" dy="29">graph</tspan></text>
+    <rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="rgb(249 226 175)" stroke-width="5"/><circle cx="124" cy="20" r="6" fill="rgb(205 214 244)"/>
+    <text x="76" y="64" font-family="Consolas" font-weight="700" font-size="24" fill="rgb(205 214 244)" text-anchor="middle">research</text><text x="76" y="93" font-family="Consolas" font-weight="700" font-size="24" fill="rgb(205 214 244)" text-anchor="middle">vodint-…</text>
     <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">NEEDS YOU</text>
   </svg>
 <svg x="248" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="12" width="6" height="120" rx="3" fill="rgb(137 180 250)"/>
-    <text x="76" y="64" font-family="Consolas" font-weight="700" font-size="25.5" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">review-</tspan><tspan x="76" dy="29">suite</tspan></text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">TOOLS · T2</text>
+    <rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="rgb(137 180 250)" stroke-width="5"/><rect x="4" y="4" width="136" height="136" rx="18" pathLength="100" fill="none" stroke-linecap="round" stroke-width="5" stroke="rgb(205 214 244)" stroke-dasharray="12 88" stroke-dashoffset="-31.3"/>
+    <text x="76" y="64" font-family="Consolas" font-weight="700" font-size="25.5" fill="rgb(205 214 244)" text-anchor="middle">review-</text><text x="76" y="93" font-family="Consolas" font-weight="700" font-size="25.5" fill="rgb(205 214 244)" text-anchor="middle">suite</text>
+
   </svg>
 <svg x="408" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="12" width="6" height="120" rx="3" fill="rgb(112 116 137)"/>
-    <text x="76" y="64" font-family="Consolas" font-weight="700" font-size="25.5" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">kraken-</tspan><tspan x="76" dy="29">backup</tspan></text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">AUDIT · T1</text>
+    <rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="rgb(137 180 250)" stroke-width="5"/><rect x="4" y="4" width="136" height="136" rx="18" pathLength="100" fill="none" stroke-linecap="round" stroke-width="5" stroke="#000000" stroke-opacity=".72" stroke-dasharray="12 88" stroke-dashoffset="-31.3"/>
+    <text x="76" y="64" font-family="Consolas" font-weight="700" font-size="25.5" fill="rgb(205 214 244)" text-anchor="middle">kraken-</text><text x="76" y="93" font-family="Consolas" font-weight="700" font-size="25.5" fill="rgb(205 214 244)" text-anchor="middle">backup</text>
+
   </svg>
 <svg x="568" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="12" width="6" height="120" rx="3" fill="rgb(249 226 175)"/><circle cx="124" cy="20" r="6" fill="rgb(205 214 244)"/>
-    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="28.5" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">INBOX</tspan></text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">2 NEED YOU</text>
+    <rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="rgb(249 226 175)" stroke-width="5"/>
+    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="28.5" fill="rgb(205 214 244)" text-anchor="middle">INBOX</text>
+    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">2</text>
   </svg>
 <svg x="88" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
@@ -32,45 +32,53 @@
   </svg>
 <svg x="248" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="12" width="6" height="120" rx="3" fill="rgb(112 116 137)"/>
-    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="24" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">daedalus</tspan></text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">DAEDAL… · T1</text>
+    <rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="rgb(112 116 137)" stroke-width="5"/>
+    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="24" fill="rgb(205 214 244)" text-anchor="middle">daedalus</text>
+
   </svg>
 <svg x="408" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="3" y="12" width="6" height="120" rx="3" fill="rgb(137 180 250)"/>
-    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="24" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">vod-graph</tspan></text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">VOD RE… · T5</text>
+    <rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="rgb(137 180 250)" stroke-width="5"/><rect x="4" y="4" width="136" height="136" rx="18" pathLength="100" fill="none" stroke-linecap="round" stroke-width="5" stroke="#af2eff" stroke-dasharray="3 97" stroke-dashoffset="-31.3"/><rect x="4" y="4" width="136" height="136" rx="18" pathLength="100" fill="none" stroke-linecap="round" stroke-width="5" stroke="#ff3355" stroke-dasharray="3 97" stroke-dashoffset="-34.3"/><rect x="4" y="4" width="136" height="136" rx="18" pathLength="100" fill="none" stroke-linecap="round" stroke-width="5" stroke="#ffda53" stroke-dasharray="3 97" stroke-dashoffset="-37.3"/><rect x="4" y="4" width="136" height="136" rx="18" pathLength="100" fill="none" stroke-linecap="round" stroke-width="5" stroke="#1ee4bc" stroke-dasharray="3 97" stroke-dashoffset="-40.3"/>
+    <text x="76" y="64" font-family="Consolas" font-weight="700" font-size="28.5" fill="rgb(205 214 244)" text-anchor="middle">vod-</text><text x="76" y="93" font-family="Consolas" font-weight="700" font-size="28.5" fill="rgb(205 214 244)" text-anchor="middle">graph</text>
+
   </svg>
 <svg x="568" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
 
-    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="25.5" fill="rgb(205 214 244)" text-anchor="middle"><tspan x="76" dy="0">COMMAND</tspan></text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">TAP ACTIONS</text>
+    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="25.5" fill="rgb(205 214 244)" text-anchor="middle">COMMAND</text>
+
   </svg>
     <rect y="342" width="800" height="112" rx="10" fill="#050507"/>
     <svg x="0" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">
-    <rect width="200" height="100" fill="#000000"/>
-    <rect x="0" y="0" width="5" height="100" fill="rgb(249 226 175)"/>
-    <text x="18" y="32" font-family="Consolas" font-weight="700" font-size="20" fill="rgb(166 173 200)" letter-spacing=".2">INBOX</text>
-    <text x="18" y="73" font-family="Consolas" font-weight="700" font-size="28" fill="rgb(205 214 244)">1 OF 2</text>
+    <rect width="800" height="100" fill="#000000"/>
+    <rect width="6" height="100" fill="rgb(249 226 175)"/>
+        <text x="28" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(249 226 175)">NEEDS YOU</text>
+        <text x="28" y="70" font-family="Consolas" font-weight="700" font-size="42" fill="rgb(205 214 244)">api-rewrite</text>
+        <text x="772" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(166 173 200)" text-anchor="end">1 / 2</text>
+        <text x="772" y="70" font-family="Consolas" font-weight="700" font-size="21" fill="rgb(205 214 244)" text-anchor="end">PRESS OPEN</text>
   </svg>
-<svg x="200" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">
-    <rect width="200" height="100" fill="#000000"/>
-    <rect x="0" y="0" width="5" height="100" fill="rgb(249 226 175)"/>
-    <text x="18" y="32" font-family="Consolas" font-weight="700" font-size="20" fill="rgb(166 173 200)" letter-spacing=".2">THREAD</text>
-    <text x="18" y="73" font-family="Consolas" font-weight="700" font-size="28" fill="rgb(205 214 244)">api-rewri…</text>
+<svg x="200" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="200 0 200 100">
+    <rect width="800" height="100" fill="#000000"/>
+    <rect width="6" height="100" fill="rgb(249 226 175)"/>
+        <text x="28" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(249 226 175)">NEEDS YOU</text>
+        <text x="28" y="70" font-family="Consolas" font-weight="700" font-size="42" fill="rgb(205 214 244)">api-rewrite</text>
+        <text x="772" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(166 173 200)" text-anchor="end">1 / 2</text>
+        <text x="772" y="70" font-family="Consolas" font-weight="700" font-size="21" fill="rgb(205 214 244)" text-anchor="end">PRESS OPEN</text>
   </svg>
-<svg x="400" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">
-    <rect width="200" height="100" fill="#000000"/>
-    <rect x="0" y="0" width="5" height="100" fill="rgb(249 226 175)"/>
-    <text x="18" y="32" font-family="Consolas" font-weight="700" font-size="20" fill="rgb(166 173 200)" letter-spacing=".2">NEEDS INPUT</text>
-    <text x="18" y="73" font-family="Consolas" font-weight="700" font-size="28" fill="rgb(205 214 244)">IN HERDR</text>
+<svg x="400" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="400 0 200 100">
+    <rect width="800" height="100" fill="#000000"/>
+    <rect width="6" height="100" fill="rgb(249 226 175)"/>
+        <text x="28" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(249 226 175)">NEEDS YOU</text>
+        <text x="28" y="70" font-family="Consolas" font-weight="700" font-size="42" fill="rgb(205 214 244)">api-rewrite</text>
+        <text x="772" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(166 173 200)" text-anchor="end">1 / 2</text>
+        <text x="772" y="70" font-family="Consolas" font-weight="700" font-size="21" fill="rgb(205 214 244)" text-anchor="end">PRESS OPEN</text>
   </svg>
-<svg x="600" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">
-    <rect width="200" height="100" fill="#000000"/>
-    <rect x="0" y="0" width="5" height="100" fill="rgb(249 226 175)"/>
-    <text x="18" y="32" font-family="Consolas" font-weight="700" font-size="20" fill="rgb(166 173 200)" letter-spacing=".2">PRESS DIAL</text>
-    <text x="18" y="73" font-family="Consolas" font-weight="700" font-size="28" fill="rgb(205 214 244)">OPEN</text>
+<svg x="600" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="600 0 200 100">
+    <rect width="800" height="100" fill="#000000"/>
+    <rect width="6" height="100" fill="rgb(249 226 175)"/>
+        <text x="28" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(249 226 175)">NEEDS YOU</text>
+        <text x="28" y="70" font-family="Consolas" font-weight="700" font-size="42" fill="rgb(205 214 244)">api-rewrite</text>
+        <text x="772" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(166 173 200)" text-anchor="end">1 / 2</text>
+        <text x="772" y="70" font-family="Consolas" font-weight="700" font-size="21" fill="rgb(205 214 244)" text-anchor="end">PRESS OPEN</text>
   </svg>
   </svg>

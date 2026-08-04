@@ -83,6 +83,7 @@ export type Pin = {
 };
 export type PinPage = { name: string; pins: Array<Pin | null> };
 export type LogoAlignment = "center" | "right";
+export const MOTION_BASE_SPEED = 0.5;
 export type DeckSettings = {
   pageIndex: number;
   pages: PinPage[];
@@ -95,8 +96,8 @@ export const DEFAULT_SETTINGS: DeckSettings = {
   pageIndex: 0,
   pages: ["ONE", "TWO", "THREE"].map((name) => ({ name, pins: Array(6).fill(null) })),
   focusFeedback: false,
-  motionSpeed: 1,
-  logoAlignment: "center"
+  motionSpeed: MOTION_BASE_SPEED,
+  logoAlignment: "right"
 };
 
 export function normalizeSettings(value: unknown): DeckSettings {
@@ -120,13 +121,13 @@ export function normalizeSettings(value: unknown): DeckSettings {
     focusFeedback: input.focusFeedback === true,
     motionSpeed: typeof input.motionSpeed === "number" && Number.isFinite(input.motionSpeed)
       ? adjustMotionSpeed(input.motionSpeed, 0)
-      : 1,
-    logoAlignment: input.logoAlignment === "right" ? "right" : "center"
+      : MOTION_BASE_SPEED,
+    logoAlignment: input.logoAlignment === "center" ? "center" : "right"
   };
 }
 
 export function adjustMotionSpeed(speed: number, ticks: number): number {
-  return Math.max(0.2, Math.min(2, Math.round((speed + ticks * 0.1) * 10) / 10));
+  return Math.max(0.1, Math.min(1, Math.round((speed + ticks * 0.05) * 20) / 20));
 }
 
 function normalizePin(value: unknown): Pin | null {

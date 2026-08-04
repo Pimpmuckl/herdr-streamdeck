@@ -17,6 +17,7 @@ import {
   attentionPanes,
   commandIntent,
   type DeckSettings,
+  MOTION_BASE_SPEED,
   navigatePages,
   normalizeSettings,
   type PaneSnapshot,
@@ -49,7 +50,7 @@ const motionVariants = [
   { id: "lighten", name: "LIGHT SWOOSH" },
   { id: "rainbow", name: "RAINBOW SWOOSH" }
 ] satisfies Array<{ id: WorkingMotion; name: string }>;
-let motionVariantIndex = 1;
+let motionVariantIndex = 0;
 
 type Listener = () => void;
 
@@ -792,7 +793,7 @@ async function renderStrip(action: DialAction, region: number): Promise<void> {
       summary: pageSummary(page.pins)
     };
   } else if (strip.takeover === "speed") {
-    view = { kind: "speed", value: `${settings.motionSpeed.toFixed(1)}×` };
+    view = { kind: "speed", value: `${(settings.motionSpeed / MOTION_BASE_SPEED).toFixed(1)}×` };
   } else if (strip.takeover === "motion") {
     view = {
       kind: "motion",

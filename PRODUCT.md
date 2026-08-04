@@ -71,10 +71,10 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 
 ### Working motion tuning
 
-- In the dashboard, each dial 3 detent adjusts the working-border lap speed by `0.1×` from `0.2×` through `2.0×` without changing render FPS.
+- In the dashboard, each dial 3 detent adjusts the working-border lap speed by `0.1×` from `0.2×` through `2.0×` without changing render FPS. The calibrated default is `1.0×`.
 - Turning dial 3 replaces the full strip for five seconds with `WORKING SPEED` and the exact persisted multiplier.
-- Pressing dial 3 toggles the persisted idle logo between centered and flush-right, then reveals the logo immediately.
-- Dial 4 continues to compare darkening, lightening, and rainbow treatments at the selected speed.
+- The idle logo defaults flush-right. Pressing dial 3 toggles it between centered and flush-right, then reveals the logo immediately.
+- The working border defaults to the dark swoosh. Dial 4 continues to compare darkening, lightening, and rainbow treatments at the selected speed.
 
 ### Structured Question Mode and dial 2
 

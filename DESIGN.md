@@ -73,7 +73,7 @@ The plugin has no independent palette. Until Herdr exposes its resolved runtime 
 
 ### Runtime roles
 
-- **OLED field:** every key and dial background is fixed `#000000`; theme surface colors never tint unused pixels.
+- **OLED field:** every key and dial background is fixed `#000000`; the selected thread alone uses fixed `#202020` plus its focus dot. Theme surface colors never tint unused pixels.
 - **Idle brand mark:** the exact Herdr vector uses `#959391` on the black dial strip so it stays quieter than live status content.
 - **Surface role:** `surface1` defines only the resting key outline.
 - **Text roles:** `text` and `subtext0` separate primary labels from slot numbers, titles, and hints.
@@ -83,7 +83,7 @@ The plugin has no independent palette. Until Herdr exposes its resolved runtime 
 
 **The Herdr Owns Color Rule.** Never add plugin palette settings or hand-maintained swatches. The temporary generated palette copy must remain mechanically derived from Herdr and disappear when a resolved-theme API exists.
 
-**The OLED Black Rule.** Keep every background pixel `#000000`. Theme roles color information only: text, lifecycle outlines, the focus dot, and dial bars.
+**The OLED Black Rule.** Keep every background pixel `#000000` except the selected thread's `#202020` field. This fixed neutral is selection geometry, not a plugin theme color. Theme roles color information only: text, lifecycle outlines, the focus dot, and dial bars.
 
 **The OLED Contrast Rule.** Resolve every foreground from its actual configured RGB value, not the theme name or appearance. Text and small marks require 4.5:1 against black; outlines and bars require 3:1.
 
@@ -117,7 +117,7 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 
 ## Layout
 
-The key bank is a fixed four-column, two-row arrangement of full 144-by-144-pixel black canvases. Thread slots form a 3-by-2 block on the left; Inbox and Command form a persistent action rail on the right. A single outline sits 3 pixels from the edge; slot metadata sits at the upper left, the state mark at the upper right, and the primary label remains centered.
+The key bank is a fixed four-column, two-row arrangement of full 144-by-144-pixel canvases. Thread slots form a 3-by-2 block on the left; Inbox and Command form a persistent action rail on the right. A single outline sits 3 pixels from the edge; slot metadata sits at the upper left, the state mark at the upper right, and the primary label remains centered. The selected thread alone receives the fixed near-black field.
 
 The touch strip is one uninterrupted 800-by-100-pixel black composition rendered through four adjacent 200-by-100-pixel regions. Titles and values share an 18-pixel left inset. Each region uses a 5-pixel full-height state bar at its left edge.
 
@@ -125,22 +125,22 @@ The touch strip is one uninterrupted 800-by-100-pixel black composition rendered
 
 ## Elevation & Depth
 
-The system uses no shadows, nested fills, or background artwork. Hierarchy comes only from type, border-carried lifecycle cues, the focus dot, and border-weight changes for completion or danger.
+The system uses no shadows, nested fills, or background artwork. Hierarchy comes only from type, border-carried lifecycle cues, the selected-thread field and focus dot, and border-weight changes for completion or danger.
 
 **The Flat Instrument Rule.** Do not add decorative chrome, gradients, gloss, or simulated physical depth.
 
 ## Shapes
 
-Keys use one rounded outline on the full black OLED field. The dial strip is rectangular and continuous; individual regions must not read as detached cards. Working, blocked, and offline borders are 5 pixels; completed and armed destructive borders are 7 pixels; idle borders are 3 pixels; and unknown borders are 3-pixel dashed outlines. Selection uses the separate upper-right focus dot without changing lifecycle geometry.
+Keys use one rounded outline on the OLED field. The dial strip is rectangular and continuous; individual regions must not read as detached cards. Working, blocked, and offline borders are 5 pixels; completed and armed destructive borders are 7 pixels; idle borders are 3 pixels; and unknown borders are 3-pixel dashed outlines. Selection combines the fixed near-black field with the upper-right focus dot without changing lifecycle geometry.
 
 ## Components
 
 ### Thread and action key
 
-- **Canvas:** full 144 by 144 pixels of deep black with a 3-pixel inset outline.
+- **Canvas:** full 144 by 144 pixels with a 3-pixel inset outline; only the selected thread changes from black to the fixed near-black field.
 - **Content:** the deepest useful pane identity, a border-carried state cue, and an optional short actionable footer. Slot numbers appear only when empty. Page and queue context use temporary full-strip takeovers; the idle strip remains the Herdr logo.
 - **Label behavior:** split labels at word separators when possible, use no more than two lines of 8 monospaced columns, and truncate the second line with an ellipsis. Never squeeze the font or leave an orphan third line. The deepest useful identity gets the largest type.
-- **State:** lifecycle color is repeated through border weight, border pattern, working motion, or a literal footer. Selection uses the separate upper-right focus dot. Do not restore interior status glyphs or the removed bottom rail.
+- **State:** lifecycle color is repeated through border weight, border pattern, working motion, or a literal footer. Selection uses the near-black field plus the upper-right focus dot. Do not restore interior status glyphs or the removed bottom rail.
 - **Inbox exception:** when attention exists, place `INBOX` at the top and render the queue count as the dominant 72-pixel number. Do not add a footer or icon.
 - **Empty slot:** show only its slot number and a quiet plus mark.
 
@@ -157,6 +157,16 @@ Keys use one rounded outline on the full black OLED field. The dial strip is rec
 - **Content:** show queue position, selected thread, needs-input state, and either `PRESS DIAL 2` for a soft preview or `QUESTION IN HERDR` after focus. Never imply that dial 4 can open unsupported question content.
 - **Fallback:** when Herdr does not expose structured question content, never infer it from terminal text; identify the item and open it in Herdr.
 - **Exit:** Command returns to the dashboard. The takeover also returns to the Herdr logo after five seconds. An empty queue uses the same full-strip surface to report `ALL CLEAR`.
+
+### Structured question takeover
+
+- **Entry:** Inbox selects or cycles the question and focuses its thread inside Herdr without raising the operating-system window.
+- **Question phase:** use the full strip for thread identity, question position, and one readable text page. Each dial 2 detent advances one page.
+- **Neutral gate:** one detent after the last page displays `TURN FOR ANSWERS`; it separates reading from selection without a blank frame.
+- **Answer phase:** further dial 2 turns highlight one answer at a time. Reverse turns cross the neutral gate and return to the question pages.
+- **Press:** with no answer selected, keep the thread focused and raise its Herdr client. With an answer selected, submit according to the plugin-wide `IMMEDIATE` or `CONFIRM` setting; `IMMEDIATE` is the initial default.
+- **Integrity:** send stable interaction and option identifiers. A stale or resolved interaction submits nothing and displays `QUESTION CHANGED`.
+- **Dependency:** runtime support requires Herdr to expose structured interactions, stable submission, and a client-owned raise command. Never infer questions or terminal-window ownership from terminal text or process heuristics.
 
 ### Page takeover
 

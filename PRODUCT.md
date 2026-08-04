@@ -66,27 +66,27 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Holding Inbox opens the attention queue in Herdr.
 - Resolved items leave the queue automatically. An empty queue reports `ALL CLEAR` across the strip.
 - Passive arrivals update status but never steal operating-system focus or replace the dashboard.
-- Dial 2 previews questions or details within the selected attention item and presses to select the preview.
+- Dial 2 owns navigation and action within the selected question. Inbox remains the only control that cycles between questions.
 
 ### Thread navigation and dial 3
 
 - In the dashboard, turning dial 3 scrolls the focused thread immediately.
 - Pressing dial 3 returns to live output and follow behavior.
-- In Question Mode, dial 3 pages long question text. Do not use a marquee.
 
-### Structured Question Mode and dial 4
+### Structured Question Mode and dial 2
 
 - Question Mode is first-release scope, not a later enhancement.
 - A selected structured interaction coordinates all four touch-strip regions into one question surface.
 - The surface shows the thread, question position, question text, selected option, and option position. It does not show the full transcript.
-- Dial 2 navigates question 1 through N when an interaction contains multiple questions.
-- Dial 3 pages question text that does not fit.
-- Dial 4 moves one option per detent without wraparound. Turning never mutates Herdr.
-- No option is initially selected; the first turn selects one.
-- Pressing dial 4 submits an ordinary selected answer.
-- Approvals or destructive choices require an armed confirmation.
+- Dial 2 first pages question text one detent at a time. Do not use a marquee.
+- One neutral detent follows the final text page and displays `TURN FOR ANSWERS`; the screen never goes blank.
+- Further turns move one option per detent without wraparound. Reverse turns return through the neutral state to the question pages. Turning never mutates Herdr.
+- Pressing dial 2 without a selected answer raises the existing Herdr client after keeping this thread focused.
+- Pressing dial 2 with a selected answer follows one plugin-wide submission setting: `IMMEDIATE` submits once, while `CONFIRM` locks on the first press and submits the unchanged answer on the second. Turning cancels a lock. `IMMEDIATE` is the initial default.
+- A successful submission acknowledges `SENT`, then advances only after Herdr reports the interaction resolved. A failure keeps the question and selection visible.
 - Submission must include a stable interaction ID. If the interaction changed or resolved, submit nothing and show `QUESTION CHANGED`.
 - Free-form or unsupported interactions show `OPEN HERDR`; the device never guesses an answer from terminal text.
+- Dial 4 remains reserved in Question Mode.
 - Command cancels Question Mode and returns to the dashboard.
 
 ### One-shot Command Mode and Command key
@@ -112,7 +112,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Herdr remains the only theme source. Until Herdr exposes its resolved palette, the plugin uses a generated compatibility copy of Herdr's 17 RGB built-in themes plus the saved theme name and custom RGB overrides in Herdr's config.
 - The plugin has no theme settings or manual light/dark override. `npm run themes:sync` refreshes the temporary generated copy from a local Herdr checkout.
 - Saved palette changes redraw every visible key and encoder region. The host-derived `terminal` palette, unsaved previews, and automatic appearance changes require a future resolved-theme API.
-- Every OLED background is fixed deep black. Herdr themes color text, lifecycle outlines, the focus dot, and dial bars only.
+- Every OLED background is fixed deep black except the selected thread key's fixed near-black fill. Herdr themes color text, lifecycle outlines, the focus dot, and dial bars only.
 - Foreground colors retain their configured hue and are lifted only when required to meet the black-field contrast floor.
 - Pinned keys show only the deepest available pane or thread label; actionable status may temporarily use the footer. Page and queue context appear only during their full-strip takeovers; the idle strip remains the Herdr logo. Empty slots stay almost blank.
 - Status colors are paired with a label, motion, or border geometry:
@@ -121,7 +121,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
   - green: completed and unseen with the strongest lifecycle outline;
   - blue: working with a moving border highlight;
   - gray: idle with a thin solid outline, unknown with a dashed outline;
-  - white outline or marker: focused.
+  - near-black fill plus white marker: focused.
 - Do not infer review-ready, test-failed, approval, or question semantics from arbitrary terminal text.
 
 ### Required Herdr extension seams

@@ -39,9 +39,9 @@ In Herdr, open keyboard shortcut settings and assign a shortcut to **Pin focused
 | Inbox (top-right) | Open/cycle the full attention strip | Attention |
 | Command (bottom-right) | Enter/cancel Command mode | Cancel |
 | Dial 1 | Switch pinned page immediately | Pinned page |
-| Dial 2 | Preview and open attention item | Attention queue |
+| Dial 2 | Preview and focus attention item; owns structured questions when available | Attention queue |
 | Dial 3 | Show current thread | Frozen command target |
-| Dial 4 | Open the current question in Herdr | Open question |
+| Dial 4 | Compare working-motion variants; reserved in Inbox | Reserved |
 
 ## Herdr 0.8.0 capability matrix
 
@@ -57,7 +57,7 @@ In Herdr, open keyboard shortcut settings and assign a shortcut to **Pin focused
 | Pin-focused-pane Herdr plugin action | Supported |
 | Raise an existing client window | Not exposed by stock 0.8.0 |
 | Scroll/follow control from dial 3 | Not exposed by stock 0.8.0 |
-| Structured multi-question paging and answer submission | Not exposed by stock 0.8.0; the attention strip identifies the item and dial 4 opens it in Herdr |
+| Structured multi-question paging and answer submission | Not exposed by stock 0.8.0; the attention strip identifies the item while Question Mode awaits a structured interaction API |
 
 The profile source is committed under `profiles/`; generated `.streamDeckPlugin` and `.streamDeckProfile` archives remain ignored. Validate without writing archives with `npm run package:dry-run`.
 

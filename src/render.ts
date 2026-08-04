@@ -29,6 +29,7 @@ export type StripView =
 
 export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): string {
   const palette = theme?.palette;
+  const background = view.selected ? "#202020" : "#000000";
   const text = palette && view.danger ? oledColor(palette.red) : oledForeground(theme, "text");
   const subtext = oledForeground(theme, "subtext");
   const statusVisual = statusAppearance(view.status, theme);
@@ -58,7 +59,7 @@ export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): str
     : `<text x="76" y="36" ${monoFont} font-size="22" fill="${text}" text-anchor="middle">${escapeXml(view.label.toUpperCase())}</text>
       <text x="76" y="116" ${monoFont} font-size="72" fill="${statusVisual?.color ?? text}" text-anchor="middle">${view.count}</text>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <rect width="144" height="144" fill="#000000"/>
+    <rect width="144" height="144" fill="${background}"/>
     ${outline}${workingHighlight}${slot}${focus}
     ${label}
     ${footer}${empty}

@@ -1,8 +1,11 @@
 node_modules/
 .preview/
 dist/
-dev.herdr.streamdeck.sdPlugin/bin/
+dev.herdr.streamdeck.sdPlugin/bin/*
+!dev.herdr.streamdeck.sdPlugin/bin/package.json
+!dev.herdr.streamdeck.sdPlugin/bin/plugin.js
 dev.herdr.streamdeck.sdPlugin/logs/
-dev.herdr.streamdeck.sdPlugin/profiles/
+dev.herdr.streamdeck.sdPlugin/herdr-path.txt
 *.streamDeckPlugin
 *.streamDeckProfile
+!dev.herdr.streamdeck.sdPlugin/profiles/Herdr Stream Deck+.streamDeckProfile

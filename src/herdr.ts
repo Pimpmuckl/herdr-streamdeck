@@ -1,7 +1,8 @@
 import { execFile } from "node:child_process";
 import { randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { readFile, rename, unlink } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 
@@ -20,7 +21,18 @@ const run = promisify(execFile);
 type Listener = () => void;
 type PinRequestListener = (pane: PaneSnapshot) => void;
 
-const pinRequestPath = join(process.env.LOCALAPPDATA || tmpdir(), "Herdr Stream Deck", "pin-request.json");
+const installedHerdrPath = (() => {
+  try {
+    return readFileSync(new URL("../herdr-path.txt", import.meta.url), "utf8").trim();
+  } catch {
+    return "";
+  }
+})();
+
+const pinRequestDirectory = process.platform === "win32"
+  ? join(process.env.LOCALAPPDATA || tmpdir(), "Herdr Stream Deck")
+  : join(process.env.XDG_STATE_HOME || join(homedir(), ".local", "state"), "herdr-streamdeck");
+const pinRequestPath = join(pinRequestDirectory, "pin-request.json");
 
 export class HerdrBridge {
   snapshot: HerdrSnapshot | null = null;
@@ -120,7 +132,7 @@ export class HerdrBridge {
   }
 
   private command(args: string[]): ReturnType<typeof run> {
-    return run(process.env.HERDR_PATH || "herdr", args, {
+    return run(process.env.HERDR_PATH || installedHerdrPath || "herdr", args, {
       encoding: "utf8",
       maxBuffer: 4 * 1024 * 1024,
       timeout: 2500,

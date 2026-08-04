@@ -1,12 +1,28 @@
 id = "dev.herdr.streamdeck"
 name = "Herdr Stream Deck+"
 version = "0.1.0"
-min_herdr_version = "0.7.5"
-description = "Send the focused Herdr pane to the Stream Deck slot picker."
+min_herdr_version = "0.8.0"
+description = "Physical triage and control for Herdr on Stream Deck+."
+platforms = ["linux", "macos", "windows"]
+
+[[build]]
+command = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts/install-streamdeck.ps1"]
 platforms = ["windows"]
+
+[[build]]
+command = ["sh", "scripts/install-streamdeck.sh"]
+platforms = ["linux", "macos"]
 
 [[actions]]
 id = "pin-focused-pane"
 title = "Pin focused pane to Stream Deck"
 contexts = ["pane"]
-command = ["node", "herdr-plugin/pin-focused.mjs"]
+command = ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "herdr-plugin/pin-focused.ps1"]
+platforms = ["windows"]
+
+[[actions]]
+id = "pin-focused-pane-unix"
+title = "Pin focused pane to Stream Deck"
+contexts = ["pane"]
+command = ["sh", "herdr-plugin/pin-focused.sh"]
+platforms = ["linux", "macos"]

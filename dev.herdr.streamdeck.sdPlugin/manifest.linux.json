@@ -1,0 +1,4 @@
+{
+  "OS": [{ "Platform": "linux", "MinimumVersion": "0" }],
+  "CodePathLin": "bin/plugin.js"
+}

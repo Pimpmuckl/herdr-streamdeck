@@ -10,11 +10,23 @@
   "CodePath": "bin/plugin.js",
   "SDKVersion": 3,
   "Software": { "MinimumVersion": "7.1" },
-  "OS": [{ "Platform": "windows", "MinimumVersion": "10" }],
+  "OS": [
+    { "Platform": "windows", "MinimumVersion": "10" },
+    { "Platform": "mac", "MinimumVersion": "13" }
+  ],
   "Nodejs": { "Version": "24", "Debug": "enabled" },
   "UUID": "dev.herdr.streamdeck",
   "URL": "https://herdr.dev",
   "SupportURL": "https://github.com/herdrdev/herdr/issues",
+  "Profiles": [
+    {
+      "Name": "profiles/Herdr Stream Deck+",
+      "DeviceType": 7,
+      "Readonly": false,
+      "DontAutoSwitchWhenInstalled": false,
+      "AutoInstall": true
+    }
+  ],
   "Actions": [
     {
       "Name": "Pinned Thread",

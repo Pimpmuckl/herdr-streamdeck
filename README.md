@@ -1,15 +1,26 @@
 # Herdr Stream Deck+
 
-A Windows Stream Deck+ control surface for six pinned Herdr threads, attention triage, and safe one-shot commands. It uses the existing Herdr client and never launches a client implicitly.
+A Stream Deck+ control surface for six pinned Herdr threads, attention triage, and safe one-shot commands. It uses the existing Herdr client and never launches a client implicitly.
 
-## Prerequisites
+## Install
 
-- Windows 10 or newer
-- Stream Deck 7.1 or newer and a Stream Deck+ (`20GBD9901`, DeviceType 7)
-- Herdr 0.8.0 on `PATH`
-- Node.js 24 and npm
+Install [Herdr 0.8.0 or newer](https://herdr.dev), then prepare the controller software for your platform:
 
-## Local setup
+- Windows 10 or newer: Stream Deck 7.1 or newer. This is the supported and tested platform.
+- macOS 13 or newer: Stream Deck 7.1 or newer. Support is experimental and unproven.
+- Linux: [OpenDeck 2.14 or newer](https://github.com/nekename/OpenDeck) and Node.js 20 or newer. Support is experimental and unproven. Launch OpenDeck once before installing.
+
+Then run one command on every platform:
+
+```text
+herdr plugin install Pimpmuckl/herdr-streamdeck
+```
+
+On Windows and macOS, accept the Stream Deck install prompt. The Stream Deck+ profile installs with the plugin. On Linux, restart OpenDeck after the command finishes. OpenDeck can run the same plugin, but its profile import is not yet verified, so the eight keys and four dials may need to be assigned once in OpenDeck.
+
+In Herdr, open keyboard shortcut settings and assign a shortcut to **Pin focused pane to Stream Deck**. The same action is available from Herdr's plugin action surfaces.
+
+## Development
 
 Clone the repository, then run:
 
@@ -23,13 +34,9 @@ npx streamdeck link dev.herdr.streamdeck.sdPlugin
 npm run package
 ```
 
-For a non-development Herdr install from GitHub, use `herdr plugin install Pimpmuckl/herdr-streamdeck`; use `herdr plugin link (Get-Location) --enabled` only for a local checkout.
+The profile assigns pinned threads to keys 1-6, Attention to key 7, Command to key 8, and all four Herdr encoders. `scripts\install-local.ps1` performs the local links; add `-OpenProfile` to open the generated profile for import.
 
-Import `dist\Herdr-Stream-Deck-Plus-0.1.0.streamDeckProfile` in the Stream Deck app. The profile assigns pinned threads to keys 1-6, Attention to key 7, Command to key 8, and all four Herdr encoders. `scripts\install-local.ps1` performs the same local links; add `-OpenProfile` to open the generated profile for import.
-
-For a packaged install, build with `npm run package`, open the versioned `.streamDeckPlugin`, then open the `.streamDeckProfile`. Release tags run the same packaging on Windows and upload both files as workflow artifacts; they do not publish to Elgato Marketplace.
-
-In Herdr, open keyboard shortcut settings and assign a shortcut to **Pin focused pane to Stream Deck**. The same action is available from Herdr's plugin action surfaces.
+For a packaged development install, build with `npm run package` and open the versioned `.streamDeckPlugin`. Node.js 24 and npm are development dependencies only; the Elgato app supplies the plugin runtime on Windows and macOS. OpenDeck uses the system Node.js runtime on Linux.
 
 ## Controls
 
@@ -59,17 +66,16 @@ In Herdr, open keyboard shortcut settings and assign a shortcut to **Pin focused
 | Scroll/follow control from dial 3 | Not exposed by stock 0.8.0 |
 | Structured multi-question paging and answer submission | Not exposed by stock 0.8.0; the attention strip identifies the item while Question Mode awaits a structured interaction API |
 
-The profile source is committed under `profiles/`; generated `.streamDeckPlugin` and `.streamDeckProfile` archives remain ignored. Validate without writing archives with `npm run package:dry-run`.
+The profile source is committed under `profiles/`; generated standalone archives remain ignored. The installable plugin contains a prebuilt runtime and bundled profile. Validate without writing archives with `npm run package:dry-run`.
 
 Herdr still owns the palette. `npm run themes:sync` regenerates the temporary built-in theme copy from a sibling Herdr checkout; saved theme and custom RGB changes redraw automatically. Unsaved previews and host-driven automatic switching require Herdr to expose its resolved palette.
 
 ## Uninstall
 
-Remove the imported **Herdr Stream Deck+** profile in Stream Deck, then unlink both local plugins:
+Remove **Herdr Stream Deck+** in Stream Deck or OpenDeck, then uninstall the Herdr plugin:
 
-```powershell
-npx streamdeck unlink dev.herdr.streamdeck
-herdr plugin unlink dev.herdr.streamdeck
+```text
+herdr plugin uninstall dev.herdr.streamdeck
 ```
 
-Packaged Stream Deck installs can instead be removed from Stream Deck Preferences. This repository currently has no license; no reuse permission is granted by default.
+Local development links still use `npx streamdeck unlink dev.herdr.streamdeck` and `herdr plugin unlink dev.herdr.streamdeck`. This repository currently has no license; no reuse permission is granted by default.

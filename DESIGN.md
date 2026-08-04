@@ -80,7 +80,7 @@ The plugin has no independent palette. Until Herdr exposes its resolved runtime 
 
 **The Herdr Owns Color Rule.** Never add plugin palette settings or hand-maintained swatches. The temporary generated palette copy must remain mechanically derived from Herdr and disappear when a resolved-theme API exists.
 
-**The OLED Black Rule.** Keep every background pixel `#000000`. Theme roles color information only: text, state marks, rails, outlines, and dial bars.
+**The OLED Black Rule.** Keep every background pixel `#000000`. Theme roles color information only: text, lifecycle outlines, the focus dot, and dial bars.
 
 **The OLED Contrast Rule.** Resolve every foreground from its actual configured RGB value, not the theme name or appearance. Text and small marks require 4.5:1 against black; outlines and bars require 3:1.
 
@@ -121,7 +121,7 @@ The touch strip is one uninterrupted 800-by-100-pixel black composition rendered
 
 ## Elevation & Depth
 
-The system uses no shadows, nested fills, or background artwork. Hierarchy comes only from type, state marks, rails, and border-weight changes for selection or danger.
+The system uses no shadows, nested fills, or background artwork. Hierarchy comes only from type, border-carried lifecycle cues, the focus dot, and border-weight changes for completion or danger.
 
 **The Flat Instrument Rule.** Do not add decorative chrome, gradients, gloss, or simulated physical depth.
 
@@ -134,7 +134,7 @@ Keys use one rounded outline on the full black OLED field. The dial strip is rec
 ### Thread and action key
 
 - **Canvas:** full 144 by 144 pixels of deep black with a 3-pixel inset outline.
-- **Content:** the deepest useful pane identity, a border-carried state cue, and an optional short actionable footer. Slot numbers appear only when empty; workspace and tab context belong on the full strip.
+- **Content:** the deepest useful pane identity, a border-carried state cue, and an optional short actionable footer. Slot numbers appear only when empty. Page and queue context use temporary full-strip takeovers; the idle strip remains the Herdr logo.
 - **Label behavior:** split labels at word separators when possible, use no more than two lines of 8 monospaced columns, and truncate the second line with an ellipsis. Never squeeze the font or leave an orphan third line. The deepest useful identity gets the largest type.
 - **State:** lifecycle color is repeated through border weight, border pattern, working motion, or a literal footer. Selection uses the separate upper-right focus dot. Do not restore interior status glyphs or the removed bottom rail.
 - **Empty slot:** show only its slot number and a quiet plus mark.

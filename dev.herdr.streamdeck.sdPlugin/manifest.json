@@ -61,7 +61,7 @@
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
-        "TriggerDescription": { "Rotate": "Reserved", "Push": "Reserved" }
+        "TriggerDescription": { "Rotate": "Preview attention item", "Push": "Open in Herdr" }
       },
       "States": [{ "Image": "imgs/key" }]
     },

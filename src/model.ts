@@ -82,11 +82,21 @@ export type Pin = {
   agentSession?: AgentSessionRef;
 };
 export type PinPage = { name: string; pins: Array<Pin | null> };
-export type DeckSettings = { pageIndex: number; pages: PinPage[] };
+export type LogoAlignment = "center" | "right";
+export type DeckSettings = {
+  pageIndex: number;
+  pages: PinPage[];
+  focusFeedback: boolean;
+  motionSpeed: number;
+  logoAlignment: LogoAlignment;
+};
 
 export const DEFAULT_SETTINGS: DeckSettings = {
   pageIndex: 0,
-  pages: ["ONE", "TWO", "THREE"].map((name) => ({ name, pins: Array(6).fill(null) }))
+  pages: ["ONE", "TWO", "THREE"].map((name) => ({ name, pins: Array(6).fill(null) })),
+  focusFeedback: false,
+  motionSpeed: 1,
+  logoAlignment: "center"
 };
 
 export function normalizeSettings(value: unknown): DeckSettings {
@@ -104,7 +114,19 @@ export function normalizeSettings(value: unknown): DeckSettings {
     : [];
   const safePages = pages.length ? pages : structuredClone(DEFAULT_SETTINGS.pages);
   const requested = Number.isInteger(input.pageIndex) ? Number(input.pageIndex) : 0;
-  return { pageIndex: Math.max(0, Math.min(requested, safePages.length - 1)), pages: safePages };
+  return {
+    pageIndex: Math.max(0, Math.min(requested, safePages.length - 1)),
+    pages: safePages,
+    focusFeedback: input.focusFeedback === true,
+    motionSpeed: typeof input.motionSpeed === "number" && Number.isFinite(input.motionSpeed)
+      ? adjustMotionSpeed(input.motionSpeed, 0)
+      : 1,
+    logoAlignment: input.logoAlignment === "right" ? "right" : "center"
+  };
+}
+
+export function adjustMotionSpeed(speed: number, ticks: number): number {
+  return Math.max(0.2, Math.min(2, Math.round((speed + ticks * 0.1) * 10) / 10));
 }
 
 function normalizePin(value: unknown): Pin | null {

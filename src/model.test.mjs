@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  adjustMotionSpeed,
   attentionPanes,
   commandIntent,
   hasResolvedTheme,
@@ -24,8 +25,17 @@ test("device state, pin identity, and device rendering stay coherent", () => {
     pages: [{ name: "WORK", pins: [{ paneId: "w1:p1", label: "api" }] }]
   });
   assert.equal(settings.pageIndex, 0);
+  assert.equal(settings.focusFeedback, false);
+  assert.equal(settings.motionSpeed, 1);
+  assert.equal(settings.logoAlignment, "center");
   assert.equal(settings.pages[0].pins.length, 6);
   assert.deepEqual(settings.pages[0].pins[0], { paneId: "w1:p1", label: "api" });
+  assert.equal(normalizeSettings({ focusFeedback: true }).focusFeedback, true);
+  assert.equal(normalizeSettings({ motionSpeed: 1.46 }).motionSpeed, 1.5);
+  assert.equal(normalizeSettings({ logoAlignment: "right" }).logoAlignment, "right");
+  assert.equal(adjustMotionSpeed(1, 2), 1.2);
+  assert.equal(adjustMotionSpeed(0.2, -1), 0.2);
+  assert.equal(adjustMotionSpeed(2, 1), 2);
   assert.equal(slotForCoordinates(2, 0), 2);
   assert.equal(slotForCoordinates(0, 1), 3);
   assert.equal(slotForCoordinates(2, 1), 5);
@@ -163,9 +173,14 @@ red = "rgb(255, 85, 85)"
   const mixedKey = keySvg({ label: "ABCDEFGHIJ-K" });
   assert.match(mixedKey, />ABCDEFGH<\/text>/);
   assert.match(mixedKey, />IJ-K<\/text>/);
-  assert.match(keySvg({ label: "nextide-saas-vod-kraken" }), />nextide-<\/text>.*>saas-vod<\/text>.*>kraken<\/text>/su);
+  assert.match(keySvg({ label: "daedalus-architect" }), /font-size="22\.5"[^>]*>daedalus<\/text>.*font-size="22\.5"[^>]*>architect<\/text>/su);
+  const herdrStreamDeckKey = keySvg({ label: "herdr-streamdeck", selected: true });
+  assert.match(herdrStreamDeckKey, /x="72"[^>]*font-size="21"[^>]*letter-spacing="-0\.04em"[^>]*>herdr<\/text>.*x="72"[^>]*font-size="21"[^>]*letter-spacing="-0\.04em"[^>]*>streamdeck<\/text>/su);
+  assert.doesNotMatch(herdrStreamDeckKey, /x="76"/);
+  assert.match(keySvg({ label: "nextide-saas-vod-kraken" }), />nextide<\/text>.*>saas-vod<\/text>.*>kraken<\/text>/su);
   assert.match(keySvg({ label: "ABCDEFGHIJKLMNOPQRSTUVWXY" }), /font-size="18"[^>]*>ABCDEFGHIJKL<\/text>.*>MNOPQRSTUVWX<\/text>.*>Y<\/text>/su);
-  assert.match(keySvg({ label: "nextide-saas-vod-intelligence" }), /font-size="18"[^>]*>nextide-<\/text>.*>saas-vod-<\/text>.*>intelligence<\/text>/su);
+  assert.match(keySvg({ label: "nextide-saas-vod-intelligence" }), /font-size="18"[^>]*>nextide<\/text>.*>saas-vod<\/text>.*>intelligence<\/text>/su);
+  assert.match(keySvg({ label: "ends-" }), />ends-<\/text>/);
   assert.match(keySvg({ label: "1234567😀" }), />1234567<\/text>.*>😀<\/text>/su);
   assert.match(keySvg({ label: "1234567e\u0301" }), />1234567é<\/text>/u);
   assert.match(keySvg({ label: "😀😀😀😀😀😀😀😀" }), />😀😀😀😀<\/text>.*>😀😀😀😀<\/text>/su);
@@ -175,11 +190,14 @@ red = "rgb(255, 85, 85)"
   assert.match(keySvg({ label: "PANE", context: "WORK › IMPLEMENTATION" }), />IMPLEMENTAT…<\/text>/);
 
   const threadKey = keySvg({ label: "research-vodint-graph", context: "VOD-INTELLIGENCE › T1", slot: 0, status: "working", selected: true });
-  assert.match(threadKey, /y="47"[^>]*>research<\/text>.*y="76"[^>]*>vodint-<\/text>.*y="105"[^>]*>graph<\/text>/s);
+  assert.match(threadKey, /y="47"[^>]*>research<\/text>.*y="76"[^>]*>vodint<\/text>.*y="105"[^>]*>graph<\/text>/s);
+  assert.doesNotMatch(threadKey, /letter-spacing="-0\.04em"/);
   assert.doesNotMatch(threadKey, /<tspan/);
-  assert.match(threadKey, /<rect x="4" y="4" width="136" height="136" rx="18"[^>]*stroke-width="5"/);
-  assert.match(threadKey, /<circle cx="124" cy="20" r="6"/);
-  assert.match(threadKey, /<rect width="144" height="144" fill="#202020"/);
+  assert.match(threadKey, /<rect x="4" y="4" width="136" height="136" rx="18"[^>]*stroke="#ffffff" stroke-width="5"/);
+  assert.match(threadKey, /<rect x="11" y="11" width="122" height="122" rx="11"[^>]*stroke="#ffffff" stroke-width="3"/);
+  assert.equal(threadKey.match(/stroke="#ffffff"/g)?.length, 2);
+  assert.doesNotMatch(threadKey, /<circle|#202020/);
+  assert.match(threadKey, /<rect width="144" height="144" fill="#000000"/);
   assert.doesNotMatch(threadKey, />1<\/text>/);
   assert.match(keySvg({ label: "idle" }), /<rect width="144" height="144" fill="#000000"/);
   const inboxKey = keySvg({ label: "INBOX", count: 12, status: "blocked" });
@@ -188,13 +206,21 @@ red = "rgb(255, 85, 85)"
   assert.match(keySvg({ label: "idle", status: "idle" }), /stroke-width="3"/);
   assert.match(keySvg({ label: "unknown", status: "unknown" }), /stroke-width="3" stroke-dasharray="10 8"/);
   assert.match(keySvg({ label: "done", status: "done" }), /stroke-width="7"/);
-  assert.match(keySvg({ label: "RELEASED", detail: "LET GO", status: "done" }), />RELEASED<\/text>.*>LET GO<\/text>/s);
+  const successKey = keySvg({ label: "THREAD UNPINNED", feedback: "success" }, copiedTheme);
+  assert.match(successKey, /<rect width="144" height="144" fill="rgb\(\d+ \d+ \d+\)"/);
+  assert.match(successKey, /fill="#000000"[^>]*>THREAD<\/text>.*fill="#000000"[^>]*>UNPINNED<\/text>/s);
+  assert.doesNotMatch(successKey, /stroke-width=/);
   assert.match(keySvg({ label: "STOP", danger: true }), /stroke-width="7"/);
-  assert.match(keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "darken" }), /stroke="#000000" stroke-opacity="\.72"[^>]*stroke-dashoffset="-25\.0"/);
-  assert.match(keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "lighten" }), /pathLength="100"[^>]*stroke="#[a-f0-9]+"[^>]*stroke-dashoffset="-25\.0"/i);
+  const darkSwoosh = keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "darken" });
+  const lightSwoosh = keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "lighten" });
+  assert.equal(darkSwoosh.match(/stroke="#000000" stroke-opacity=/g)?.length, 19);
+  assert.equal(lightSwoosh.match(/stroke-dasharray="4\.62 1021\.58"/g)?.length, 19);
+  assert.match(lightSwoosh, /stroke-opacity="0\.02"/);
+  assert.match(lightSwoosh, /stroke-opacity="0\.45"[^>]*stroke-dashoffset="-95\.4"/);
+  assert.doesNotMatch(lightSwoosh, /pathLength=/);
   const rainbowKey = keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "rainbow" });
-  assert.equal(rainbowKey.match(/stroke-dasharray="3 97"/g)?.length, 4);
-  for (const color of ["#af2eff", "#ff3355", "#ffda53", "#1ee4bc"]) assert.match(rainbowKey, new RegExp(`stroke="${color}"`));
+  assert.equal(rainbowKey.match(/stroke-dasharray="4\.62 1021\.58"/g)?.length, 19);
+  for (const color of ["rgb(175 46 255)", "rgb(255 51 85)", "rgb(255 218 83)", "rgb(30 228 188)"]) assert.match(rainbowKey, new RegExp(`stroke="${color.replace(/[()]/g, "\\$&")}"`));
   assert.match(keySvg({ label: "", slot: 0, empty: true }), />1<\/text>/);
 
   const lowContrastTheme = {
@@ -219,8 +245,11 @@ red = "rgb(255, 85, 85)"
   assert.match(pageStrip[1], /viewBox="200 0 200 100"/);
   assert.match(pageStrip[3], /viewBox="600 0 200 100"/);
   assert.match(pageStrip.join(""), /font-size="50"[^>]*>ONE<\/text>/);
-  assert.match(stripRegionSvg(0, { kind: "logo", image: "logo.png" }, lowContrastTheme), /<image href="logo\.png" x="350" y="0" width="100" height="100"\/>/);
+  assert.match(stripRegionSvg(0, { kind: "logo", image: "logo.png", alignment: "center" }, lowContrastTheme), /<image href="logo\.png" x="350" y="0" width="100" height="100"\/>/);
+  assert.match(stripRegionSvg(0, { kind: "logo", image: "logo.png", alignment: "right" }, lowContrastTheme), /<image href="logo\.png" x="700" y="0" width="100" height="100"\/>/);
   assert.match(stripRegionSvg(0, { kind: "motion", name: "RAINBOW SWOOSH", position: "3 \/ 3" }, lowContrastTheme), />WORKING MOTION<\/text>.*>RAINBOW SWOOSH<\/text>/s);
+  assert.match(stripRegionSvg(0, { kind: "speed", value: "0.7×" }, lowContrastTheme), /font-size="56"[^>]*>0\.7×<\/text>/);
+  assert.match(stripRegionSvg(0, { kind: "command", label: "review-suite" }, lowContrastTheme), />ACTIONS FOR<\/text>.*>review-suite<\/text>/s);
   const attentionStrip = stripRegionSvg(0, { kind: "attention", label: "api-rewrite", position: "1 \/ 2", focused: true }, lowContrastTheme);
   assert.match(attentionStrip, />NEEDS YOU<\/text>/);
   assert.match(attentionStrip, />QUESTION IN HERDR<\/text>/);

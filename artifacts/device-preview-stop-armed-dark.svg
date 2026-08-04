@@ -3,75 +3,75 @@
     <svg x="88" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
 
-    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="24" fill="rgb(205 214 244)" text-anchor="middle">CONTINUE</text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS SEND</text>
+    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="24" fill="rgb(205 214 244)" text-anchor="middle">CONTINUE</text>
+
   </svg>
 <svg x="248" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
 
-    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="27" fill="rgb(205 214 244)" text-anchor="middle">STATUS</text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS SEND</text>
+    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="27" fill="rgb(205 214 244)" text-anchor="middle">STATUS</text>
+
   </svg>
 <svg x="408" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
 
-    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="27" fill="rgb(205 214 244)" text-anchor="middle">VERIFY</text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS SEND</text>
+    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="27" fill="rgb(205 214 244)" text-anchor="middle">VERIFY</text>
+
   </svg>
 <svg x="568" y="18" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
     <rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="rgb(249 226 175)" stroke-width="5"/>
-    <text x="76" y="36" font-family="Consolas" font-weight="700" font-size="22" fill="rgb(205 214 244)" text-anchor="middle">INBOX</text>
-      <text x="76" y="116" font-family="Consolas" font-weight="700" font-size="72" fill="rgb(249 226 175)" text-anchor="middle">2</text>
+    <text x="72" y="36" font-family="Consolas" font-weight="700" font-size="22" fill="rgb(205 214 244)" text-anchor="middle">INBOX</text>
+      <text x="72" y="116" font-family="Consolas" font-weight="700" font-size="72" fill="rgb(249 226 175)" text-anchor="middle">2</text>
 
   </svg>
 <svg x="88" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
 
-    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="30" fill="rgb(205 214 244)" text-anchor="middle">ZOOM</text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS SEND</text>
+    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="30" fill="rgb(205 214 244)" text-anchor="middle">ZOOM</text>
+
   </svg>
 <svg x="248" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
 
-    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="34.5" fill="rgb(205 214 244)" text-anchor="middle">—</text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">UNASSIGNED</text>
+    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="34.5" fill="rgb(205 214 244)" text-anchor="middle">—</text>
+    <text x="72" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">UNASSIGNED</text>
   </svg>
 <svg x="408" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
     <rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="rgb(243 139 168)" stroke-width="7"/>
-    <text x="76" y="64" font-family="Consolas" font-weight="700" font-size="28.5" fill="rgb(243 139 168)" text-anchor="middle">STOP</text><text x="76" y="93" font-family="Consolas" font-weight="700" font-size="28.5" fill="rgb(243 139 168)" text-anchor="middle">AGAIN</text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS AGAIN</text>
+    <text x="72" y="64" font-family="Consolas" font-weight="700" font-size="28.5" fill="rgb(243 139 168)" text-anchor="middle">STOP</text><text x="72" y="93" font-family="Consolas" font-weight="700" font-size="28.5" fill="rgb(243 139 168)" text-anchor="middle">AGAIN</text>
+    <text x="72" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">PRESS AGAIN</text>
   </svg>
 <svg x="568" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
 
-    <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="27" fill="rgb(205 214 244)" text-anchor="middle">CANCEL</text>
-    <text x="76" y="130" font-family="Consolas" font-weight="700" font-size="18" fill="rgb(166 173 200)" text-anchor="middle" letter-spacing=".1">REVIEW-SUITE</text>
+    <text x="72" y="84" font-family="Consolas" font-weight="700" font-size="30" fill="rgb(205 214 244)" text-anchor="middle">BACK</text>
+
   </svg>
     <rect y="342" width="800" height="112" rx="10" fill="#050507"/>
     <svg x="0" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100">
     <rect width="800" height="100" fill="#000000"/>
     <rect width="6" height="100" fill="rgb(137 180 250)"/>
-        <text x="28" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(137 180 250)">COMMAND</text>
+        <text x="28" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(137 180 250)">ACTIONS FOR</text>
         <text x="28" y="70" font-family="Consolas" font-weight="700" font-size="42" fill="rgb(205 214 244)">review-suite</text>
   </svg>
 <svg x="200" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="200 0 200 100">
     <rect width="800" height="100" fill="#000000"/>
     <rect width="6" height="100" fill="rgb(137 180 250)"/>
-        <text x="28" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(137 180 250)">COMMAND</text>
+        <text x="28" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(137 180 250)">ACTIONS FOR</text>
         <text x="28" y="70" font-family="Consolas" font-weight="700" font-size="42" fill="rgb(205 214 244)">review-suite</text>
   </svg>
 <svg x="400" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="400 0 200 100">
     <rect width="800" height="100" fill="#000000"/>
     <rect width="6" height="100" fill="rgb(137 180 250)"/>
-        <text x="28" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(137 180 250)">COMMAND</text>
+        <text x="28" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(137 180 250)">ACTIONS FOR</text>
         <text x="28" y="70" font-family="Consolas" font-weight="700" font-size="42" fill="rgb(205 214 244)">review-suite</text>
   </svg>
 <svg x="600" y="348" xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="600 0 200 100">
     <rect width="800" height="100" fill="#000000"/>
     <rect width="6" height="100" fill="rgb(137 180 250)"/>
-        <text x="28" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(137 180 250)">COMMAND</text>
+        <text x="28" y="27" font-family="Consolas" font-weight="700" font-size="19" fill="rgb(137 180 250)">ACTIONS FOR</text>
         <text x="28" y="70" font-family="Consolas" font-weight="700" font-size="42" fill="rgb(205 214 244)">review-suite</text>
   </svg>
   </svg>

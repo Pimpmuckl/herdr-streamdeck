@@ -1,9 +1,10 @@
-import type { AgentStatus, PaneSnapshot, ResolvedThemeSnapshot } from "./model.js";
+import type { AgentStatus, LogoAlignment, PaneSnapshot, ResolvedThemeSnapshot } from "./model.js";
 
 const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
 const monoFont = `font-family="Consolas" font-weight="700"`;
 
 export type WorkingMotion = "darken" | "lighten" | "rainbow";
+export const MOTION_CYCLE_FRAMES = 21;
 
 type KeyView = {
   label: string;
@@ -15,53 +16,62 @@ type KeyView = {
   selected?: boolean;
   empty?: boolean;
   danger?: boolean;
+  feedback?: "success";
   workingFrame?: number;
   workingMotion?: WorkingMotion;
 };
 
 export type StripView =
-  | { kind: "logo"; image: string }
+  | { kind: "logo"; image: string; alignment: LogoAlignment }
   | { kind: "page"; name: string; position: string; summary: string }
   | { kind: "attention"; label: string; position: string; focused: boolean }
   | { kind: "clear" }
   | { kind: "command"; label: string }
+  | { kind: "speed"; value: string }
   | { kind: "motion"; name: string; position: string };
 
 export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): string {
   const palette = theme?.palette;
-  const background = view.selected ? "#202020" : "#000000";
-  const text = palette && view.danger ? oledColor(palette.red) : oledForeground(theme, "text");
-  const subtext = oledForeground(theme, "subtext");
-  const statusVisual = statusAppearance(view.status, theme);
+  const feedbackColor = view.feedback === "success" ? palette ? oledColor(palette.green) : "#ffffff" : null;
+  const text = feedbackColor ? "#000000" : palette && view.danger ? oledColor(palette.red) : oledForeground(theme, "text");
+  const subtext = feedbackColor ? "#000000" : oledForeground(theme, "subtext");
+  const statusVisual = feedbackColor ? null : statusAppearance(view.status, theme);
   const labelColumns = displayWidth(view.label.trim() || "EMPTY") > 24 ? 12 : 8;
-  const lines = splitLabel(view.label, labelColumns);
-  const labelSize = Math.max(18, 36 - Math.max(...lines.map(displayWidth)) * 1.5);
+  let lines = splitLabel(view.label, labelColumns);
+  if (labelColumns < 12 && lines.length === 3 && displayWidth(lines[2]) <= 3) {
+    const balanced = splitLabel(view.label, 12);
+    if (balanced.length === 2 && labelFontSize(balanced) >= 20) lines = balanced;
+  }
+  const labelSize = labelFontSize(lines);
+  const labelTracking = Math.max(...lines.map(displayWidth)) >= 9 ? ' letter-spacing="-0.04em"' : "";
   const outlineColor = view.danger
     ? palette ? oledColor(palette.red) : "#ffffff"
     : statusVisual?.color;
   const slot = view.empty && view.slot !== undefined
     ? `<text x="16" y="32" ${monoFont} font-size="26" fill="${subtext}">${view.slot + 1}</text>`
     : "";
-  const focus = view.selected ? `<circle cx="124" cy="20" r="6" fill="${oledForeground(theme, "text")}"/>` : "";
+  const selection = view.selected && !feedbackColor
+    ? `<rect x="11" y="11" width="122" height="122" rx="11" fill="none" stroke="${outlineColor ?? oledForeground(theme, "text")}" stroke-width="3"/>`
+    : "";
   const outline = outlineColor
-    ? `<rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="${outlineColor}" stroke-width="${view.danger ? 7 : statusVisual?.width ?? 5}"${statusVisual?.dash ? ` stroke-dasharray="${statusVisual.dash}"` : ""}/>`
+    ? `<rect ${keyOutlineGeometry()} fill="none" stroke="${outlineColor}" stroke-width="${view.danger ? 7 : statusVisual?.width ?? 5}"${statusVisual?.dash ? ` stroke-dasharray="${statusVisual.dash}"` : ""}/>`
     : "";
   const workingHighlight = workingAnimation(view, theme);
   const empty = view.empty ? `<path d="M57 76H87M72 61V91" stroke="${subtext}" stroke-width="6" stroke-linecap="round"/>` : "";
   const footerValue = (view.detail || view.context)?.replaceAll(" › ", " · ");
   const footer = footerValue
-    ? `<text x="76" y="130" ${monoFont} font-size="18" fill="${subtext}" text-anchor="middle" letter-spacing=".1">${escapeXml(compactContext(footerValue.toUpperCase(), 12))}</text>`
+    ? `<text x="72" y="130" ${monoFont} font-size="18" fill="${subtext}" text-anchor="middle" letter-spacing=".1">${escapeXml(compactContext(footerValue.toUpperCase(), 12))}</text>`
     : "";
   const labelY = lines.length === 1 ? 84 : lines.length === 2 ? 64 : 47;
   const label = view.empty ? "" : view.count === undefined
     ? lines.map((line, index) =>
-        `<text x="76" y="${labelY + index * 29}" ${monoFont} font-size="${labelSize}" fill="${text}" text-anchor="middle">${escapeXml(line)}</text>`
+        `<text x="72" y="${labelY + index * 29}" ${monoFont} font-size="${labelSize}" fill="${text}" text-anchor="middle"${labelTracking}>${escapeXml(line)}</text>`
       ).join("")
-    : `<text x="76" y="36" ${monoFont} font-size="22" fill="${text}" text-anchor="middle">${escapeXml(view.label.toUpperCase())}</text>
-      <text x="76" y="116" ${monoFont} font-size="72" fill="${statusVisual?.color ?? text}" text-anchor="middle">${view.count}</text>`;
+    : `<text x="72" y="36" ${monoFont} font-size="22" fill="${text}" text-anchor="middle">${escapeXml(view.label.toUpperCase())}</text>
+      <text x="72" y="116" ${monoFont} font-size="72" fill="${statusVisual?.color ?? text}" text-anchor="middle">${view.count}</text>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <rect width="144" height="144" fill="${background}"/>
-    ${outline}${workingHighlight}${slot}${focus}
+    <rect width="144" height="144" fill="${feedbackColor ?? "#000000"}"/>
+    ${selection}${outline}${workingHighlight}${slot}
     ${label}
     ${footer}${empty}
   </svg>`;
@@ -99,7 +109,7 @@ export function stripRegionSvg(
 
   switch (view.kind) {
     case "logo":
-      content = `<image href="${view.image}" x="350" y="0" width="100" height="100"/>`;
+      content = `<image href="${view.image}" x="${view.alignment === "right" ? 700 : 350}" y="0" width="100" height="100"/>`;
       break;
     case "page":
       content = `<rect width="6" height="100" fill="${accent}"/>
@@ -119,8 +129,13 @@ export function stripRegionSvg(
       break;
     case "command":
       content = `<rect width="6" height="100" fill="${accent}"/>
-        <text x="28" y="27" ${monoFont} font-size="19" fill="${accent}">COMMAND</text>
+        <text x="28" y="27" ${monoFont} font-size="19" fill="${accent}">ACTIONS FOR</text>
         <text x="28" y="70" ${monoFont} font-size="42" fill="${text}">${escapeXml(truncate(view.label, 22))}</text>`;
+      break;
+    case "speed":
+      content = `<rect width="6" height="100" fill="${palette ? oledColor(palette.blue, 3) : "#ffffff"}"/>
+        <text x="400" y="27" ${monoFont} font-size="19" fill="${subtext}" text-anchor="middle">WORKING SPEED</text>
+        <text x="400" y="82" ${monoFont} font-size="56" fill="${text}" text-anchor="middle">${escapeXml(view.value)}</text>`;
       break;
     case "motion":
       content = `<rect width="6" height="100" fill="${palette ? oledColor(palette.blue, 3) : "#ffffff"}"/>
@@ -139,18 +154,44 @@ export function stripRegionSvg(
 function workingAnimation(view: KeyView, theme?: ResolvedThemeSnapshot | null): string {
   if (view.status !== "working" || view.workingFrame === undefined) return "";
   const frame = Math.max(0, view.workingFrame);
-  const offset = -((frame % 16) / 16) * 100;
-  const rect = `x="4" y="4" width="136" height="136" rx="18" pathLength="100" fill="none" stroke-linecap="round" stroke-width="5"`;
-  switch (view.workingMotion ?? "lighten") {
-    case "darken":
-      return `<rect ${rect} stroke="#000000" stroke-opacity=".72" stroke-dasharray="12 88" stroke-dashoffset="${offset.toFixed(1)}"/>`;
-    case "lighten":
-      return `<rect ${rect} stroke="${oledForeground(theme, "text")}" stroke-dasharray="12 88" stroke-dashoffset="${offset.toFixed(1)}"/>`;
-    case "rainbow":
-      return ["#af2eff", "#ff3355", "#ffda53", "#1ee4bc"].map((color, index) =>
-        `<rect ${rect} stroke="${color}" stroke-dasharray="3 97" stroke-dashoffset="${(offset - index * 3).toFixed(1)}"/>`
-      ).join("");
-  }
+  const motion = view.workingMotion ?? "lighten";
+  const outlinePerimeter = 400 + 36 * Math.PI;
+  const center = ((frame % MOTION_CYCLE_FRAMES) / MOTION_CYCLE_FRAMES) * outlinePerimeter;
+  const segmentCount = 19;
+  const segmentLength = outlinePerimeter * 0.009;
+  const segmentSpacing = outlinePerimeter * 0.008;
+  const rect = `${keyOutlineGeometry()} fill="none" stroke-width="5"`;
+  return Array.from({ length: segmentCount }, (_, index) => {
+    const progress = index / (segmentCount - 1);
+    const intensity = 0.02 + 0.43 * Math.sin(Math.PI * progress) ** 2;
+    const position = (center + (index - (segmentCount - 1) / 2) * segmentSpacing + outlinePerimeter) % outlinePerimeter;
+    const color = motion === "darken"
+      ? "#000000"
+      : motion === "lighten"
+        ? oledForeground(theme, "text")
+        : rainbowSwooshColor(progress);
+    return `<rect ${rect} stroke="${color}" stroke-opacity="${intensity.toFixed(2)}" stroke-dasharray="${segmentLength.toFixed(2)} ${(outlinePerimeter * 2 - segmentLength).toFixed(2)}" stroke-dashoffset="${(-(position - segmentLength / 2)).toFixed(1)}"/>`;
+  }).join("");
+}
+
+function keyOutlineGeometry(): string {
+  return `x="4" y="4" width="136" height="136" rx="18"`;
+}
+
+const rainbowSwooshStops = [
+  [175, 46, 255],
+  [255, 51, 85],
+  [255, 218, 83],
+  [30, 228, 188]
+] as const;
+
+function rainbowSwooshColor(progress: number): string {
+  const position = progress * (rainbowSwooshStops.length - 1);
+  const index = Math.min(Math.floor(position), rainbowSwooshStops.length - 2);
+  const amount = position - index;
+  const start = rainbowSwooshStops[index];
+  const end = rainbowSwooshStops[index + 1];
+  return `rgb(${start.map((channel, channelIndex) => Math.round(channel + (end[channelIndex] - channel) * amount)).join(" ")})`;
 }
 
 function statusAppearance(status: KeyView["status"], theme?: ResolvedThemeSnapshot | null): { color: string; width: number; dash?: string } | null {
@@ -224,7 +265,11 @@ function splitLabel(value: string, width: number): string[] {
     rest = tail;
   }
   if (rest) lines.push(truncate(rest, width));
-  return lines;
+  return lines.map((line, index) => index < lines.length - 1 && line.endsWith("-") ? line.slice(0, -1) : line);
+}
+
+function labelFontSize(lines: string[]): number {
+  return Math.max(18, 36 - Math.max(...lines.map(displayWidth)) * 1.5);
 }
 
 function splitLabelLine(value: string, width: number): [string, string] {

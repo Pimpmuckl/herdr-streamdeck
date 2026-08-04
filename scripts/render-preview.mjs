@@ -25,21 +25,21 @@ function devicePreview(activeTheme, mode = "dashboard") {
     { label: "", slot: 3, empty: true },
     { label: "daedalus", slot: 4, status: "idle" },
     { label: "vod-graph", slot: 5, status: "working", workingFrame: 5, workingMotion: "rainbow" },
-    { label: "COMMAND" }
+    { label: "ACTIONS" }
   ];
   const commandActions = ["CONTINUE", "STATUS", "VERIFY", "ZOOM", "—", mode === "stop" ? "STOP AGAIN" : "STOP"]
-    .map((label, slot) => ({ label, context: "COMMAND", detail: mode === "stop" && slot === 5 ? "PRESS AGAIN" : slot === 4 ? "UNASSIGNED" : "PRESS SEND", slot, danger: mode === "stop" && slot === 5 }));
+    .map((label, slot) => ({ label, detail: mode === "stop" && slot === 5 ? "PRESS AGAIN" : slot === 4 ? "UNASSIGNED" : undefined, slot, danger: mode === "stop" && slot === 5 }));
   const commandKeys = [
     ...commandActions.slice(0, 3),
     { label: "INBOX", count: 2, status: "blocked" },
     ...commandActions.slice(3),
-    { label: "CANCEL", context: "COMMAND", detail: "review-suite" }
+    { label: "BACK" }
   ];
   const keys = (["command", "stop"].includes(mode) ? commandKeys : dashboardKeys).map((view) => keySvg(view, activeTheme));
   const strip = mode === "attention"
     ? { kind: "attention", label: "api-rewrite", position: "1 / 2", focused: true }
     : mode === "dashboard"
-      ? { kind: "logo", image: logoImage }
+      ? { kind: "logo", image: logoImage, alignment: "center" }
       : { kind: "command", label: "review-suite" };
   const dials = [0, 1, 2, 3].map((region) => stripRegionSvg(region, strip, activeTheme));
   const placedKeys = keys.map((svg, index) => place(svg, 88 + (index % 4) * 160, 18 + Math.floor(index / 4) * 160)).join("\n");

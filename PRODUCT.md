@@ -29,7 +29,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 ## Operating Context
 
 - The primary surface is an Elgato Stream Deck+ with eight LCD keys, four dials, and an 800 x 100 touch strip composed of four coordinated 200 x 100 encoder regions.
-- The fixed key rows are `1 2 3 INBOX` and `4 5 6 COMMAND`.
+- The fixed key rows are `1 2 3 INBOX` and `4 5 6 ACTIONS`.
 - The user normally operates it with one hand while Herdr is open in the background.
 - The Herdr client may be foreground, background, or closed. Device actions may focus an existing client but never launch one implicitly.
 - A bundled Stream Deck+ profile owns all four encoder positions so Question Mode can appear as one coordinated strip.
@@ -42,7 +42,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - **Pinned:** stored in a physical slot on a named page.
 - **Previewed:** selected on the device without changing Herdr state.
 - **Focused:** selected inside Herdr.
-- **Command target:** the focused thread frozen when Command Mode opens.
+- **Action target:** the focused thread frozen when Actions Mode opens.
 - **Attention item:** a structured question or approval, explicit error, or unseen completion that needs human action.
 
 ### Pin pages and six thread keys
@@ -50,10 +50,11 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Pages grow on demand without a fixed limit. Dial 1 exposes used pages plus exactly one empty next page; another page appears only after that page receives a pin.
 - Turning dial 1 immediately switches the active page and redraws the six thread keys.
 - Stream Deck settings are the primary page manager for create, rename, reorder, and delete.
-- A single pin tap focuses its thread inside Herdr without stealing operating-system focus.
-- Tapping an empty slot pins Herdr's focused thread.
+- Pressing a pinned key focuses its thread immediately on key-down without stealing operating-system focus. A long hold may therefore focus the thread before unpinning it.
+- A global `Show FOCUSED flash` setting controls the brief full-key acknowledgement and defaults off.
+- Tapping an empty slot pins Herdr's focused thread and immediately renders that thread without an intermediate acknowledgement screen.
 - A second tap raises the existing Herdr client.
-- Holding an occupied slot unpins it. Replacement requires unpinning first.
+- Holding an occupied slot unpins it and shows a full-key `THREAD UNPINNED` acknowledgement. Holding an empty slot does nothing. Replacement requires unpinning first.
 - Offline pins remain visible. A restarted agent reconnects by exact session, then the same terminal and agent, then one unique exact label for that agent. Ambiguous or different agents stay offline.
 - Herdr should expose `Pin to Stream Deck...` on a thread. It opens a compact page-and-slot map that shows occupied slots and allows direct placement.
 - Both configuration surfaces operate on one shared pin and page model.
@@ -62,16 +63,18 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 
 - The queue contains structured questions or approvals, explicit errors, and unseen completions.
 - Working and ordinary idle threads do not enter the queue.
-- Inbox immediately replaces the full touch strip with the selected attention item and focuses it in the background. Repeated taps cycle the queue.
+- Inbox immediately replaces the full touch strip with the selected attention item and focuses it in the background. Repeated taps or dial 1 turns cycle the queue.
 - Holding Inbox opens the attention queue in Herdr.
 - Resolved items leave the queue automatically. An empty queue reports `ALL CLEAR` across the strip.
 - Passive arrivals update status but never steal operating-system focus or replace the dashboard.
-- Dial 2 owns navigation and action within the selected question. Inbox remains the only control that cycles between questions.
+- Dial 1 cycles attention items while Inbox is open. Dial 2 owns navigation and action within the selected question.
 
-### Thread navigation and dial 3
+### Working motion tuning
 
-- In the dashboard, turning dial 3 scrolls the focused thread immediately.
-- Pressing dial 3 returns to live output and follow behavior.
+- In the dashboard, each dial 3 detent adjusts the working-border lap speed by `0.1×` from `0.2×` through `2.0×` without changing render FPS.
+- Turning dial 3 replaces the full strip for five seconds with `WORKING SPEED` and the exact persisted multiplier.
+- Pressing dial 3 toggles the persisted idle logo between centered and flush-right, then reveals the logo immediately.
+- Dial 4 continues to compare darkening, lightening, and rainbow treatments at the selected speed.
 
 ### Structured Question Mode and dial 2
 
@@ -87,22 +90,22 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Submission must include a stable interaction ID. If the interaction changed or resolved, submit nothing and show `QUESTION CHANGED`.
 - Free-form or unsupported interactions show `OPEN HERDR`; the device never guesses an answer from terminal text.
 - Dial 4 remains reserved in Question Mode.
-- Command cancels Question Mode and returns to the dashboard.
+- Actions cancels Question Mode and returns to the dashboard.
 
-### One-shot Command Mode and Command key
+### One-shot Actions Mode and Actions key
 
-- Tap Command to enter Command Mode. Holding another control simultaneously is never required.
-- Entry freezes and visibly identifies the focused command target.
-- One successful action returns automatically to the dashboard. Command cancels.
-- The six thread keys become fixed command positions:
+- Tap Actions to enter Actions Mode. Holding another control simultaneously is never required.
+- Entry freezes the focused thread and identifies it on the touch strip as `ACTIONS FOR` followed by the thread name.
+- One successful action returns automatically to the dashboard. Back cancels.
+- The six thread keys become fixed action positions:
   1. `CONTINUE`: send a fixed continue-with-best-judgment prompt.
   2. `STATUS`: request a concise completed, next, and blocked report.
   3. `VERIFY`: request relevant checks and their result.
-  4. `ZOOM`: toggle the target pane's zoom.
+  4. `ZOOM`: toggle the target pane's normal Herdr zoom.
   5. Unassigned until real usage identifies a frequent action.
-  6. `STOP`: arm in red, then require a second press on the same key.
-- Prompt commands are unavailable while a structured question is active.
-- Every command acknowledges `SENT`, `QUEUED`, or `FAILED` before returning.
+  6. `STOP`: arm in red, then require a second press to send `Ctrl+C` to the target pane.
+- Prompt actions are unavailable while a structured question is active.
+- Prompt actions acknowledge `PROMPT SENT`, Zoom acknowledges `ZOOMED`, and Stop acknowledges `INTERRUPTED`. Failures acknowledge `FAILED` before returning.
 - Failures render a short cause and recovery hint on the affected key or dial; the generic Stream Deck warning triangle is never used.
 
 ### Status and display language
@@ -112,7 +115,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Herdr remains the only theme source. Until Herdr exposes its resolved palette, the plugin uses a generated compatibility copy of Herdr's 17 RGB built-in themes plus the saved theme name and custom RGB overrides in Herdr's config.
 - The plugin has no theme settings or manual light/dark override. `npm run themes:sync` refreshes the temporary generated copy from a local Herdr checkout.
 - Saved palette changes redraw every visible key and encoder region. The host-derived `terminal` palette, unsaved previews, and automatic appearance changes require a future resolved-theme API.
-- Every OLED background is fixed deep black except the selected thread key's fixed near-black fill. Herdr themes color text, lifecycle outlines, the focus dot, and dial bars only.
+- Every OLED background is fixed deep black. Herdr themes color text, lifecycle outlines, and dial bars; a second inset lifecycle-color ring marks the selected thread while the status border stays in its normal outer position.
 - Foreground colors retain their configured hue and are lifted only when required to meet the black-field contrast floor.
 - Pinned keys show only the deepest available pane or thread label; actionable status may temporarily use the footer. Page and queue context appear only during their full-strip takeovers; the idle strip remains the Herdr logo. Empty slots stay almost blank.
 - Status colors are paired with a label, motion, or border geometry:
@@ -121,7 +124,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
   - green: completed and unseen with the strongest lifecycle outline;
   - blue: working with a moving border highlight;
   - gray: idle with a thin solid outline, unknown with a dashed outline;
-  - near-black fill plus white marker: focused.
+  - doubled lifecycle-color border: focused.
 - Do not infer review-ready, test-failed, approval, or question semantics from arbitrary terminal text.
 
 ### Required Herdr extension seams
@@ -153,7 +156,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - `herdr_logo.svg`: primary square Herdr mark and OLED baseline source.
 - `herdr_logo_wide.png`: wide mark for light surfaces.
 - `herdr_logo_wide_dark.png`: wide mark for dark surfaces.
-- A runnable Stream Deck plugin slice and actual-resolution rendered previews now cover the dashboard, light/dark Herdr theme sync, one-shot Command Mode, and armed Stop state.
+- A runnable Stream Deck plugin slice and actual-resolution rendered previews now cover the dashboard, light/dark Herdr theme sync, one-shot Actions Mode, and armed Stop state.
 - The dashboard, pin chooser, eight keys, and four encoder regions have been exercised on a physical Stream Deck+. Timing and legibility still require continued hardware iteration.
 
 ## Product Principles

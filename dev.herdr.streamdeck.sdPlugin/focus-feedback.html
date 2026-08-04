@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pinned thread settings</title>
+  <style>
+    :root { color-scheme: dark; font: 13px system-ui, sans-serif; }
+    body { margin: 18px; color: #f2f2f2; }
+    label { display: flex; align-items: center; justify-content: space-between; gap: 16px; cursor: pointer; }
+    input { width: 18px; height: 18px; margin: 0; accent-color: #22c55e; }
+    p { margin: 8px 34px 0 0; color: #bdbdbd; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <label for="focus-feedback">
+    <span>Show FOCUSED flash</span>
+    <input id="focus-feedback" type="checkbox">
+  </label>
+  <p>Show a brief confirmation after switching threads.</p>
+  <script>
+    const input = document.querySelector("#focus-feedback");
+    let connection;
+    let settings = {};
+
+    window.connectElgatoStreamDeckSocket = (port, uuid, registerEvent) => {
+      connection = new WebSocket(`ws://127.0.0.1:${port}`);
+      connection.addEventListener("open", () => {
+        connection.send(JSON.stringify({ event: registerEvent, uuid }));
+        connection.send(JSON.stringify({ event: "getGlobalSettings", context: uuid }));
+      });
+      connection.addEventListener("message", ({ data }) => {
+        const message = JSON.parse(data);
+        if (message.event !== "didReceiveGlobalSettings") return;
+        settings = message.payload.settings ?? {};
+        input.checked = settings.focusFeedback === true;
+      });
+      input.addEventListener("change", () => {
+        settings = { ...settings, focusFeedback: input.checked };
+        connection.send(JSON.stringify({ event: "setGlobalSettings", context: uuid, payload: settings }));
+      });
+    };
+  </script>
+</body>
+</html>

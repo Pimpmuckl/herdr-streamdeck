@@ -20,8 +20,9 @@
       "Name": "Pinned Thread",
       "UUID": "dev.herdr.streamdeck.pin",
       "Icon": "imgs/herdr",
-      "Tooltip": "Tap to focus. Hold to pin or unpin the focused Herdr thread.",
+      "Tooltip": "Press to focus. Hold an occupied slot to unpin.",
       "Controllers": ["Keypad"],
+      "PropertyInspectorPath": "focus-feedback.html",
       "UserTitleEnabled": false,
       "States": [{ "Image": "imgs/key", "TitleAlignment": "middle" }]
     },
@@ -35,22 +36,22 @@
       "States": [{ "Image": "imgs/key", "TitleAlignment": "middle" }]
     },
     {
-      "Name": "Command",
+      "Name": "Actions",
       "UUID": "dev.herdr.streamdeck.command",
       "Icon": "imgs/herdr",
-      "Tooltip": "Tap to enter one-shot thread commands. Tap again to cancel.",
+      "Tooltip": "Open one-shot actions for the focused Herdr thread.",
       "Controllers": ["Keypad"],
       "UserTitleEnabled": false,
       "States": [{ "Image": "imgs/key", "TitleAlignment": "middle" }]
     },
     {
-      "Name": "Pinned Pages",
+      "Name": "Navigation",
       "UUID": "dev.herdr.streamdeck.pages",
       "Icon": "imgs/herdr",
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
-        "TriggerDescription": { "Rotate": "Switch page", "Push": "Return to page one" }
+        "TriggerDescription": { "Rotate": "Switch page or Inbox item", "Push": "Return to page one" }
       },
       "States": [{ "Image": "imgs/key" }]
     },
@@ -61,18 +62,18 @@
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
-        "TriggerDescription": { "Rotate": "Preview attention item", "Push": "Open in Herdr" }
+        "TriggerDescription": { "Rotate": "Navigate selected question", "Push": "Open in Herdr" }
       },
       "States": [{ "Image": "imgs/key" }]
     },
     {
-      "Name": "Current Thread",
+      "Name": "Working Speed",
       "UUID": "dev.herdr.streamdeck.thread",
       "Icon": "imgs/herdr",
       "Controllers": ["Encoder"],
       "Encoder": {
         "layout": "$A0",
-        "TriggerDescription": { "Rotate": "Reserved", "Push": "Reserved" }
+        "TriggerDescription": { "Rotate": "Adjust working speed", "Push": "Toggle logo alignment" }
       },
       "States": [{ "Image": "imgs/key" }]
     },

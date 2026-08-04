@@ -63,7 +63,7 @@ The implementation is flat, compact, and terminal-like. Every unused OLED pixel 
 - Short, bold monospaced labels with small uppercase strip titles.
 - Strong border changes for focus and armed destructive state.
 - Turns preview and presses commit, except direct page and thread navigation.
-- One-shot Command mode preserves fixed command positions.
+- One-shot Actions Mode preserves fixed action positions.
 
 **Build limitations:** The current SVGs depend on Unicode status glyphs and prefer system-installed Consolas or Cascadia Mono. Those dependencies are shipped implementation constraints, not canonical iconography or typeface assets.
 
@@ -73,7 +73,7 @@ The plugin has no independent palette. Until Herdr exposes its resolved runtime 
 
 ### Runtime roles
 
-- **OLED field:** every key and dial background is fixed `#000000`; the selected thread alone uses fixed `#202020` plus its focus dot. Theme surface colors never tint unused pixels.
+- **OLED field:** every key and dial background is fixed `#000000`. The selected thread adds an inset ring in its lifecycle color while the status border stays at the outer edge. Theme surface colors never tint unused pixels.
 - **Idle brand mark:** the exact Herdr vector uses `#959391` on the black dial strip so it stays quieter than live status content.
 - **Surface role:** `surface1` defines only the resting key outline.
 - **Text roles:** `text` and `subtext0` separate primary labels from slot numbers, titles, and hints.
@@ -83,7 +83,7 @@ The plugin has no independent palette. Until Herdr exposes its resolved runtime 
 
 **The Herdr Owns Color Rule.** Never add plugin palette settings or hand-maintained swatches. The temporary generated palette copy must remain mechanically derived from Herdr and disappear when a resolved-theme API exists.
 
-**The OLED Black Rule.** Keep every background pixel `#000000` except the selected thread's `#202020` field. This fixed neutral is selection geometry, not a plugin theme color. Theme roles color information only: text, lifecycle outlines, the focus dot, and dial bars.
+**The OLED Black Rule.** Keep every background pixel `#000000`. Theme roles color information only: text, lifecycle outlines, and dial bars. Selection repeats the lifecycle color as an inset ring rather than using a fill.
 
 **The OLED Contrast Rule.** Resolve every foreground from its actual configured RGB value, not the theme name or appearance. Text and small marks require 4.5:1 against black; outlines and bars require 3:1.
 
@@ -101,7 +101,7 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 - **Status mark** (700, 22px): the compact upper-right state marker on a key.
 - **Meta label** (700, 20px): slot numbers and compact key metadata.
 - **Strip title** (700, 20px, 0.2px tracking): uppercase dial-region context.
-- **Hint** (700, 18px, 0.1px tracking): secondary physical instructions such as `PRESS SEND`.
+- **Hint** (700, 18px, 0.1px tracking): secondary physical instructions such as `PRESS AGAIN`.
 
 **The Physical Type Floor.** Informational device text never falls below 18 pixels on its authored key or dial canvas. Shorten, truncate, or omit secondary copy before reducing type.
 
@@ -109,39 +109,42 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 
 **The Operational Copy Rule.** Labels stay brief, literal, and free of implementation terminology; longer content belongs only in the coordinated Question surface.
 
-**The Authored Action Feedback Rule.** Every interactive key and dial owns its pending, success, failure, and restore behavior. An immediate authored state change such as focus, page, Inbox, or Command mode is sufficient acknowledgement; otherwise the affected control briefly renders a literal outcome such as `PINNED`, `UNPINNED`, `FOCUSED`, or `SENT`. Failures name the cause and recovery on the affected control. Never call Stream Deck's generic `showOk()` or `showAlert()` overlays, and never let a rejected action fall through to host-owned feedback.
+**The Authored Action Feedback Rule.** Every interactive key and dial owns its pending, success, failure, and restore behavior. A successful key acknowledgement uses a full green field with black text so it cannot be confused with normal lifecycle state. The optional pinned-thread `FOCUSED` acknowledgement defaults off because the selected ring already confirms the change. An immediate authored state change such as pinning, page navigation, Inbox, or Actions Mode needs no intermediate acknowledgement screen. Failures name the cause and recovery on the affected control. Never call Stream Deck's generic `showOk()` or `showAlert()` overlays, and never let a rejected action fall through to host-owned feedback.
 
 **The Actionable Error Rule.** Never use the host warning triangle. Render a short cause and recovery hint on the affected key or dial, then restore its normal state.
 
-**The Working Motion Rule.** Keep working labels and the blue lifecycle outline static; animate only a 12% swoosh carried by that same outline. Render explicit SVG frames every 128 milliseconds only on visible working keys. Motion never adds an interior ornament, replaces semantic color, or overwrites pressed, success, or failure feedback. Dial 4 compares darkening, lightening, and Nextide rainbow treatments on identical geometry and timing; the treatment remains under physical-device comparison and is not yet locked.
+**The Working Motion Rule.** Keep working labels and the blue lifecycle outline static; animate only a soft 15% swoosh carried by that same outline, with overlay intensity rising toward its center and falling away at both ends. Complete one lap in 21 explicit SVG frames rendered every 128 milliseconds only on visible working keys. Use the rounded outline's measured 513-pixel perimeter for dash length and travel because the Stream Deck renderer does not honor normalized `pathLength` dash metrics; make each dash pattern span two measured perimeters so it cannot repeat. Motion never adds an interior ornament, replaces semantic color, or overwrites pressed, success, or failure feedback. Dial 4 compares darkening, lightening, and Nextide rainbow treatments on identical geometry and timing; the treatment remains under physical-device comparison and is not yet locked.
+
+**The Motion Tuning Rule.** Dial 3 adjusts a persisted `0.2×` through `2.0×` lap-speed multiplier in `0.1×` detents while the 128-millisecond render cadence stays fixed. Turning it takes over the full strip for five seconds with a centered `WORKING SPEED` label and 56-pixel numeric multiplier. Pressing it toggles the persisted idle logo between centered and flush-right, then returns directly to the logo for comparison. Dial 4 changes only the treatment, never the speed.
 
 ## Layout
 
-The key bank is a fixed four-column, two-row arrangement of full 144-by-144-pixel canvases. Thread slots form a 3-by-2 block on the left; Inbox and Command form a persistent action rail on the right. A single outline sits 3 pixels from the edge; slot metadata sits at the upper left, the state mark at the upper right, and the primary label remains centered. The selected thread alone receives the fixed near-black field.
+The key bank is a fixed four-column, two-row arrangement of full 144-by-144-pixel canvases. Thread slots form a 3-by-2 block on the left; Inbox and Actions form a persistent action rail on the right. The lifecycle outline sits 3 pixels from the edge; slot metadata sits at the upper left, the state mark at the upper right, and the primary label remains centered. The selected thread adds a second lifecycle-color ring inside it.
 
 The touch strip is one uninterrupted 800-by-100-pixel black composition rendered through four adjacent 200-by-100-pixel regions. Titles and values share an 18-pixel left inset. Each region uses a 5-pixel full-height state bar at its left edge.
 
-**The Fixed Geography Rule.** The rows remain `1 2 3 INBOX` and `4 5 6 COMMAND`. Preserve these positions across modes so one-handed muscle memory remains reliable.
+**The Fixed Geography Rule.** The rows remain `1 2 3 INBOX` and `4 5 6 ACTIONS`. Preserve these positions across modes so one-handed muscle memory remains reliable.
 
 ## Elevation & Depth
 
-The system uses no shadows, nested fills, or background artwork. Hierarchy comes only from type, border-carried lifecycle cues, the selected-thread field and focus dot, and border-weight changes for completion or danger.
+The system uses no shadows, nested fills, or background artwork. Hierarchy comes only from type, border-carried lifecycle cues, the selected-thread ring, and border-weight changes for completion or danger.
 
 **The Flat Instrument Rule.** Do not add decorative chrome, gradients, gloss, or simulated physical depth.
 
 ## Shapes
 
-Keys use one rounded outline on the OLED field. The dial strip is rectangular and continuous; individual regions must not read as detached cards. Working, blocked, and offline borders are 5 pixels; completed and armed destructive borders are 7 pixels; idle borders are 3 pixels; and unknown borders are 3-pixel dashed outlines. Selection combines the fixed near-black field with the upper-right focus dot without changing lifecycle geometry.
+Keys use one rounded lifecycle outline on the OLED field. The dial strip is rectangular and continuous; individual regions must not read as detached cards. Working, blocked, and offline borders are 5 pixels; completed and armed destructive borders are 7 pixels; idle borders are 3 pixels; and unknown borders are 3-pixel dashed outlines. Selection adds a 3-pixel inset ring in the lifecycle color without moving or changing the outer status outline.
 
 ## Components
 
 ### Thread and action key
 
-- **Canvas:** full 144 by 144 pixels with a 3-pixel inset outline; only the selected thread changes from black to the fixed near-black field.
+- **Canvas:** full 144 by 144 pixels on fixed black; the selected thread adds an inset lifecycle-color ring inside the unchanged outer status outline.
 - **Content:** the deepest useful pane identity, a border-carried state cue, and an optional short actionable footer. Slot numbers appear only when empty. Page and queue context use temporary full-strip takeovers; the idle strip remains the Herdr logo.
-- **Label behavior:** split labels at word separators when possible and use no more than three centered lines. Keep the default 8-column measure at 24px or larger; names beyond its 24-column capacity may expand to 12 columns and shrink as far as the 18px physical type floor. Truncate only after that wider measure is exhausted. The deepest useful identity gets the largest type.
-- **Hold feedback:** crossing the 650ms pin threshold commits the change immediately. Keep `RELEASED · LET GO` visible after an unpin until the physical key is released, then restore the empty slot.
-- **State:** lifecycle color is repeated through border weight, border pattern, working motion, or a literal footer. Selection uses the near-black field plus the upper-right focus dot. Do not restore interior status glyphs or the removed bottom rail.
+- **Label behavior:** split labels at word separators when possible and use no more than three centered lines. Before accepting a third line of only one to three columns, retry as two balanced lines up to 12 columns wide and use that result only when it remains at least 20px. Lines nine columns or wider tighten to `-0.04em` so they remain clear of the selected-thread ring without changing size on focus. Remove a trailing hyphen only when it marks a rendered line break; preserve a hyphen at the end of the complete name. Keep the default 8-column measure at 24px or larger; names beyond its 24-column capacity may expand to 12 columns and shrink as far as the 18px physical type floor. Truncate only after that wider measure is exhausted. The deepest useful identity gets the largest type.
+- **Hold feedback:** crossing the 650ms threshold unpins only an occupied slot. Show `THREAD UNPINNED` on the full green success field for at least 500ms and until the physical key is released, then restore the empty slot. Holding an empty slot does nothing.
+- **Focus timing:** begin focus on key-down. Key release only resolves tap-versus-hold behavior and optional acknowledgement.
+- **State:** lifecycle color is repeated through border weight, border pattern, working motion, or a literal footer. Selection repeats that color as an inset ring while preserving the outer lifecycle border. Do not restore interior status glyphs or the removed bottom rail.
 - **Inbox exception:** when attention exists, place `INBOX` at the top and render the queue count as the dominant 72-pixel number. Do not add a footer or icon.
 - **Empty slot:** show only its slot number and a quiet plus mark.
 
@@ -157,11 +160,11 @@ Keys use one rounded outline on the OLED field. The dial strip is rectangular an
 - **Entry:** tapping Inbox immediately replaces all four dial regions; no second press is required.
 - **Content:** show queue position, selected thread, needs-input state, and either `PRESS DIAL 2` for a soft preview or `QUESTION IN HERDR` after focus. Never imply that dial 4 can open unsupported question content.
 - **Fallback:** when Herdr does not expose structured question content, never infer it from terminal text; identify the item and open it in Herdr.
-- **Exit:** Command returns to the dashboard. The takeover also returns to the Herdr logo after five seconds. An empty queue uses the same full-strip surface to report `ALL CLEAR`.
+- **Exit:** Actions returns to the dashboard. The takeover also returns to the Herdr logo after five seconds. An empty queue uses the same full-strip surface to report `ALL CLEAR`.
 
 ### Structured question takeover
 
-- **Entry:** Inbox selects or cycles the question and focuses its thread inside Herdr without raising the operating-system window.
+- **Entry:** Inbox selects the first question and focuses its thread inside Herdr without raising the operating-system window. Dial 1 cycles between questions without changing Herdr focus.
 - **Question phase:** use the full strip for thread identity, question position, and one readable text page. Each dial 2 detent advances one page.
 - **Neutral gate:** one detent after the last page displays `TURN FOR ANSWERS`; it separates reading from selection without a blank frame.
 - **Answer phase:** further dial 2 turns highlight one answer at a time. Reverse turns cross the neutral gate and return to the question pages.
@@ -171,22 +174,23 @@ Keys use one rounded outline on the OLED field. The dial strip is rectangular an
 
 ### Page takeover
 
-- **Entry:** turning dial 1 immediately switches the six pinned keys and replaces the whole strip with the active page.
+- **Entry:** outside Inbox, turning dial 1 immediately switches the six pinned keys and replaces the whole strip with the active page.
 - **Content:** show the page name, its position among currently reachable pages, and a terse status summary.
 - **Exit:** return to the Herdr logo five seconds after the latest page turn.
 - **Boundary:** expose every used page and exactly one empty next page; do not wrap or scroll through additional blanks.
 
-### Command bank
+### Actions bank
 
-- **Positions:** the six thread slots remain `CONTINUE`, `STATUS`, `VERIFY`, `ZOOM`, unassigned, and `STOP`; Inbox stays top-right and Command becomes Cancel at bottom-right.
-- **Target:** the third dial region identifies the frozen command target.
-- **Lifecycle:** entering Command mode swaps the six thread keys in place; one successful action acknowledges and returns to the dashboard.
+- **Positions:** the six thread slots remain `CONTINUE`, `STATUS`, `VERIFY`, `ZOOM`, unassigned, and `STOP`; Inbox stays top-right and Actions becomes Back at bottom-right.
+- **Target:** the full touch strip displays `ACTIONS FOR` and the frozen thread name.
+- **Labels:** Continue, Status, and Verify use `PROMPT`; Zoom uses `HERDR`; Stop uses `CTRL+C`; and the unused slot uses `UNASSIGNED`. Armed Stop replaces its footer with `PRESS AGAIN`.
+- **Lifecycle:** entering Actions Mode swaps the six thread keys in place; one successful action acknowledges and returns to the dashboard.
 
 ### Armed Stop
 
 - **First press:** changes only key 6 to `STOP AGAIN`, switches label and border to Herdr's resolved red role, and increases the border to 7 pixels.
 - **Second press:** commits Stop on the same key.
-- **Cancellation:** the fixed cancel key exits without executing the destructive action.
+- **Cancellation:** the fixed Back key exits without executing the destructive action.
 
 ## Do's and Don'ts
 

@@ -571,6 +571,30 @@ class AttentionDialAction extends SingletonAction {
     if (event.action.isDial()) return this.render(event.action);
   }
 
+  override onDialRotate(event: DialRotateEvent): void {
+    const queue = attentionPanes(herdr.snapshot);
+    if (!queue.length) return;
+    const current = queue.findIndex((pane) => pane.pane_id === inbox.paneId);
+    const start = current >= 0 ? current : event.payload.ticks > 0 ? -1 : 0;
+    inbox.open(queue[wrappedIndex(start, event.payload.ticks, queue.length)].pane_id);
+  }
+
+  override async onDialDown(event: DialDownEvent): Promise<void> {
+    const queue = attentionPanes(herdr.snapshot);
+    if (!queue.length) {
+      inbox.open(null);
+      return;
+    }
+    const pane = selectedAttentionPane() ?? queue[0];
+    try {
+      inbox.open(pane.pane_id);
+      await herdr.focusPane(pane.pane_id);
+    } catch (error) {
+      streamDeck.logger.error(`Attention dial failed: ${String(error)}`);
+      await showDialError(event.action, "FAILED", "HERDR OFFLINE", () => this.render(event.action));
+    }
+  }
+
   private render(action: DialAction): Promise<void> {
     return renderStrip(action, 1);
   }

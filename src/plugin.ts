@@ -238,9 +238,10 @@ class PinnedThreadAction extends SingletonAction {
         else await showKeyError(event.action, "SLOT BUSY", "UNPIN FIRST", slot, () => this.render(event.action));
       } else if (command.active) {
         if (await this.runCommand(slot, event.action)) {
-          await renderKey(event.action, keySvg({ label: "SENT", context: "COMMAND", detail: "DELIVERED", slot, status: "done" }, herdr.theme));
-          await delay(400);
-          command.cancel();
+          await showKeySuccess(event.action, "SENT", async () => {
+            command.cancel();
+            await this.render(event.action);
+          });
         }
       } else if (Date.now() - started >= HOLD_MS) {
         const change = await this.togglePin(slot);
@@ -263,9 +264,7 @@ class PinnedThreadAction extends SingletonAction {
     } catch (error) {
       streamDeck.logger.error(`Pinned thread action failed: ${String(error)}`);
       if (command.active) {
-        await renderKey(event.action, keySvg({ label: "FAILED", context: "COMMAND", detail: "NOT SENT", slot, danger: true }, herdr.theme));
-        await delay(600);
-        await this.render(event.action);
+        await showKeyError(event.action, "FAILED", "NOT SENT", slot, () => this.render(event.action));
         return;
       }
       await showKeyError(event.action, "FAILED", "TRY AGAIN", slot, () => this.render(event.action));
@@ -336,10 +335,12 @@ class PinnedThreadAction extends SingletonAction {
   }
 
   private async render(action: KeyAction): Promise<void> {
+    if (transientKeyFeedback.has(action.id)) return;
     const slot = keySlot(action);
     if (slot === null) return;
     const theme = herdr.theme;
     const settings = await deck.get();
+    if (transientKeyFeedback.has(action.id)) return;
     if (pinChooser.pane) {
       const occupied = settings.pages[settings.pageIndex].pins[slot];
       return renderKey(action, keySvg({
@@ -377,7 +378,9 @@ class PinnedThreadAction extends SingletonAction {
   }
 
   private async renderAll(): Promise<void> {
-    await Promise.all(this.actions.toArray().flatMap((item) => item.isKey() ? [this.render(item)] : []));
+    await Promise.all(this.actions.toArray().flatMap((item) =>
+      item.isKey() && !transientKeyFeedback.has(item.id) ? [this.render(item)] : []
+    ));
   }
 
   private async renderWorkingFrame(): Promise<void> {
@@ -697,10 +700,10 @@ async function showKeyError(
   try {
     await renderKey(action, keySvg({ label, detail, slot, danger: true }, herdr.theme));
     await delay(700);
-    await restore();
   } finally {
     transientKeyFeedback.delete(action.id);
   }
+  await restore();
 }
 
 async function showKeySuccess(
@@ -712,10 +715,10 @@ async function showKeySuccess(
   try {
     await renderKey(action, keySvg({ label, status: "done" }, herdr.theme));
     await delay(500);
-    await restore();
   } finally {
     transientKeyFeedback.delete(action.id);
   }
+  await restore();
 }
 
 async function showDialError(action: DialAction, title: string, value: string, restore: () => Promise<void>): Promise<void> {

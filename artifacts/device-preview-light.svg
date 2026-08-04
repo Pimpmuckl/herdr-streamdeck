@@ -32,7 +32,7 @@
   </svg>
 <svg x="248" y="178" xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect width="144" height="144" fill="#000000"/>
-    <rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="rgb(156 160 176)" stroke-width="5"/>
+    <rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="rgb(156 160 176)" stroke-width="3"/>
     <text x="76" y="84" font-family="Consolas" font-weight="700" font-size="24" fill="rgb(113 115 136)" text-anchor="middle">daedalus</text>
 
   </svg>

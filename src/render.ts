@@ -40,7 +40,9 @@ export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): str
     ? `<text x="16" y="32" ${monoFont} font-size="26" fill="${subtext}">${view.slot + 1}</text>`
     : "";
   const focus = view.selected ? `<circle cx="124" cy="20" r="6" fill="${oledForeground(theme, "text")}"/>` : "";
-  const outline = outlineColor ? `<rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="${outlineColor}" stroke-width="5"/>` : "";
+  const outline = outlineColor
+    ? `<rect x="4" y="4" width="136" height="136" rx="18" fill="none" stroke="${outlineColor}" stroke-width="${view.danger ? 7 : statusVisual?.width ?? 5}"${statusVisual?.dash ? ` stroke-dasharray="${statusVisual.dash}"` : ""}/>`
+    : "";
   const workingHighlight = workingAnimation(view, theme);
   const empty = view.empty ? `<path d="M57 76H87M72 61V91" stroke="${subtext}" stroke-width="6" stroke-linecap="round"/>` : "";
   const footerValue = (view.detail || view.context)?.replaceAll(" › ", " · ");
@@ -145,14 +147,15 @@ function workingAnimation(view: KeyView, theme?: ResolvedThemeSnapshot | null): 
   }
 }
 
-function statusAppearance(status: KeyView["status"], theme?: ResolvedThemeSnapshot | null): { color: string } | null {
+function statusAppearance(status: KeyView["status"], theme?: ResolvedThemeSnapshot | null): { color: string; width: number; dash?: string } | null {
   const palette = theme?.palette;
   switch (status) {
-    case "blocked": return { color: palette ? oledColor(palette.yellow) : "#ffffff" };
-    case "working": return { color: palette ? oledColor(palette.blue) : "#ffffff" };
-    case "done": return { color: palette ? oledColor(palette.green) : "#ffffff" };
-    case "offline": return { color: palette ? oledColor(palette.red) : "#ffffff" };
-    case "idle": case "unknown": return { color: palette ? oledColor(palette.overlay0) : "#9a9ca5" };
+    case "blocked": return { color: palette ? oledColor(palette.yellow) : "#ffffff", width: 5 };
+    case "working": return { color: palette ? oledColor(palette.blue) : "#ffffff", width: 5 };
+    case "done": return { color: palette ? oledColor(palette.green) : "#ffffff", width: 5 };
+    case "offline": return { color: palette ? oledColor(palette.red) : "#ffffff", width: 5 };
+    case "idle": return { color: palette ? oledColor(palette.overlay0) : "#9a9ca5", width: 3 };
+    case "unknown": return { color: palette ? oledColor(palette.overlay0) : "#9a9ca5", width: 3, dash: "10 8" };
     default: return null;
   }
 }

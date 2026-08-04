@@ -127,7 +127,7 @@ The system uses no shadows, nested fills, or background artwork. Hierarchy comes
 
 ## Shapes
 
-Keys use one 16-pixel-radius outline on the full black OLED field. The dial strip is rectangular and continuous; individual regions must not read as detached cards. Resting key borders are 2 pixels, selected borders are 5 pixels, and armed destructive borders are 7 pixels.
+Keys use one rounded outline on the full black OLED field. The dial strip is rectangular and continuous; individual regions must not read as detached cards. Working, blocked, done, and offline borders are 5 pixels; idle borders are 3 pixels; unknown borders are 3-pixel dashed outlines; and armed destructive borders are 7 pixels. Selection uses the separate upper-right focus dot without changing lifecycle geometry.
 
 ## Components
 

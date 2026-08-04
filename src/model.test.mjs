@@ -167,6 +167,9 @@ red = "rgb(255, 85, 85)"
   assert.match(threadKey, /<rect x="4" y="4" width="136" height="136" rx="18"[^>]*stroke-width="5"/);
   assert.match(threadKey, /<circle cx="124" cy="20" r="6"/);
   assert.doesNotMatch(threadKey, />1<\/text>/);
+  assert.match(keySvg({ label: "idle", status: "idle" }), /stroke-width="3"/);
+  assert.match(keySvg({ label: "unknown", status: "unknown" }), /stroke-width="3" stroke-dasharray="10 8"/);
+  assert.match(keySvg({ label: "STOP", danger: true }), /stroke-width="7"/);
   assert.match(keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "darken" }), /stroke="#000000" stroke-opacity="\.72"[^>]*stroke-dashoffset="-25\.0"/);
   assert.match(keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "lighten" }), /pathLength="100"[^>]*stroke="#[a-f0-9]+"[^>]*stroke-dashoffset="-25\.0"/i);
   const rainbowKey = keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "rainbow" });

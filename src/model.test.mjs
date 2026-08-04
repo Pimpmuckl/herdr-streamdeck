@@ -47,6 +47,16 @@ test("device state, pin identity, and device rendering stay coherent", () => {
   assert.equal(paged.pages.length, 3);
   navigatePages(paged, -99);
   assert.equal(paged.pageIndex, 0);
+  const gappedPages = normalizeSettings({
+    pages: [
+      { name: "ONE", pins: [] },
+      { name: "TWO", pins: [{ paneId: "p2", label: "two" }] },
+      { name: "THREE", pins: [] }
+    ]
+  });
+  assert.equal(visiblePageCount(gappedPages), 3);
+  navigatePages(gappedPages, 2);
+  assert.equal(gappedPages.pageIndex, 2);
   assert.deepEqual(
     attentionPanes({
       panes: [
@@ -169,6 +179,7 @@ red = "rgb(255, 85, 85)"
   assert.doesNotMatch(threadKey, />1<\/text>/);
   assert.match(keySvg({ label: "idle", status: "idle" }), /stroke-width="3"/);
   assert.match(keySvg({ label: "unknown", status: "unknown" }), /stroke-width="3" stroke-dasharray="10 8"/);
+  assert.match(keySvg({ label: "done", status: "done" }), /stroke-width="7"/);
   assert.match(keySvg({ label: "STOP", danger: true }), /stroke-width="7"/);
   assert.match(keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "darken" }), /stroke="#000000" stroke-opacity="\.72"[^>]*stroke-dashoffset="-25\.0"/);
   assert.match(keySvg({ label: "working", status: "working", workingFrame: 4, workingMotion: "lighten" }), /pathLength="100"[^>]*stroke="#[a-f0-9]+"[^>]*stroke-dashoffset="-25\.0"/i);

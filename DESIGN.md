@@ -127,7 +127,7 @@ The system uses no shadows, nested fills, or background artwork. Hierarchy comes
 
 ## Shapes
 
-Keys use one rounded outline on the full black OLED field. The dial strip is rectangular and continuous; individual regions must not read as detached cards. Working, blocked, done, and offline borders are 5 pixels; idle borders are 3 pixels; unknown borders are 3-pixel dashed outlines; and armed destructive borders are 7 pixels. Selection uses the separate upper-right focus dot without changing lifecycle geometry.
+Keys use one rounded outline on the full black OLED field. The dial strip is rectangular and continuous; individual regions must not read as detached cards. Working, blocked, and offline borders are 5 pixels; completed and armed destructive borders are 7 pixels; idle borders are 3 pixels; and unknown borders are 3-pixel dashed outlines. Selection uses the separate upper-right focus dot without changing lifecycle geometry.
 
 ## Components
 
@@ -136,7 +136,7 @@ Keys use one rounded outline on the full black OLED field. The dial strip is rec
 - **Canvas:** full 144 by 144 pixels of deep black with a 3-pixel inset outline.
 - **Content:** slot number, compact workspace and tab context, the deepest useful pane identity, a state mark, and an optional short hint.
 - **Label behavior:** split labels at word separators when possible, use no more than two lines of 8 monospaced columns, and truncate the second line with an ellipsis. Never squeeze the font or leave an orphan third line. Context caps at 11 columns and prioritizes its trailing tab identity, dropping the workspace first when both do not fit. The deepest useful identity gets the largest type.
-- **State:** focused keys use the stronger 5-pixel text-role border; ordinary keys use the 2-pixel surface-role border. A bottom rail and authored mark repeat state without relying on color alone.
+- **State:** lifecycle color is repeated through border weight, border pattern, working motion, or a literal footer. Selection uses the separate upper-right focus dot. Do not restore interior status glyphs or the removed bottom rail.
 - **Empty slot:** show only its slot number and a quiet plus mark.
 
 ### Dial region

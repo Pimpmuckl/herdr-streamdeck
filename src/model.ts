@@ -144,7 +144,7 @@ export function navigatePages(settings: DeckSettings, ticks: number): void {
       settings.pageIndex = Math.max(0, settings.pageIndex - 1);
       continue;
     }
-    if (!settings.pages[settings.pageIndex].pins.some(Boolean)) return;
+    if (settings.pageIndex >= lastUsedPageIndex(settings) + 1) return;
     if (settings.pageIndex === settings.pages.length - 1) {
       settings.pages.push({ name: `PAGE ${settings.pages.length + 1}`, pins: Array(6).fill(null) });
     }
@@ -153,8 +153,14 @@ export function navigatePages(settings: DeckSettings, ticks: number): void {
 }
 
 export function visiblePageCount(settings: DeckSettings): number {
-  const firstEmpty = settings.pages.findIndex((page) => !page.pins.some(Boolean));
-  return Math.max(settings.pageIndex + 1, firstEmpty < 0 ? settings.pages.length : firstEmpty + 1);
+  return Math.max(settings.pageIndex + 1, lastUsedPageIndex(settings) + 2);
+}
+
+function lastUsedPageIndex(settings: DeckSettings): number {
+  for (let index = settings.pages.length - 1; index >= 0; index--) {
+    if (settings.pages[index].pins.some(Boolean)) return index;
+  }
+  return -1;
 }
 
 export function attentionPanes(snapshot: HerdrSnapshot | null): PaneSnapshot[] {

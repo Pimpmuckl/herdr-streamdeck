@@ -115,13 +115,12 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Every OLED background is fixed deep black. Herdr themes color text, status marks, rails, focus outlines, and dial bars only.
 - Foreground colors retain their configured hue and are lifted only when required to meet the black-field contrast floor.
 - Pinned keys read from parent to child as workspace, tab, then the deepest available pane or thread label. Empty slots stay almost blank.
-- Status colors are paired with a label or symbol:
-  - amber: needs input;
-  - red: explicit error;
-  - green: completed and unseen;
-  - blue: working;
-  - gray: idle;
-  - dark: offline;
+- Status colors are paired with a label, motion, or border geometry:
+  - amber: needs-input label;
+  - red: explicit error or offline label;
+  - green: completed and unseen with the strongest lifecycle outline;
+  - blue: working with a moving border highlight;
+  - gray: idle with a thin solid outline, unknown with a dashed outline;
   - white outline or marker: focused.
 - Do not infer review-ready, test-failed, approval, or question semantics from arbitrary terminal text.
 

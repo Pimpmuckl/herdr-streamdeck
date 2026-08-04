@@ -152,7 +152,7 @@ function statusAppearance(status: KeyView["status"], theme?: ResolvedThemeSnapsh
   switch (status) {
     case "blocked": return { color: palette ? oledColor(palette.yellow) : "#ffffff", width: 5 };
     case "working": return { color: palette ? oledColor(palette.blue) : "#ffffff", width: 5 };
-    case "done": return { color: palette ? oledColor(palette.green) : "#ffffff", width: 5 };
+    case "done": return { color: palette ? oledColor(palette.green) : "#ffffff", width: 7 };
     case "offline": return { color: palette ? oledColor(palette.red) : "#ffffff", width: 5 };
     case "idle": return { color: palette ? oledColor(palette.overlay0) : "#9a9ca5", width: 3 };
     case "unknown": return { color: palette ? oledColor(palette.overlay0) : "#9a9ca5", width: 3, dash: "10 8" };

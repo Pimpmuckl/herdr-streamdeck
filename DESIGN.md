@@ -185,7 +185,7 @@ Keys use one rounded lifecycle outline on the OLED field. The dial strip is rect
 ### Page takeover
 
 - **Entry:** outside Inbox, turning dial 1 immediately switches the six pinned keys and replaces the left field with the active page.
-- **Content:** show `PINNED`, the page position, and the `Page N` name. Keep the herd KPIs and Herdr logo fixed at the right.
+- **Content:** show `PINNED`, the page position, the `Page N` name, and a transient 3-by-2 lifecycle map in thread-key order. Empty slots use an unlabelled dim outline. Keep the herd KPIs and Herdr logo fixed at the right.
 - **Exit:** return to the selected idle layout five seconds after the latest page turn, or immediately after any thread press.
 - **Boundary:** expose every used page and exactly one empty next page; do not wrap or scroll through additional blanks.
 

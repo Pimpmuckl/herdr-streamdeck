@@ -260,12 +260,18 @@ red = "rgb(255, 85, 85)"
   assert.doesNotMatch(oledKey, /rgb\((?:10 10 10|20 20 20|157 0 6)\)/);
   assert.doesNotMatch(customKey, /rgb\((?:10 10 10|20 20 20)\)/);
   const pageStrip = [0, 1, 2, 3].map((region) => stripRegionSvg(region, {
-    kind: "page", name: "Page 1", position: "1 / 3", image: "logo.png", blocked: 2, working: 3
+    kind: "page", name: "Page 1", position: "1 / 3", image: "logo.png", blocked: 2, working: 3,
+    slots: ["working", "blocked", "done", null, "idle", "offline"]
   }, lowContrastTheme));
   assert.match(pageStrip[0], /viewBox="0 0 200 100"/);
   assert.match(pageStrip[1], /viewBox="200 0 200 100"/);
   assert.match(pageStrip[3], /viewBox="600 0 200 100"/);
   assert.match(pageStrip.join(""), />PINNED · 1 \/ 3<\/text>.*font-size="44"[^>]*>Page 1<\/text>.*>3 RUNNING<\/text>.*>2 NEED YOU<\/text>/s);
+  assert.equal(pageStrip[0].match(/width="20" height="20"/g)?.length, 6);
+  assert.match(pageStrip[0], /x="452" y="19"[^>]*stroke-width="5"/);
+  assert.match(pageStrip[0], /x="514" y="19"[^>]*stroke-width="7"/);
+  assert.match(pageStrip[0], /x="452" y="60"[^>]*stroke-width="2"[^>]*stroke-opacity="\.35"/);
+  assert.match(pageStrip[0], /x="514" y="60"[^>]*stroke-width="5"/);
   const idleBase = {
     kind: "idle", image: "logo.png", page: "Page 1", position: "1/3", label: "herdr-streamdeck",
     status: "working", blocked: 2, working: 3, frame: 5

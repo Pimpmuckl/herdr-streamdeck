@@ -35,7 +35,7 @@ export type StripView = (
       working: number;
       frame: number;
     }
-  | { kind: "page"; name: string; position: string; image: string; blocked: number; working: number }
+  | { kind: "page"; name: string; position: string; image: string; blocked: number; working: number; slots: Array<AgentStatus | "offline" | null> }
   | { kind: "attention"; label: string; position: string; focused: boolean }
   | { kind: "clear" }
   | { kind: "command"; label: string }
@@ -127,7 +127,8 @@ export function stripRegionSvg(
     case "page":
       content = `<rect width="6" height="100" fill="${accent}"/>
         <text x="28" y="27" ${monoFont} font-size="19" fill="${subtext}">${escapeXml(`PINNED · ${view.position}`)}</text>
-        <text x="28" y="74" ${monoFont} font-size="44" fill="${text}">${escapeXml(truncate(view.name, 17))}</text>
+        <text x="28" y="74" ${monoFont} font-size="44" fill="${text}">${escapeXml(truncate(view.name, 13))}</text>
+        ${pageStatusMap(view.slots, theme)}
         ${stripBaseline(view, theme)}`;
       break;
     case "attention":
@@ -172,6 +173,20 @@ export function stripRegionSvg(
     <rect width="800" height="100" fill="#000000"/>
     ${content}${timeoutBar}
   </svg>`;
+}
+
+function pageStatusMap(
+  slots: Array<AgentStatus | "offline" | null>,
+  theme?: ResolvedThemeSnapshot | null
+): string {
+  const empty = oledForeground(theme, "subtext");
+  return Array.from({ length: 6 }, (_, slot) => {
+    const status = slots[slot] ?? null;
+    const visual = statusAppearance(status ?? undefined, theme);
+    const x = 452 + (slot % 3) * 31;
+    const y = 19 + Math.floor(slot / 3) * 41;
+    return `<rect x="${x}" y="${y}" width="20" height="20" rx="5" fill="none" stroke="${visual?.color ?? empty}" stroke-width="${visual?.width ?? 2}"${visual?.dash ? ` stroke-dasharray="${visual.dash}"` : ""}${status ? "" : ' stroke-opacity=".35"'}/>`;
+  }).join("");
 }
 
 function idleStrip(view: Extract<StripView, { kind: "idle" }>, theme?: ResolvedThemeSnapshot | null): string {

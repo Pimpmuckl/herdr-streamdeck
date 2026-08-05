@@ -996,6 +996,9 @@ async function renderStrip(action: DialAction, region: number): Promise<void> {
       kind: "page",
       name: page.name,
       position: `${settings.pageIndex + 1} / ${visiblePageCount(settings)}`,
+      slots: page.pins.map((pin) => pin
+        ? currentPane(snapshot?.panes ?? [], pin.paneId)?.agent_status ?? "offline"
+        : null),
       ...baseline
     };
   } else if (strip.takeover === "speed") {

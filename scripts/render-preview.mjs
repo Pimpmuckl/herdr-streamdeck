@@ -40,7 +40,8 @@ function devicePreview(activeTheme, mode = "dashboard") {
   const strip = mode === "attention"
     ? { kind: "attention", label: "api-rewrite", position: "1 / 2", focused: true }
     : mode === "page"
-      ? { kind: "page", name: "Page 1", position: "1 / 3", image: logoImage }
+      ? { kind: "page", name: "Page 1", position: "1 / 3", image: logoImage,
+          slots: ["working", "working", "working", null, "idle", "blocked"] }
     : mode === "dashboard"
       ? {
           kind: "idle", image: logoImage, page: "Page 1",

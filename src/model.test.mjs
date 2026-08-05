@@ -63,6 +63,8 @@ test("device state, pin identity, and device rendering stay coherent", () => {
   recent.observe(recentSnapshot("three"));
   recent.observe(recentSnapshot("two"));
   assert.deepEqual(recent.panes(recentSnapshot("two")).map((pane) => pane.pane_id), ["three", "one"]);
+  recent.observe(null);
+  assert.deepEqual(recent.panes(recentSnapshot("two")).map((pane) => pane.pane_id), ["three", "one"]);
   assert.deepEqual(recent.panes(recentSnapshot("two", ["two", "one"])).map((pane) => pane.pane_id), ["one"]);
   const boundedRecent = new RecentPaneHistory();
   const manyPaneIds = Array.from({ length: 14 }, (_, index) => `pane-${index}`);

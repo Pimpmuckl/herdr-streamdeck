@@ -183,9 +183,9 @@ function pageStatusMap(
   return Array.from({ length: 6 }, (_, slot) => {
     const status = slots[slot] ?? null;
     const visual = statusAppearance(status ?? undefined, theme);
-    const x = 452 + (slot % 3) * 31;
-    const y = 19 + Math.floor(slot / 3) * 41;
-    return `<rect x="${x}" y="${y}" width="20" height="20" rx="5" fill="none" stroke="${visual?.color ?? empty}" stroke-width="${visual?.width ?? 2}"${visual?.dash ? ` stroke-dasharray="${visual.dash}"` : ""}${status ? "" : ' stroke-opacity=".35"'}/>`;
+    const x = 462 + (slot % 3) * 31;
+    const y = 29 + Math.floor(slot / 3) * 41;
+    return `<circle cx="${x}" cy="${y}" r="10" fill="none" stroke="${visual?.color ?? empty}" stroke-width="${visual?.width ?? 2}"${visual?.dash ? ` stroke-dasharray="${visual.dash}"` : ""}${status ? "" : ' stroke-opacity=".35"'}/>`;
   }).join("");
 }
 

@@ -10,6 +10,7 @@ import {
   navigatePages,
   normalizeSettings,
   paneIdentity,
+  RecentPaneHistory,
   resolvePin,
   resolvePinRequest,
   snapshotFromApi,
@@ -51,6 +52,22 @@ test("device state, pin identity, and device rendering stay coherent", () => {
   assert.equal(slotForCoordinates(3, 0), null);
   assert.equal(slotForCoordinates(3, 1), null);
   assert.equal(wrappedIndex(0, -1, 3), 2);
+  const recent = new RecentPaneHistory();
+  const recentSnapshot = (focused, paneIds = ["one", "two", "three"]) => ({
+    focused_pane_id: focused,
+    panes: paneIds.map((pane_id) => ({ pane_id, focused: pane_id === focused, agent_status: "idle" }))
+  });
+  recent.observe(recentSnapshot("one"));
+  assert.deepEqual(recent.panes(recentSnapshot("one")), []);
+  recent.observe(recentSnapshot("two"));
+  recent.observe(recentSnapshot("three"));
+  recent.observe(recentSnapshot("two"));
+  assert.deepEqual(recent.panes(recentSnapshot("two")).map((pane) => pane.pane_id), ["three", "one"]);
+  assert.deepEqual(recent.panes(recentSnapshot("two", ["two", "one"])).map((pane) => pane.pane_id), ["one"]);
+  const boundedRecent = new RecentPaneHistory();
+  const manyPaneIds = Array.from({ length: 14 }, (_, index) => `pane-${index}`);
+  for (const paneId of manyPaneIds) boundedRecent.observe(recentSnapshot(paneId, manyPaneIds));
+  assert.equal(boundedRecent.panes(recentSnapshot("pane-13", manyPaneIds)).length, 12);
   const paged = normalizeSettings({
     pages: [{ name: "ONE", pins: [{ paneId: "p1", label: "one" }] }]
   });
@@ -304,7 +321,10 @@ red = "rgb(255, 85, 85)"
   assert.match(attentionStrip, />NEEDS YOU<\/text>/);
   assert.match(attentionStrip, />QUESTION IN HERDR<\/text>/);
   assert.match(stripRegionSvg(0, { kind: "attention", label: "api-rewrite", position: "1 \/ 2", focused: false }, lowContrastTheme), />PRESS DIAL 2<\/text>/);
-  assert.doesNotMatch(`${pageStrip.join("")}${attentionStrip}${settingsBrowse}${settingsEdit}`, /<style|class=|font:|<tspan/);
+  const recentStrip = stripRegionSvg(0, { kind: "recent", label: "review-suite", context: "TOOLS › T2", position: "1 / 3", timeout: 0.5 }, lowContrastTheme);
+  assert.match(recentStrip, />RECENT THREAD<\/text>.*>review-suite<\/text>.*>TOOLS › T2<\/text>.*>PRESS DIAL 3<\/text>/s);
+  assert.match(recentStrip, /<rect x="0" y="96" width="400\.0" height="4"/);
+  assert.doesNotMatch(`${pageStrip.join("")}${attentionStrip}${recentStrip}${settingsBrowse}${settingsEdit}`, /<style|class=|font:|<tspan/);
   const [, red, green, blue] = oledKey.match(/font-size="[^"]+" fill="rgb\((\d+) (\d+) (\d+)\)"/).map(Number);
   const luminance = [red, green, blue].map((channel) => {
     const value = channel / 255;

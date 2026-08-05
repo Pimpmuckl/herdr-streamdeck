@@ -181,6 +181,32 @@ export function wrappedIndex(index: number, ticks: number, length: number): numb
   return ((index + ticks) % length + length) % length;
 }
 
+export class RecentPaneHistory {
+  private focusedPaneId: string | null | undefined;
+  private paneIds: string[] = [];
+
+  observe(snapshot: HerdrSnapshot | null): void {
+    const focused = snapshot?.focused_pane_id ?? null;
+    if (this.focusedPaneId === undefined) {
+      this.focusedPaneId = focused;
+      return;
+    }
+    if (focused !== this.focusedPaneId) {
+      const previous = this.focusedPaneId;
+      this.paneIds = [...(previous ? [previous] : []), ...this.paneIds]
+        .filter((paneId, index, paneIds) => paneId !== focused && paneIds.indexOf(paneId) === index)
+        .slice(0, 12);
+      this.focusedPaneId = focused;
+    }
+    const livePaneIds = new Set(snapshot?.panes.map((pane) => pane.pane_id) ?? []);
+    this.paneIds = this.paneIds.filter((paneId) => livePaneIds.has(paneId));
+  }
+
+  panes(snapshot: HerdrSnapshot | null): PaneSnapshot[] {
+    return this.paneIds.flatMap((paneId) => snapshot?.panes.find((pane) => pane.pane_id === paneId) ?? []);
+  }
+}
+
 export function navigatePages(settings: DeckSettings, ticks: number): void {
   const direction = Math.sign(ticks);
   for (let step = 0; step < Math.abs(ticks); step++) {

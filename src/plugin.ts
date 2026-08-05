@@ -997,7 +997,7 @@ async function renderStrip(action: DialAction, region: number): Promise<void> {
       name: page.name,
       position: `${settings.pageIndex + 1} / ${visiblePageCount(settings)}`,
       slots: page.pins.map((pin) => pin
-        ? currentPane(snapshot?.panes ?? [], pin.paneId)?.agent_status ?? "offline"
+        ? resolvePin(pin, snapshot)?.agent_status ?? "offline"
         : null),
       ...baseline
     };

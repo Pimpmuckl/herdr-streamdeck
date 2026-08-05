@@ -19,7 +19,6 @@ import {
   attentionPanes,
   commandIntent,
   type DeckSettings,
-  type IdleLayout,
   MOTION_BASE_SPEED,
   navigatePages,
   normalizeSettings,
@@ -55,8 +54,7 @@ const motionVariants = [
   { id: "lighten", name: "LIGHT" },
   { id: "rainbow", name: "RAINBOW" }
 ] satisfies Array<{ id: WorkingMotion; name: string }>;
-const idleLayouts = ["triage", "focus", "ambient"] as const satisfies readonly IdleLayout[];
-const settingNames = ["IDLE VIEW", "WORKING SPEED", "WORKING MOTION", "WORKING WIDTH", "WORKING INTENSITY", "FOCUS FEEDBACK"] as const;
+const settingNames = ["WORKING SPEED", "WORKING MOTION", "WORKING WIDTH", "WORKING INTENSITY", "FOCUS FEEDBACK"] as const;
 let pendingSettingsSave: DeckSettings | null = null;
 let settingsSaveTask: Promise<void> | null = null;
 
@@ -226,7 +224,7 @@ class StripState {
 
   async tickIdle(regions: readonly number[]): Promise<void> {
     await this.emit(regions);
-    this.idleFrame = (this.idleFrame + 1) % 660; // LCM of the 6-state indicator and 220-step ambient trail.
+    this.idleFrame = (this.idleFrame + 1) % 6;
   }
 
   refresh(regions: readonly number[]): Promise<void> {
@@ -619,13 +617,9 @@ class PinnedThreadAction extends SingletonAction {
     if (command.active || pinChooser.pane || settingsMenu.active) return MOTION_BASE_SPEED;
     const settings = await deck.get();
     const focused = currentPane(herdr.snapshot?.panes ?? [], herdr.snapshot?.focused_pane_id);
-    const animateIdle = !inbox.active && strip.takeover === null && (
-      settings.idleLayout === "ambient"
-        ? Boolean(herdr.snapshot?.panes.some((pane) => pane.agent_status === "working"))
-        : focused?.agent_status === "working"
-    );
+    const animateIdle = !inbox.active && strip.takeover === null && focused?.agent_status === "working";
     if (!animateIdle) return MOTION_BASE_SPEED;
-    await strip.tickIdle(settings.idleLayout === "ambient" ? [0, 1, 2] : [0]);
+    await strip.tickIdle([0]);
     return settings.motionSpeed;
   }
 }
@@ -946,11 +940,7 @@ async function renderStrip(action: DialAction, region: number): Promise<void> {
   const settings = settingsMenu.draft ?? storedSettings;
   if (transientDialFeedback.has(action.id)) return;
   const snapshot = herdr.snapshot;
-  const baseline = {
-    image: logoImage,
-    blocked: snapshot?.panes.filter((pane) => pane.agent_status === "blocked").length ?? 0,
-    working: snapshot?.panes.filter((pane) => pane.agent_status === "working").length ?? 0
-  };
+  const baseline = { image: logoImage };
   let view: StripView;
   if (settingsMenu.active) {
     view = {
@@ -987,10 +977,8 @@ async function renderStrip(action: DialAction, region: number): Promise<void> {
     const page = settings.pages[settings.pageIndex];
     view = {
       kind: "idle",
-      mode: settings.idleLayout,
       ...baseline,
       page: page.name,
-      position: `${settings.pageIndex + 1}/${visiblePageCount(settings)}`,
       label: focused ? paneIdentity(focused, snapshot, focused.pane_id).primary : "NO THREAD",
       status: focused?.agent_status ?? (snapshot ? "idle" : "offline"),
       frame: strip.idleFrame
@@ -1012,25 +1000,22 @@ function activeTimeoutProgress(): number {
 }
 
 function settingValue(settings: DeckSettings, index: number): string {
-  if (index === 0) return settings.idleLayout.toUpperCase();
-  if (index === 1) return `${(settings.motionSpeed / MOTION_BASE_SPEED).toFixed(1)}×`;
-  if (index === 2) return motionVariants.find((variant) => variant.id === settings.workingMotion)?.name ?? "DARK";
-  if (index === 3) return `${settings.motionWidth.toFixed(1)}×`;
-  if (index === 4) return `${Math.round(settings.motionIntensity * 100)}%`;
+  if (index === 0) return `${(settings.motionSpeed / MOTION_BASE_SPEED).toFixed(1)}×`;
+  if (index === 1) return motionVariants.find((variant) => variant.id === settings.workingMotion)?.name ?? "DARK";
+  if (index === 2) return `${settings.motionWidth.toFixed(1)}×`;
+  if (index === 3) return `${Math.round(settings.motionIntensity * 100)}%`;
   return settings.focusFeedback ? "ON" : "OFF";
 }
 
 function adjustSetting(settings: DeckSettings, index: number, ticks: number): void {
   if (index === 0) {
-    settings.idleLayout = idleLayouts[wrappedIndex(idleLayouts.indexOf(settings.idleLayout), ticks, idleLayouts.length)];
-  } else if (index === 1) {
     settings.motionSpeed = adjustMotionSpeed(settings.motionSpeed, ticks);
-  } else if (index === 2) {
+  } else if (index === 1) {
     const current = motionVariants.findIndex((variant) => variant.id === settings.workingMotion);
     settings.workingMotion = motionVariants[wrappedIndex(Math.max(0, current), ticks, motionVariants.length)].id;
-  } else if (index === 3) {
+  } else if (index === 2) {
     settings.motionWidth = adjustMotionScale(settings.motionWidth, ticks);
-  } else if (index === 4) {
+  } else if (index === 3) {
     settings.motionIntensity = adjustMotionScale(settings.motionIntensity, ticks);
   } else if (ticks) {
     settings.focusFeedback = ticks > 0;
@@ -1063,7 +1048,6 @@ async function flushSettingsSaves(): Promise<void> {
 
 function saveSettings(draft: DeckSettings): Promise<void> {
   return deck.update((settings) => {
-    settings.idleLayout = draft.idleLayout;
     settings.motionSpeed = draft.motionSpeed;
     settings.workingMotion = draft.workingMotion;
     settings.motionWidth = draft.motionWidth;

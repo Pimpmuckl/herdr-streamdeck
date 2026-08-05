@@ -15,8 +15,6 @@ for (const [name, value] of [["dark", dark], ["light", light]]) {
 writeFileSync("artifacts/device-preview-command-dark.svg", cleanSvg(devicePreview(dark, "command")));
 writeFileSync("artifacts/device-preview-attention-dark.svg", cleanSvg(devicePreview(dark, "attention")));
 writeFileSync("artifacts/device-preview-stop-armed-dark.svg", cleanSvg(devicePreview(dark, "stop")));
-writeFileSync("artifacts/device-preview-focus-dark.svg", cleanSvg(devicePreview(dark, "focus")));
-writeFileSync("artifacts/device-preview-ambient-dark.svg", cleanSvg(devicePreview(dark, "ambient")));
 writeFileSync("artifacts/device-preview-page-dark.svg", cleanSvg(devicePreview(dark, "page")));
 
 function devicePreview(activeTheme, mode = "dashboard") {
@@ -42,11 +40,11 @@ function devicePreview(activeTheme, mode = "dashboard") {
   const strip = mode === "attention"
     ? { kind: "attention", label: "api-rewrite", position: "1 / 2", focused: true }
     : mode === "page"
-      ? { kind: "page", name: "Page 1", position: "1 / 3", image: logoImage, blocked: 2, working: 3 }
-    : ["dashboard", "focus", "ambient"].includes(mode)
+      ? { kind: "page", name: "Page 1", position: "1 / 3", image: logoImage }
+    : mode === "dashboard"
       ? {
-          kind: "idle", mode: mode === "dashboard" ? "triage" : mode, image: logoImage, page: "Page 1", position: "1/3",
-          label: "herdr-streamdeck", status: "working", blocked: 2, working: 3, frame: 5
+          kind: "idle", image: logoImage, page: "Page 1",
+          label: "herdr-streamdeck", status: "working", frame: 5
         }
       : { kind: "command", label: "review-suite" };
   const dials = [0, 1, 2, 3].map((region) => stripRegionSvg(region, strip, activeTheme));

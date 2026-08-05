@@ -82,7 +82,6 @@ export type Pin = {
   agentSession?: AgentSessionRef;
 };
 export type PinPage = { name: string; pins: Array<Pin | null> };
-export type IdleLayout = "triage" | "focus" | "ambient";
 export type WorkingMotion = "darken" | "lighten" | "rainbow";
 export const MOTION_BASE_SPEED = 0.35;
 export const MOTION_BASE_WIDTH = 1.4;
@@ -95,7 +94,6 @@ export type DeckSettings = {
   motionWidth: number;
   motionIntensity: number;
   motionTuningVersion: 1;
-  idleLayout: IdleLayout;
 };
 
 export const DEFAULT_SETTINGS: DeckSettings = {
@@ -106,8 +104,7 @@ export const DEFAULT_SETTINGS: DeckSettings = {
   workingMotion: "darken",
   motionWidth: 1,
   motionIntensity: 1,
-  motionTuningVersion: 1,
-  idleLayout: "triage"
+  motionTuningVersion: 1
 };
 
 export function normalizeSettings(value: unknown): DeckSettings {
@@ -140,8 +137,7 @@ export function normalizeSettings(value: unknown): DeckSettings {
     motionIntensity: calibrated && typeof input.motionIntensity === "number" && Number.isFinite(input.motionIntensity)
       ? adjustMotionScale(input.motionIntensity, 0)
       : 1,
-    motionTuningVersion: 1,
-    idleLayout: input.idleLayout === "focus" || input.idleLayout === "ambient" ? input.idleLayout : "triage"
+    motionTuningVersion: 1
   };
 }
 

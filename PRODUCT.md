@@ -71,7 +71,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 
 ### Working motion settings
 
-- Dial 4 Settings owns idle layout, working speed, motion treatment, width, and intensity.
+- Dial 4 Settings owns working speed, motion treatment, width, and intensity.
 - Dial 3 has no turn or press behavior. A passive encoder action remains in the bundled profile only to preserve its quarter of the continuous touch strip.
 - The working border defaults to the dark swoosh; lightening and rainbow remain available in Settings.
 
@@ -116,7 +116,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Saved palette changes redraw every visible key and encoder region. The host-derived `terminal` palette, unsaved previews, and automatic appearance changes require a future resolved-theme API.
 - Every OLED background is fixed deep black. Herdr themes color text, lifecycle outlines, and dial bars; a second inset lifecycle-color ring marks the selected thread while the status border stays in its normal outer position.
 - Foreground colors retain their configured hue and are lifted only when required to meet the black-field contrast floor.
-- Pinned keys show only the deepest available pane or thread label; actionable status may temporarily use the footer. Queue context may take over the strip. Idle and page views keep herd KPIs beside the fixed right-hand Herdr logo. The focused thread always reserves one lifecycle gutter so its LCD name never shifts; working uses the six-circle animation while other states reuse Herdr's blocked, done, idle, and unknown marks. Empty slots stay almost blank.
+- Pinned keys show only the deepest available pane or thread label; actionable status may temporarily use the footer. The idle strip shows only `Page N`, the focused thread lifecycle and name, and the fixed right-hand Herdr logo. Page position appears only during page navigation; Inbox owns attention counts. The focused thread always reserves one lifecycle gutter so its LCD name never shifts; working uses the six-circle animation while other states reuse Herdr's blocked, done, idle, and unknown marks. Empty slots stay almost blank.
 - Status colors are paired with a label, motion, or border geometry:
   - amber: needs-input label;
   - red: explicit error or offline label;

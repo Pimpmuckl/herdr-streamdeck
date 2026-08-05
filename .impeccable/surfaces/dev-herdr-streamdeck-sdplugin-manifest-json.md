@@ -27,7 +27,7 @@ Herdr owns the information colors while every unused OLED pixel remains deep bla
 
 The memorable moment is one-shot Command Mode: tap Command, the six thread keys become a compact action bank around a visibly frozen target, then one successful action acknowledges and returns to the dashboard. Stop becomes destructive only after its first press arms a red `STOP AGAIN` state.
 
-Dial 3 is input-inert. Its passive encoder action remains bound only so the third LCD region stays part of the continuous status strip; all motion and idle-layout controls live in Dial 4 Settings.
+Dial 3 is input-inert. Its passive encoder action remains bound only so the third LCD region stays part of the continuous status strip; all motion controls live in Dial 4 Settings. The idle baseline keeps `Page N` and the focused thread on the left and reserves the rightmost 100 pixels for the Herdr logo. Page position appears only while navigating pages; Inbox owns attention counts.
 
 ## Constraints
 

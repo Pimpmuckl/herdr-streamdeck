@@ -1,4 +1,4 @@
-import { MOTION_BASE_WIDTH, type AgentStatus, type IdleLayout, type PaneSnapshot, type ResolvedThemeSnapshot, type WorkingMotion } from "./model.js";
+import { MOTION_BASE_WIDTH, type AgentStatus, type PaneSnapshot, type ResolvedThemeSnapshot, type WorkingMotion } from "./model.js";
 
 const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
 const monoFont = `font-family="Consolas" font-weight="700"`;
@@ -25,17 +25,13 @@ type KeyView = {
 export type StripView = (
   | {
       kind: "idle";
-      mode: IdleLayout;
       image: string;
       page: string;
-      position: string;
       label: string;
       status: AgentStatus | "offline";
-      blocked: number;
-      working: number;
       frame: number;
     }
-  | { kind: "page"; name: string; position: string; image: string; blocked: number; working: number }
+  | { kind: "page"; name: string; position: string; image: string }
   | { kind: "attention"; label: string; position: string; focused: boolean }
   | { kind: "clear" }
   | { kind: "command"; label: string }
@@ -126,8 +122,8 @@ export function stripRegionSvg(
     case "page":
       content = `<rect width="6" height="100" fill="${accent}"/>
         <text x="28" y="27" ${monoFont} font-size="19" fill="${subtext}">${escapeXml(`PINNED · ${view.position}`)}</text>
-        <text x="28" y="74" ${monoFont} font-size="44" fill="${text}">${escapeXml(truncate(view.name, 17))}</text>
-        ${stripBaseline(view, theme)}`;
+        <text x="28" y="74" ${monoFont} font-size="44" fill="${text}">${escapeXml(truncate(view.name, 23))}</text>
+        ${stripLogo(view.image)}`;
       break;
     case "attention":
       content = `<rect width="6" height="100" fill="${yellow}"/>
@@ -169,55 +165,16 @@ export function stripRegionSvg(
 }
 
 function idleStrip(view: Extract<StripView, { kind: "idle" }>, theme?: ResolvedThemeSnapshot | null): string {
-  const palette = theme?.palette;
   const text = oledForeground(theme, "text");
   const subtext = oledForeground(theme, "subtext");
-  const blue = palette ? oledColor(palette.blue, 3) : "#ffffff";
-  const yellow = palette ? oledColor(palette.yellow, 3) : "#ffffff";
   const indicator = threadStatusIndicator(view.status, view.frame, theme);
-  const baseline = stripBaseline(view, theme);
-
-  if (view.mode === "triage") {
-    return `<text x="24" y="27" ${monoFont} font-size="19" fill="${subtext}">${escapeXml(`${truncate(view.page, 15)} · ${view.position}`)}</text>
-      ${indicator}<text x="60" y="75" ${monoFont} font-size="40" fill="${text}">${escapeXml(truncate(view.label, 19))}</text>
-      ${baseline}`;
-  }
-
-  if (view.mode === "focus") {
-    return `<text x="24" y="27" ${monoFont} font-size="19" fill="${subtext}">CURRENT</text>
-      ${indicator}<text x="60" y="75" ${monoFont} font-size="44" fill="${text}">${escapeXml(truncate(view.label, 17))}</text>
-      ${baseline}`;
-  }
-
-  const trailWidth = 440;
-  const runnerCount = Math.min(view.working, 4);
-  const runners = Array.from({ length: runnerCount }, (_, runner) => {
-    const head = (view.frame * 6 + runner * 103) % trailWidth;
-    const y = 18 + runner * 21;
-    return [0, 1, 2].map((dot) => {
-      const x = 24 + ((head - dot * 12 + trailWidth) % trailWidth);
-      return `<circle cx="${x}" cy="${y}" r="${dot ? 3 : 4}" fill="${blue}" fill-opacity="${[1, 0.55, 0.25][dot]}"/>`;
-    }).join("");
-  }).join("");
-  const blockers = Array.from({ length: Math.min(view.blocked, 3) }, (_, index) =>
-    `<circle cx="${480 + index * 14}" cy="50" r="5" fill="${yellow}"/>`
-  ).join("");
-  const empty = runnerCount ? "" : `<text x="244" y="59" ${monoFont} font-size="24" fill="${subtext}" text-anchor="middle">${view.status === "offline" ? "HERDR OFFLINE" : "HERD IDLE"}</text>`;
-  return `${runners}${blockers}${empty}
-    ${baseline}`;
+  return `<text x="24" y="27" ${monoFont} font-size="19" fill="${subtext}">${escapeXml(truncate(view.page, 28))}</text>
+    ${indicator}<text x="60" y="75" ${monoFont} font-size="44" fill="${text}">${escapeXml(truncate(view.label, 22))}</text>
+    ${stripLogo(view.image)}`;
 }
 
-function stripBaseline(
-  view: { image: string; blocked: number; working: number },
-  theme?: ResolvedThemeSnapshot | null
-): string {
-  const palette = theme?.palette;
-  const subtext = oledForeground(theme, "subtext");
-  const blue = palette ? oledColor(palette.blue, 3) : "#ffffff";
-  const yellow = palette ? oledColor(palette.yellow, 3) : "#ffffff";
-  return `<text x="676" y="34" ${monoFont} font-size="20" fill="${view.working ? blue : subtext}" text-anchor="end">${view.working ? `${view.working} RUNNING` : "HERD IDLE"}</text>
-    <text x="676" y="72" ${monoFont} font-size="20" fill="${view.blocked ? yellow : subtext}" text-anchor="end">${view.blocked ? `${view.blocked} NEED YOU` : "ALL CLEAR"}</text>
-    <image href="${view.image}" x="700" y="0" width="100" height="100"/>`;
+function stripLogo(image: string): string {
+  return `<image href="${image}" x="700" y="0" width="100" height="100"/>`;
 }
 
 function threadStatusIndicator(

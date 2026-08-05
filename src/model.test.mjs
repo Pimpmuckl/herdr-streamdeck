@@ -31,7 +31,6 @@ test("device state, pin identity, and device rendering stay coherent", () => {
   assert.equal(settings.workingMotion, "darken");
   assert.equal(settings.motionWidth, 1);
   assert.equal(settings.motionIntensity, 1);
-  assert.equal(settings.idleLayout, "triage");
   assert.equal(normalizeSettings({}).pages[0].name, "Page 1");
   assert.equal(settings.pages[0].pins.length, 6);
   assert.deepEqual(settings.pages[0].pins[0], { paneId: "w1:p1", label: "api" });
@@ -40,8 +39,6 @@ test("device state, pin identity, and device rendering stay coherent", () => {
   assert.equal(normalizeSettings({ motionSpeed: 0.5, motionTuningVersion: 1 }).motionSpeed, 0.49);
   assert.equal(normalizeSettings({ workingMotion: "rainbow" }).workingMotion, "rainbow");
   assert.equal(normalizeSettings({ workingMotion: "nope" }).workingMotion, "darken");
-  assert.equal(normalizeSettings({ idleLayout: "focus" }).idleLayout, "focus");
-  assert.equal(normalizeSettings({ idleLayout: "ambient" }).idleLayout, "ambient");
   assert.equal(adjustMotionSpeed(0.35, 2), 0.42);
   assert.equal(adjustMotionSpeed(0.07, -1), 0.07);
   assert.equal(adjustMotionSpeed(0.7, 1), 0.7);
@@ -260,45 +257,42 @@ red = "rgb(255, 85, 85)"
   assert.doesNotMatch(oledKey, /rgb\((?:10 10 10|20 20 20|157 0 6)\)/);
   assert.doesNotMatch(customKey, /rgb\((?:10 10 10|20 20 20)\)/);
   const pageStrip = [0, 1, 2, 3].map((region) => stripRegionSvg(region, {
-    kind: "page", name: "Page 1", position: "1 / 3", image: "logo.png", blocked: 2, working: 3
+    kind: "page", name: "Page 1", position: "1 / 3", image: "logo.png"
   }, lowContrastTheme));
   assert.match(pageStrip[0], /viewBox="0 0 200 100"/);
   assert.match(pageStrip[1], /viewBox="200 0 200 100"/);
   assert.match(pageStrip[3], /viewBox="600 0 200 100"/);
-  assert.match(pageStrip.join(""), />PINNED · 1 \/ 3<\/text>.*font-size="44"[^>]*>Page 1<\/text>.*>3 RUNNING<\/text>.*>2 NEED YOU<\/text>/s);
+  assert.match(pageStrip.join(""), />PINNED · 1 \/ 3<\/text>.*font-size="44"[^>]*>Page 1<\/text>.*<image href="logo\.png"/s);
+  assert.doesNotMatch(pageStrip.join(""), /RUNNING|NEED YOU|ALL CLEAR/);
   const idleBase = {
-    kind: "idle", image: "logo.png", page: "Page 1", position: "1/3", label: "herdr-streamdeck",
-    status: "working", blocked: 2, working: 3, frame: 5
+    kind: "idle", image: "logo.png", page: "Page 1", label: "herdr-streamdeck",
+    status: "working", frame: 5
   };
-  const triageStrip = stripRegionSvg(0, { ...idleBase, mode: "triage" }, lowContrastTheme);
-  assert.match(triageStrip, />Page 1 · 1\/3<\/text>.*>herdr-streamdeck<\/text>.*>3 RUNNING<\/text>.*>2 NEED YOU<\/text>/s);
-  assert.equal(triageStrip.match(/r="4"/g)?.length, 6);
-  assert.doesNotMatch(triageStrip, />WORKING<\/text>/);
-  assert.match(triageStrip, /cx="30" cy="62" r="4"[^>]*fill-opacity="1"/);
-  const indicatorFrames = Array.from({ length: 7 }, (_, frame) => stripRegionSvg(0, { ...idleBase, mode: "triage", frame }, lowContrastTheme));
+  const idleDashboard = stripRegionSvg(0, idleBase, lowContrastTheme);
+  assert.match(idleDashboard, />Page 1<\/text>.*>herdr-streamdeck<\/text>/s);
+  assert.doesNotMatch(idleDashboard, /1\/3|RUNNING|NEED YOU|ALL CLEAR|CURRENT/);
+  assert.equal(idleDashboard.match(/r="4"/g)?.length, 6);
+  assert.doesNotMatch(idleDashboard, />WORKING<\/text>/);
+  assert.match(idleDashboard, /cx="30" cy="62" r="4"[^>]*fill-opacity="1"/);
+  const indicatorFrames = Array.from({ length: 7 }, (_, frame) => stripRegionSvg(0, { ...idleBase, frame }, lowContrastTheme));
   assert.equal(new Set(indicatorFrames.slice(0, 6)).size, 6);
   assert.equal(indicatorFrames[6], indicatorFrames[0]);
-  const idleStrip = stripRegionSvg(0, { ...idleBase, mode: "triage", status: "idle" }, lowContrastTheme);
+  const idleStrip = stripRegionSvg(0, { ...idleBase, status: "idle" }, lowContrastTheme);
   assert.match(idleStrip, /d="M27\.5 62L34 68\.5L46 54\.5"/);
   assert.match(idleStrip, /<text x="60" y="75"[^>]*>herdr-streamdeck<\/text>/);
-  assert.match(stripRegionSvg(0, { ...idleBase, mode: "triage", status: "blocked" }, lowContrastTheme), /r="9"[^>]*fill="none".*r="3\.5"/s);
-  assert.match(stripRegionSvg(0, { ...idleBase, mode: "triage", status: "done" }, lowContrastTheme), /r="8"[^>]*fill="rgb/);
-  assert.match(stripRegionSvg(0, { ...idleBase, mode: "triage", status: "unknown" }, lowContrastTheme), /r="8"[^>]*fill="none"/);
-  assert.match(triageStrip, /<image href="logo\.png" x="700" y="0" width="100" height="100"\/>/);
-  assert.match(stripRegionSvg(0, { ...idleBase, mode: "focus" }, lowContrastTheme), />CURRENT<\/text>.*>herdr-streamdeck<\/text>.*>3 RUNNING<\/text>.*>2 NEED YOU<\/text>/s);
-  const ambientStrip = stripRegionSvg(0, { ...idleBase, mode: "ambient" }, lowContrastTheme);
-  assert.equal(ambientStrip.match(/r="4"/g)?.length, 3);
-  assert.equal(ambientStrip.match(/r="5"/g)?.length, 2);
-  assert.match(ambientStrip, />3 RUNNING<\/text>.*>2 NEED YOU<\/text>/s);
+  assert.match(stripRegionSvg(0, { ...idleBase, status: "blocked" }, lowContrastTheme), /r="9"[^>]*fill="none".*r="3\.5"/s);
+  assert.match(stripRegionSvg(0, { ...idleBase, status: "done" }, lowContrastTheme), /r="8"[^>]*fill="rgb/);
+  assert.match(stripRegionSvg(0, { ...idleBase, status: "unknown" }, lowContrastTheme), /r="8"[^>]*fill="none"/);
+  assert.match(idleDashboard, /<image href="logo\.png" x="700" y="0" width="100" height="100"\/>/);
   const settingsBrowse = stripRegionSvg(0, {
-    kind: "settings", editing: false, name: "WORKING MOTION", value: "RAINBOW", position: "3/4", timeout: 0.5
+    kind: "settings", editing: false, name: "WORKING MOTION", value: "RAINBOW", position: "2/5", timeout: 0.5
   }, lowContrastTheme);
-  assert.match(settingsBrowse, />SETTINGS · 3\/4<\/text>.*>WORKING MOTION<\/text>.*>RAINBOW<\/text>.*>CONTROLS<\/text>.*>DIAL TURN<\/text><text[^>]*>BROWSE<\/text>.*>DIAL PRESS<\/text><text[^>]*>EDIT<\/text>.*>DIAL HOLD<\/text><text[^>]*>EXIT<\/text>/s);
+  assert.match(settingsBrowse, />SETTINGS · 2\/5<\/text>.*>WORKING MOTION<\/text>.*>RAINBOW<\/text>.*>CONTROLS<\/text>.*>DIAL TURN<\/text><text[^>]*>BROWSE<\/text>.*>DIAL PRESS<\/text><text[^>]*>EDIT<\/text>.*>DIAL HOLD<\/text><text[^>]*>EXIT<\/text>/s);
   assert.match(settingsBrowse, /<rect x="0" y="96" width="400\.0" height="4"/);
   const settingsEdit = stripRegionSvg(3, {
-    kind: "settings", editing: true, name: "FOCUS FEEDBACK", value: "ON", position: "4/4"
+    kind: "settings", editing: true, name: "FOCUS FEEDBACK", value: "ON", position: "5/5"
   }, lowContrastTheme);
-  assert.match(settingsEdit, /viewBox="600 0 200 100".*>EDITING · 4\/4<\/text>.*>DIAL TURN<\/text><text[^>]*>CHANGE<\/text>.*>DIAL PRESS<\/text><text[^>]*>DONE<\/text>.*>DIAL HOLD<\/text><text[^>]*>EXIT<\/text>/s);
+  assert.match(settingsEdit, /viewBox="600 0 200 100".*>EDITING · 5\/5<\/text>.*>DIAL TURN<\/text><text[^>]*>CHANGE<\/text>.*>DIAL PRESS<\/text><text[^>]*>DONE<\/text>.*>DIAL HOLD<\/text><text[^>]*>EXIT<\/text>/s);
   assert.match(stripRegionSvg(0, { kind: "command", label: "review-suite" }, lowContrastTheme), />ACTIONS FOR<\/text>.*>review-suite<\/text>/s);
   const attentionStrip = stripRegionSvg(0, { kind: "attention", label: "api-rewrite", position: "1 \/ 2", focused: true }, lowContrastTheme);
   assert.match(attentionStrip, />NEEDS YOU<\/text>/);

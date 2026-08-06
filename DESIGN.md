@@ -117,7 +117,9 @@ All device text follows one compact monospaced hierarchy. The normative tokens d
 
 **The Working Motion Rule.** Keep working labels and the blue lifecycle outline static; animate only a soft 15% swoosh carried by that same outline, with overlay intensity rising toward its center and falling away at both ends. Complete one lap in 21 explicit SVG frames rendered every 128 milliseconds only on visible working keys. Use the rounded outline's measured 513-pixel perimeter for dash length and travel because the Stream Deck renderer does not honor normalized `pathLength` dash metrics; make each dash pattern span two measured perimeters so it cannot repeat. Motion never adds an interior ornament, replaces semantic color, or overwrites pressed, success, or failure feedback. Darkening is the default treatment; dial 4 keeps lightening and Nextide rainbow available for physical comparison.
 
-**The Motion Tuning Rule.** Dial 4 Settings owns the persisted `0.2×` through `2.0×` lap-speed multiplier, working-border treatment, width, and intensity. Dial 3 has no turn or press behavior; its passive action exists only to preserve the third region of the continuous strip.
+**The Motion Tuning Rule.** Dial 4 Settings owns the persisted `0.2×` through `2.0×` lap-speed multiplier, working-border treatment, width, and intensity.
+
+**The Recent Thread Rule.** Turning dial 3 previews recently focused live threads without changing Herdr focus. Pressing commits the previewed thread; the preview times out or yields immediately to a newer action.
 
 ## Layout
 
@@ -145,7 +147,7 @@ Keys use one rounded lifecycle outline on the OLED field. The dial strip is rect
 - **Content:** the deepest useful pane identity, a border-carried state cue, and an optional short actionable footer. Slot numbers appear only when empty. Page and queue context use temporary full-strip takeovers; the idle strip uses one baseline with the Herdr logo fixed at the far right.
 - **Label behavior:** split labels at word separators when possible and use no more than three centered lines. Before accepting a third line of only one to three columns, retry as two balanced lines up to 12 columns wide and use that result only when it remains at least 20px. Lines nine columns or wider tighten to `-0.04em` so they remain clear of the selected-thread ring without changing size on focus. Remove a trailing hyphen only when it marks a rendered line break; preserve a hyphen at the end of the complete name. Keep the default 8-column measure at 24px or larger; names beyond its 24-column capacity may expand to 12 columns and shrink as far as the 18px physical type floor. Truncate only after that wider measure is exhausted. The deepest useful identity gets the largest type.
 - **Hold feedback:** crossing the 650ms threshold unpins only an occupied slot. Show `THREAD UNPINNED` on the full green success field for at least 500ms and until the physical key is released, then restore the empty slot. Holding an empty slot does nothing.
-- **Focus timing:** begin focus on key-down. Key release only resolves tap-versus-hold behavior and optional acknowledgement.
+- **Focus timing:** key-down only starts gesture tracking. A short key release focuses once; crossing the hold threshold never focuses or selects the thread.
 - **State:** lifecycle color is repeated through border weight, border pattern, working motion, or a literal footer. Selection repeats that color as an inset ring while preserving the outer lifecycle border. Do not restore interior status glyphs or the removed bottom rail.
 - **Inbox exception:** when attention exists, place `INBOX` at the top and render the queue count as the dominant 72-pixel number. Do not add a footer or icon.
 - **Empty slot:** show only its slot number and a quiet plus mark.

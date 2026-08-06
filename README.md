@@ -30,7 +30,7 @@ Focus a pane in Herdr, then tap an empty thread key to pin it. Tap a pinned thre
 | Actions | Replace keys 1–6 with Continue, Status, Verify, Zoom, unused, and Stop; press Stop twice to confirm |
 | Dial 1 | Change pinned page; while Inbox is open, cycle its items; press to return to Page 1 |
 | Dial 2 | Focus the selected Inbox thread |
-| Dial 3 | Unbound; its LCD region remains part of the status strip |
+| Dial 3 | Preview recent threads; press to focus the previewed thread |
 | Dial 4 | Open and navigate settings; press to edit or finish, hold to exit |
 
 ## License

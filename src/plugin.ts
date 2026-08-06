@@ -25,6 +25,7 @@ import {
   type PaneSnapshot,
   paneIdentity,
   paneLabel,
+  RecentPaneHistory,
   resolvePin,
   slotForCoordinates,
   visiblePageCount,
@@ -196,7 +197,8 @@ class InboxState {
 }
 
 class StripState {
-  takeover: "page" | null = null;
+  takeover: "page" | "recent" | null = null;
+  recentPaneId: string | null = null;
   idleFrame = 0;
   expiresAt = 0;
   private timer: ReturnType<typeof setTimeout> | undefined;
@@ -205,19 +207,31 @@ class StripState {
   show(takeover: "page"): void {
     if (this.timer) clearTimeout(this.timer);
     this.takeover = takeover;
+    this.recentPaneId = null;
     this.expiresAt = Date.now() + LCD_PANEL_TIMEOUT_MS;
     void this.emit();
     this.timer = setTimeout(() => {
       this.takeover = null;
+      this.recentPaneId = null;
       this.expiresAt = 0;
       void this.emit();
     }, LCD_PANEL_TIMEOUT_MS);
+  }
+
+  showRecent(paneId: string): void {
+    if (this.timer) clearTimeout(this.timer);
+    this.takeover = "recent";
+    this.recentPaneId = paneId;
+    this.expiresAt = Date.now() + LCD_PANEL_TIMEOUT_MS;
+    void this.emit();
+    this.timer = setTimeout(() => this.showIdle(), LCD_PANEL_TIMEOUT_MS);
   }
 
   showIdle(): void {
     if (this.timer) clearTimeout(this.timer);
     this.timer = undefined;
     this.takeover = null;
+    this.recentPaneId = null;
     this.expiresAt = 0;
     void this.emit();
   }
@@ -322,16 +336,21 @@ const pinChooser = new PinChooserState();
 const inbox = new InboxState();
 const strip = new StripState();
 const settingsMenu = new SettingsMenuState();
+const recent = new RecentPaneHistory();
+herdr.subscribe(() => {
+  recent.observe(herdr.snapshot);
+  if (strip.recentPaneId && !recent.panes(herdr.snapshot).some((pane) => pane.pane_id === strip.recentPaneId)) strip.showIdle();
+});
 herdr.subscribePinRequests((pane) => {
   closeSettings();
   inbox.cancel();
+  strip.showIdle();
   pinChooser.enter(pane);
 });
 
 @action({ UUID: "dev.herdr.streamdeck.pin" })
 class PinnedThreadAction extends SingletonAction {
   private readonly downKeys = new Set<string>();
-  private readonly focusTasks = new Map<string, Promise<boolean>>();
   private readonly holdTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly holdTasks = new Map<string, Promise<void>>();
   private animationFrame = 0;
@@ -355,13 +374,10 @@ class PinnedThreadAction extends SingletonAction {
   override onKeyDown(event: KeyDownEvent): void {
     this.downKeys.add(event.action.id);
     if (settingsMenu.active) closeSettings();
+    strip.showIdle();
     if (pinChooser.pane || command.active) return;
     const slot = keySlot(event.action);
     if (slot === null) return;
-    strip.showIdle();
-    const focusTask = this.focusOnPress(slot);
-    this.focusTasks.set(event.action.id, focusTask);
-    void focusTask.catch(() => undefined);
     this.holdTimers.set(event.action.id, setTimeout(() => {
       this.holdTimers.delete(event.action.id);
       this.holdTasks.set(event.action.id, this.commitHold(slot, event.action));
@@ -378,7 +394,6 @@ class PinnedThreadAction extends SingletonAction {
       try {
         await holdTask;
       } finally {
-        this.focusTasks.delete(event.action.id);
         this.holdTasks.delete(event.action.id);
         transientKeyFeedback.delete(event.action.id);
         await this.render(event.action);
@@ -387,8 +402,6 @@ class PinnedThreadAction extends SingletonAction {
     }
     const slot = keySlot(event.action);
     if (slot === null) return;
-    const focusTask = this.focusTasks.get(event.action.id);
-    this.focusTasks.delete(event.action.id);
 
     try {
       if (pinChooser.pane) {
@@ -413,7 +426,7 @@ class PinnedThreadAction extends SingletonAction {
         }
         const pane = resolvePin(pin, herdr.snapshot);
         if (!pane) return showKeyError(event.action, "OFFLINE", "THREAD LOST", slot, () => this.render(event.action));
-        if (!(await focusTask)) await herdr.focusPane(pane.pane_id);
+        await herdr.focusPane(pane.pane_id);
         if (settings.focusFeedback) await showKeySuccess(event.action, "FOCUSED", () => this.render(event.action));
         else await this.render(event.action);
       }
@@ -425,15 +438,6 @@ class PinnedThreadAction extends SingletonAction {
       }
       await showKeyError(event.action, "FAILED", "TRY AGAIN", slot, () => this.render(event.action));
     }
-  }
-
-  private async focusOnPress(slot: number): Promise<boolean> {
-    const settings = await deck.get();
-    const pin = settings.pages[settings.pageIndex].pins[slot];
-    const pane = pin && resolvePin(pin, herdr.snapshot);
-    if (!pane) return false;
-    await herdr.focusPane(pane.pane_id);
-    return true;
   }
 
   private async pinSelected(slot: number): Promise<boolean> {
@@ -641,6 +645,7 @@ class AttentionAction extends SingletonAction {
   override onKeyDown(event: KeyDownEvent): void {
     this.downAt.set(event.action.id, Date.now());
     if (settingsMenu.active) closeSettings();
+    strip.showIdle();
   }
 
   override async onKeyUp(event: KeyUpEvent): Promise<void> {
@@ -697,7 +702,12 @@ class CommandAction extends SingletonAction {
     if (event.action.isKey()) return this.render(event.action);
   }
 
+  override onKeyDown(): void {
+    strip.showIdle();
+  }
+
   override async onKeyUp(event: KeyUpEvent): Promise<void> {
+    strip.showIdle();
     if (settingsMenu.active) closeSettings();
     if (inbox.active) {
       inbox.cancel();
@@ -754,6 +764,7 @@ class PagesDialAction extends SingletonAction {
   }
 
   override async onDialRotate(event: DialRotateEvent): Promise<void> {
+    strip.showIdle();
     if (settingsMenu.active) return;
     if (inbox.active) {
       const queue = attentionPanes(herdr.snapshot);
@@ -770,6 +781,7 @@ class PagesDialAction extends SingletonAction {
   }
 
   override async onDialDown(): Promise<void> {
+    strip.showIdle();
     if (settingsMenu.active || inbox.active) return;
     await deck.update((settings) => {
       settings.pageIndex = 0;
@@ -804,6 +816,7 @@ class AttentionDialAction extends SingletonAction {
   }
 
   override async onDialDown(event: DialDownEvent): Promise<void> {
+    strip.showIdle();
     if (settingsMenu.active) return;
     const queue = attentionPanes(herdr.snapshot);
     if (!queue.length) {
@@ -846,6 +859,28 @@ class DisplayDialAction extends SingletonAction {
     if (event.action.isDial()) return this.render(event.action);
   }
 
+  override async onDialRotate(event: DialRotateEvent): Promise<void> {
+    if (inbox.active || command.active || pinChooser.pane || settingsMenu.active) return;
+    const panes = recent.panes(herdr.snapshot);
+    if (!panes.length) return;
+    const current = panes.findIndex((pane) => pane.pane_id === strip.recentPaneId);
+    const start = current >= 0 ? current : event.payload.ticks > 0 ? -1 : 0;
+    strip.showRecent(panes[wrappedIndex(start, event.payload.ticks, panes.length)].pane_id);
+  }
+
+  override async onDialDown(event: DialDownEvent): Promise<void> {
+    if (inbox.active || command.active || pinChooser.pane || settingsMenu.active) return;
+    const pane = recent.panes(herdr.snapshot).find((pane) => pane.pane_id === strip.recentPaneId);
+    if (!pane) return;
+    strip.showIdle();
+    try {
+      await herdr.focusPane(pane.pane_id);
+    } catch (error) {
+      streamDeck.logger.error(`Recent thread dial failed: ${String(error)}`);
+      await showDialError(event.action, "FAILED", "HERDR OFFLINE", () => this.render(event.action));
+    }
+  }
+
   private render(action: DialAction): Promise<void> {
     return renderStrip(action, 2);
   }
@@ -877,8 +912,8 @@ class AnswerDialAction extends SingletonAction {
 
   override async onDialRotate(event: DialRotateEvent): Promise<void> {
     if (inbox.active || command.active || pinChooser.pane) return;
+    strip.showIdle();
     if (!settingsMenu.active) {
-      strip.showIdle();
       settingsMenu.enter();
       return;
     }
@@ -892,6 +927,7 @@ class AnswerDialAction extends SingletonAction {
 
   override onDialDown(event: DialDownEvent): void {
     if (inbox.active || command.active || pinChooser.pane) return;
+    strip.showIdle();
     this.holdTimers.set(event.action.id, setTimeout(() => {
       this.holdTimers.delete(event.action.id);
       this.held.add(event.action.id);
@@ -975,6 +1011,13 @@ async function renderStrip(action: DialAction, region: number): Promise<void> {
         : null),
       ...baseline
     };
+  } else if (strip.takeover === "recent") {
+    const panes = recent.panes(snapshot);
+    const pane = panes.find((pane) => pane.pane_id === strip.recentPaneId);
+    const identity = paneIdentity(pane, snapshot, "THREAD");
+    view = pane
+      ? { kind: "recent", label: identity.primary, context: identity.context, position: `${panes.indexOf(pane) + 1} / ${panes.length}` }
+      : { kind: "idle", ...baseline, page: settings.pages[settings.pageIndex].name, label: "NO THREAD", status: snapshot ? "idle" : "offline", frame: strip.idleFrame };
   } else {
     const focused = currentPane(snapshot?.panes ?? [], snapshot?.focused_pane_id);
     const page = settings.pages[settings.pageIndex];

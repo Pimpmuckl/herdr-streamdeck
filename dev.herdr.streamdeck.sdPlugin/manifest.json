@@ -79,12 +79,13 @@
       "States": [{ "Image": "imgs/key" }]
     },
     {
-      "Name": "Display Only",
+      "Name": "Recent Threads",
       "UUID": "dev.herdr.streamdeck.thread",
       "Icon": "imgs/herdr",
       "Controllers": ["Encoder"],
       "Encoder": {
-        "layout": "$A0"
+        "layout": "$A0",
+        "TriggerDescription": { "Rotate": "Preview recent thread", "Push": "Focus previewed thread" }
       },
       "States": [{ "Image": "imgs/key" }]
     },

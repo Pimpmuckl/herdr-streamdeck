@@ -33,6 +33,7 @@ export type StripView = (
     }
   | { kind: "page"; name: string; position: string; image: string; slots: Array<AgentStatus | "offline" | null> }
   | { kind: "attention"; label: string; position: string; focused: boolean }
+  | { kind: "recent"; label: string; context?: string; position: string }
   | { kind: "clear" }
   | { kind: "command"; label: string }
   | { kind: "settings"; editing: boolean; name: string; value: string; position: string }
@@ -132,6 +133,14 @@ export function stripRegionSvg(
         <text x="28" y="70" ${monoFont} font-size="42" fill="${text}">${escapeXml(truncate(view.label, 16))}</text>
         <text x="772" y="27" ${monoFont} font-size="19" fill="${subtext}" text-anchor="end">${escapeXml(view.position)}</text>
         <text x="772" y="70" ${monoFont} font-size="21" fill="${text}" text-anchor="end">${view.focused ? "QUESTION IN HERDR" : "PRESS DIAL 2"}</text>`;
+      break;
+    case "recent":
+      content = `<rect width="6" height="100" fill="${accent}"/>
+        <text x="28" y="27" ${monoFont} font-size="19" fill="${accent}">RECENT THREAD</text>
+        <text x="28" y="70" ${monoFont} font-size="42" fill="${text}">${escapeXml(truncate(view.label, 18))}</text>
+        <text x="772" y="27" ${monoFont} font-size="19" fill="${subtext}" text-anchor="end">${escapeXml(view.position)}</text>
+        <text x="772" y="54" ${monoFont} font-size="18" fill="${subtext}" text-anchor="end">${escapeXml(truncate(view.context ?? "", 20))}</text>
+        <text x="772" y="78" ${monoFont} font-size="21" fill="${text}" text-anchor="end">PRESS DIAL 3</text>`;
       break;
     case "clear":
       content = `<text x="400" y="65" ${monoFont} font-size="42" fill="${text}" text-anchor="middle">ALL CLEAR</text>`;

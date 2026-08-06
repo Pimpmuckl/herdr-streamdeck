@@ -50,7 +50,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - Pages grow on demand without a fixed limit. Dial 1 exposes used pages plus exactly one empty next page; another page appears only after that page receives a pin.
 - Turning dial 1 immediately switches the active `Page N` and redraws the six thread keys.
 - Stream Deck settings are the primary page manager for create, rename, reorder, and delete.
-- Pressing a pinned key focuses its thread immediately on key-down without stealing operating-system focus. A long hold may therefore focus the thread before unpinning it.
+- Releasing a short pinned-key press focuses its thread once without stealing operating-system focus. Key-down only starts gesture tracking; a hold never focuses or selects the thread.
 - A global `Show FOCUSED flash` setting controls the brief full-key acknowledgement and defaults off.
 - Tapping an empty slot pins Herdr's focused thread and immediately renders that thread without an intermediate acknowledgement screen.
 - A second tap raises the existing Herdr client.

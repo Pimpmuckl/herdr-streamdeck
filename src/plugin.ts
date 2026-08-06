@@ -351,7 +351,6 @@ herdr.subscribePinRequests((pane) => {
 @action({ UUID: "dev.herdr.streamdeck.pin" })
 class PinnedThreadAction extends SingletonAction {
   private readonly downKeys = new Set<string>();
-  private readonly focusTasks = new Map<string, Promise<boolean>>();
   private readonly holdTimers = new Map<string, ReturnType<typeof setTimeout>>();
   private readonly holdTasks = new Map<string, Promise<void>>();
   private animationFrame = 0;
@@ -379,9 +378,6 @@ class PinnedThreadAction extends SingletonAction {
     if (pinChooser.pane || command.active) return;
     const slot = keySlot(event.action);
     if (slot === null) return;
-    const focusTask = this.focusOnPress(slot);
-    this.focusTasks.set(event.action.id, focusTask);
-    void focusTask.catch(() => undefined);
     this.holdTimers.set(event.action.id, setTimeout(() => {
       this.holdTimers.delete(event.action.id);
       this.holdTasks.set(event.action.id, this.commitHold(slot, event.action));
@@ -398,7 +394,6 @@ class PinnedThreadAction extends SingletonAction {
       try {
         await holdTask;
       } finally {
-        this.focusTasks.delete(event.action.id);
         this.holdTasks.delete(event.action.id);
         transientKeyFeedback.delete(event.action.id);
         await this.render(event.action);
@@ -407,8 +402,6 @@ class PinnedThreadAction extends SingletonAction {
     }
     const slot = keySlot(event.action);
     if (slot === null) return;
-    const focusTask = this.focusTasks.get(event.action.id);
-    this.focusTasks.delete(event.action.id);
 
     try {
       if (pinChooser.pane) {
@@ -433,7 +426,7 @@ class PinnedThreadAction extends SingletonAction {
         }
         const pane = resolvePin(pin, herdr.snapshot);
         if (!pane) return showKeyError(event.action, "OFFLINE", "THREAD LOST", slot, () => this.render(event.action));
-        if (!(await focusTask)) await herdr.focusPane(pane.pane_id);
+        await herdr.focusPane(pane.pane_id);
         if (settings.focusFeedback) await showKeySuccess(event.action, "FOCUSED", () => this.render(event.action));
         else await this.render(event.action);
       }
@@ -445,15 +438,6 @@ class PinnedThreadAction extends SingletonAction {
       }
       await showKeyError(event.action, "FAILED", "TRY AGAIN", slot, () => this.render(event.action));
     }
-  }
-
-  private async focusOnPress(slot: number): Promise<boolean> {
-    const settings = await deck.get();
-    const pin = settings.pages[settings.pageIndex].pins[slot];
-    const pane = pin && resolvePin(pin, herdr.snapshot);
-    if (!pane) return false;
-    await herdr.focusPane(pane.pane_id);
-    return true;
   }
 
   private async pinSelected(slot: number): Promise<boolean> {

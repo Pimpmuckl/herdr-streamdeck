@@ -8,6 +8,7 @@ import streamDeck, {
   type KeyDownEvent,
   type KeyUpEvent,
   SingletonAction,
+  type TouchTapEvent,
   type WillAppearEvent
 } from "@elgato/streamdeck";
 import { readFileSync } from "node:fs";
@@ -46,6 +47,8 @@ const LCD_TIMEOUT_BAR_MS = 2000;
 const LCD_PANEL_TIMEOUT_MS = 5000;
 const LCD_SETTINGS_TIMEOUT_MS = 15000;
 const KEY_ANIMATION_MS = 128;
+const SHEEP_ANIMATION_FRAMES = 26;
+const SHEEP_ANIMATION_MS = 96;
 const logoImage = svgImage(readFileSync(new URL("../imgs/herdr_logo.svg", import.meta.url), "utf8").replace("currentColor", "#959391"));
 const herdr = new HerdrBridge();
 const transientKeyFeedback = new Set<string>();
@@ -200,11 +203,15 @@ class StripState {
   takeover: "page" | "recent" | null = null;
   recentPaneId: string | null = null;
   idleFrame = 0;
+  sheepFrame: number | null = null;
+  sheepBaas: Array<{ frame: number; count: number }> = [];
   expiresAt = 0;
+  private sheepRun = 0;
   private timer: ReturnType<typeof setTimeout> | undefined;
   private readonly listeners = new Map<number, () => Promise<void>>();
 
   show(takeover: "page"): void {
+    this.cancelSheep();
     if (this.timer) clearTimeout(this.timer);
     this.takeover = takeover;
     this.recentPaneId = null;
@@ -219,6 +226,7 @@ class StripState {
   }
 
   showRecent(paneId: string): void {
+    this.cancelSheep();
     if (this.timer) clearTimeout(this.timer);
     this.takeover = "recent";
     this.recentPaneId = paneId;
@@ -228,6 +236,7 @@ class StripState {
   }
 
   showIdle(): void {
+    this.cancelSheep();
     if (this.timer) clearTimeout(this.timer);
     this.timer = undefined;
     this.takeover = null;
@@ -245,8 +254,35 @@ class StripState {
     return this.emit(regions);
   }
 
+  async playSheep(): Promise<void> {
+    if (this.sheepFrame !== null) return;
+    const run = ++this.sheepRun;
+    this.sheepBaas = [8, 11, 14, 17, 20].map((frame) => ({ frame, count: Math.floor(Math.random() * 4) }));
+    try {
+      for (let frame = 0; frame < SHEEP_ANIMATION_FRAMES && run === this.sheepRun; frame++) {
+        this.sheepFrame = frame;
+        await this.emit([0, 1, 2, 3]);
+        await delay(SHEEP_ANIMATION_MS);
+      }
+    } finally {
+      if (run === this.sheepRun) {
+        this.sheepFrame = null;
+        this.sheepBaas = [];
+      }
+    }
+    if (run !== this.sheepRun) return;
+    await this.emit([0, 1, 2, 3]);
+  }
+
   subscribe(region: number, listener: () => Promise<void>): void {
     this.listeners.set(region, listener);
+  }
+
+  private cancelSheep(): void {
+    if (this.sheepFrame === null) return;
+    this.sheepRun++;
+    this.sheepFrame = null;
+    this.sheepBaas = [];
   }
 
   private async emit(regions?: readonly number[]): Promise<void> {
@@ -925,6 +961,14 @@ class AnswerDialAction extends SingletonAction {
     if (draft) queueSettingsSave(draft);
   }
 
+  override onTouchTap(event: TouchTapEvent): Promise<void> | void {
+    if (
+      event.payload.hold || event.payload.tapPos[0] < 100 || inbox.active || command.active
+      || pinChooser.pane || settingsMenu.active || strip.takeover
+    ) return;
+    return strip.playSheep();
+  }
+
   override onDialDown(event: DialDownEvent): void {
     if (inbox.active || command.active || pinChooser.pane) return;
     strip.showIdle();
@@ -1027,7 +1071,9 @@ async function renderStrip(action: DialAction, region: number): Promise<void> {
       page: page.name,
       label: focused ? paneIdentity(focused, snapshot, focused.pane_id).primary : "NO THREAD",
       status: focused?.agent_status ?? (snapshot ? "idle" : "offline"),
-      frame: strip.idleFrame
+      frame: strip.idleFrame,
+      sheepFrame: strip.sheepFrame ?? undefined,
+      sheepBaas: strip.sheepBaas
     };
   }
   view.timeout = activeTimeoutProgress();

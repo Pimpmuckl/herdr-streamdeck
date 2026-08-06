@@ -30,6 +30,8 @@ export type StripView = (
       label: string;
       status: AgentStatus | "offline";
       frame: number;
+      sheepFrame?: number;
+      sheepBaas?: ReadonlyArray<{ frame: number; count: number }>;
     }
   | { kind: "page"; name: string; position: string; image: string; slots: Array<AgentStatus | "offline" | null> }
   | { kind: "attention"; label: string; position: string; focused: boolean }
@@ -194,11 +196,51 @@ function idleStrip(view: Extract<StripView, { kind: "idle" }>, theme?: ResolvedT
   const indicator = threadStatusIndicator(view.status, view.frame, theme);
   return `<text x="24" y="27" ${monoFont} font-size="19" fill="${subtext}">${escapeXml(truncate(view.page, 28))}</text>
     ${indicator}<text x="60" y="75" ${monoFont} font-size="44" fill="${text}">${escapeXml(truncate(view.label, 22))}</text>
-    ${stripLogo(view.image)}`;
+    ${stripLogo(view.image, view.sheepFrame, view.sheepBaas, theme)}`;
 }
 
-function stripLogo(image: string): string {
-  return `<image href="${image}" x="700" y="0" width="100" height="100"/>`;
+function stripLogo(
+  image: string,
+  frame?: number,
+  baas: ReadonlyArray<{ frame: number; count: number }> = [],
+  theme?: ResolvedThemeSnapshot | null
+): string {
+  if (frame === undefined) return `<image href="${image}" x="700" y="0" width="100" height="100"/>`;
+  const running = Math.max(0, frame - 6);
+  const oldX = 700 - 24 * running - 1.4 * running ** 2;
+  const oldY = frame <= 6
+    ? -18 * Math.sin(Math.PI * frame / 6)
+    : -14 * Math.abs(Math.sin(Math.PI * running / 3));
+  const oldTilt = frame <= 6 ? 5 * Math.sin(Math.PI * frame / 3) : 8 * Math.sin(Math.PI * running / 1.5);
+  const oldSheep = sheepImage(image, oldX, oldY, oldTilt);
+  const replacementFrame = frame - 8;
+  let replacement = "";
+  if (replacementFrame >= 0) {
+    const progress = Math.min(1, replacementFrame / 10);
+    const eased = 1 - (1 - progress) ** 3;
+    replacement = sheepImage(image, 800 - 100 * eased, -18 * Math.sin(Math.PI * progress), -6 * Math.sin(Math.PI * progress));
+  }
+  const burst = baas.find(({ frame: start }) => frame >= start && frame <= start + 1);
+  const baa = sheepBaaBurst(frame >= 2 && frame <= 4 ? 1 : burst?.count ?? 0, oldX, theme);
+  return `${oldSheep}${replacement}${baa}`;
+}
+
+function sheepBaaBurst(count: number, sheepX: number, theme?: ResolvedThemeSnapshot | null): string {
+  const layouts = [
+    [],
+    [[0, 0, 0]],
+    [[-26, 8, -14], [26, 8, 14]],
+    [[-46, 12, -18], [0, 0, 0], [46, 12, 18]]
+  ];
+  return layouts[count].map(([offset, drop, tilt]) => {
+    const x = sheepX + 50 + offset;
+    const y = 18 + drop;
+    return `<text x="${x.toFixed(1)}" y="${y}" ${monoFont} font-size="18" fill="${oledForeground(theme, "text")}" text-anchor="middle" transform="rotate(${tilt} ${x.toFixed(1)} ${y})">BAA!</text>`;
+  }).join("");
+}
+
+function sheepImage(image: string, x: number, y: number, tilt: number): string {
+  return `<image href="${image}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="100" height="100" transform="rotate(${tilt.toFixed(1)} ${(x + 50).toFixed(1)} ${(y + 50).toFixed(1)})"/>`;
 }
 
 function threadStatusIndicator(

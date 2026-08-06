@@ -311,6 +311,17 @@ red = "rgb(255, 85, 85)"
   assert.match(stripRegionSvg(0, { ...idleBase, status: "done" }, lowContrastTheme), /r="8"[^>]*fill="rgb/);
   assert.match(stripRegionSvg(0, { ...idleBase, status: "unknown" }, lowContrastTheme), /r="8"[^>]*fill="none"/);
   assert.match(idleDashboard, /<image href="logo\.png" x="700" y="0" width="100" height="100"\/>/);
+  const sheepHop = stripRegionSvg(3, { ...idleBase, sheepFrame: 3 }, lowContrastTheme);
+  const sheepHandoff = stripRegionSvg(3, { ...idleBase, sheepFrame: 9 }, lowContrastTheme);
+  const sheepBaaBursts = [0, 1, 2, 3].map((count) => stripRegionSvg(3, {
+    ...idleBase, sheepFrame: 9, sheepBaas: [{ frame: 8, count }]
+  }, lowContrastTheme));
+  assert.match(sheepHop, />BAA!<\/text>/);
+  assert.equal(sheepHop.match(/<image href="logo\.png"/g)?.length, 1);
+  assert.equal(sheepHandoff.match(/<image href="logo\.png"/g)?.length, 2);
+  assert.doesNotMatch(sheepHandoff, />BAA!<\/text>/);
+  for (const [count, svg] of sheepBaaBursts.entries()) assert.equal(svg.match(/>BAA!<\/text>/g)?.length ?? 0, count);
+  assert.match(sheepBaaBursts[3], /rotate\(-18 619\.4 30\).*rotate\(0 665\.4 18\).*rotate\(18 711\.4 30\)/s);
   const settingsBrowse = stripRegionSvg(0, {
     kind: "settings", editing: false, name: "WORKING MOTION", value: "RAINBOW", position: "2/5", timeout: 0.5
   }, lowContrastTheme);

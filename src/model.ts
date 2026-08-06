@@ -188,19 +188,19 @@ export class RecentPaneHistory {
   observe(snapshot: HerdrSnapshot | null): void {
     if (!snapshot) return;
     const focused = snapshot.focused_pane_id ?? null;
+    const livePaneIds = new Set(snapshot.panes.map((pane) => pane.pane_id));
+    this.paneIds = this.paneIds.filter((paneId) => livePaneIds.has(paneId));
     if (this.focusedPaneId === undefined) {
       this.focusedPaneId = focused;
       return;
     }
     if (focused !== this.focusedPaneId) {
       const previous = this.focusedPaneId;
-      this.paneIds = [...(previous ? [previous] : []), ...this.paneIds]
+      this.paneIds = [...(previous && livePaneIds.has(previous) ? [previous] : []), ...this.paneIds]
         .filter((paneId, index, paneIds) => paneId !== focused && paneIds.indexOf(paneId) === index)
         .slice(0, 12);
       this.focusedPaneId = focused;
     }
-    const livePaneIds = new Set(snapshot.panes.map((pane) => pane.pane_id));
-    this.paneIds = this.paneIds.filter((paneId) => livePaneIds.has(paneId));
   }
 
   panes(snapshot: HerdrSnapshot | null): PaneSnapshot[] {

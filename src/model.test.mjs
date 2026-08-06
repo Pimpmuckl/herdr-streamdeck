@@ -70,6 +70,8 @@ test("device state, pin identity, and device rendering stay coherent", () => {
   const manyPaneIds = Array.from({ length: 14 }, (_, index) => `pane-${index}`);
   for (const paneId of manyPaneIds) boundedRecent.observe(recentSnapshot(paneId, manyPaneIds));
   assert.equal(boundedRecent.panes(recentSnapshot("pane-13", manyPaneIds)).length, 12);
+  boundedRecent.observe(recentSnapshot("pane-14", ["pane-14", "pane-1"]));
+  assert.deepEqual(boundedRecent.panes(recentSnapshot("pane-14", ["pane-14", "pane-1"])).map((pane) => pane.pane_id), ["pane-1"]);
   const paged = normalizeSettings({
     pages: [{ name: "ONE", pins: [{ paneId: "p1", label: "one" }] }]
   });

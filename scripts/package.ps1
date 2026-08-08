@@ -17,6 +17,7 @@ try {
     Copy-Item "dev.herdr.streamdeck.sdPlugin" $packSource -Recurse
     Copy-Item "LICENSE", "THIRD_PARTY_NOTICES.md" $packSource
     Copy-Item "licenses" (Join-Path $packSource "licenses") -Recurse
+    Remove-Item -LiteralPath (Join-Path $packSource "herdr-path.txt") -Force -ErrorAction SilentlyContinue
 
     try {
         if ($DryRun) {

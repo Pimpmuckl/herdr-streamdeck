@@ -75,6 +75,60 @@ export type CommandIntent =
   | { kind: "stop" }
   | { kind: "unavailable" };
 
+export const STOP_CONFIRM_TIMEOUT_MS = 3000;
+
+export class CommandState {
+  active = false;
+  targetPaneId: string | null = null;
+  targetLabel = "";
+  stopArmed = false;
+  private stopTimer: ReturnType<typeof setTimeout> | undefined;
+  private readonly listeners = new Set<() => void>();
+
+  enter(paneId: string, label: string): void {
+    this.clearStopTimer();
+    this.active = true;
+    this.targetPaneId = paneId;
+    this.targetLabel = label;
+    this.stopArmed = false;
+    this.emit();
+  }
+
+  cancel(): void {
+    this.clearStopTimer();
+    if (!this.active) return;
+    this.active = false;
+    this.targetPaneId = null;
+    this.targetLabel = "";
+    this.stopArmed = false;
+    this.emit();
+  }
+
+  armStop(): void {
+    this.clearStopTimer();
+    this.stopArmed = true;
+    this.emit();
+    this.stopTimer = setTimeout(() => {
+      this.stopTimer = undefined;
+      this.stopArmed = false;
+      this.emit();
+    }, STOP_CONFIRM_TIMEOUT_MS);
+  }
+
+  subscribe(listener: () => void): void {
+    this.listeners.add(listener);
+  }
+
+  private clearStopTimer(): void {
+    if (this.stopTimer) clearTimeout(this.stopTimer);
+    this.stopTimer = undefined;
+  }
+
+  private emit(): void {
+    for (const listener of this.listeners) listener();
+  }
+}
+
 export type Pin = {
   paneId: string;
   label: string;

@@ -5,6 +5,7 @@ import {
   adjustMotionScale,
   adjustMotionSpeed,
   attentionPanes,
+  CommandState,
   commandIntent,
   hasResolvedTheme,
   navigatePages,
@@ -15,6 +16,7 @@ import {
   resolvePinRequest,
   snapshotFromApi,
   slotForCoordinates,
+  STOP_CONFIRM_TIMEOUT_MS,
   visiblePageCount,
   wrappedIndex
 } from "./model.ts";
@@ -261,6 +263,9 @@ red = "rgb(255, 85, 85)"
   assert.equal(wideSwoosh.match(/stroke-dasharray=/g)?.length, 53);
   assert.match(strongSwoosh, /stroke-opacity="1\.00"/);
   assert.match(keySvg({ label: "", slot: 0, empty: true }), />1<\/text>/);
+  const blankKey = keySvg({ label: "", blank: true });
+  assert.match(blankKey, /fill="#000000"/);
+  assert.doesNotMatch(blankKey, /<text|<path|stroke=/);
 
   const lowContrastTheme = {
     name: "custom", appearance: "light",
@@ -346,4 +351,15 @@ red = "rgb(255, 85, 85)"
     return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
   });
   assert.ok((0.2126 * luminance[0] + 0.7152 * luminance[1] + 0.0722 * luminance[2] + 0.05) / 0.05 >= 4.5);
+});
+
+test("Stop confirmation disarms after its confirmation window", (context) => {
+  context.mock.timers.enable({ apis: ["setTimeout"] });
+  const command = new CommandState();
+  command.enter("pane", "thread");
+  command.armStop();
+  context.mock.timers.tick(STOP_CONFIRM_TIMEOUT_MS - 1);
+  assert.equal(command.stopArmed, true);
+  context.mock.timers.tick(1);
+  assert.equal(command.stopArmed, false);
 });

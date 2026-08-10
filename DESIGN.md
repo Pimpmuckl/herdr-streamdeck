@@ -190,15 +190,16 @@ Keys use one rounded lifecycle outline on the OLED field. The dial strip is rect
 
 ### Actions bank
 
-- **Positions:** the six thread slots remain `CONTINUE`, `STATUS`, `VERIFY`, `ZOOM`, unassigned, and `STOP`; Inbox stays top-right and Actions becomes Back at bottom-right.
+- **Positions:** the six thread slots remain `CONTINUE`, `STATUS`, `VERIFY`, `ZOOM`, blank, and `STOP`; Inbox stays top-right and Actions becomes Back at bottom-right.
 - **Target:** the full touch strip displays `ACTIONS FOR` and the frozen thread name.
-- **Labels:** Continue, Status, and Verify use `PROMPT`; Zoom uses `HERDR`; Stop uses `CTRL+C`; and the unused slot uses `UNASSIGNED`. Armed Stop replaces its footer with `PRESS AGAIN`.
+- **Labels:** Continue, Status, and Verify use `PROMPT`; Zoom uses `HERDR`; Stop uses `CTRL+C`; and the unused slot stays fully black and inert. Armed Stop replaces its footer with `PRESS AGAIN`.
 - **Lifecycle:** entering Actions Mode swaps the six thread keys in place; one successful action acknowledges and returns to the dashboard.
 
 ### Armed Stop
 
 - **First press:** changes only key 6 to `STOP AGAIN`, switches label and border to Herdr's resolved red role, and increases the border to 7 pixels.
-- **Second press:** commits Stop on the same key.
+- **Timeout:** after three seconds without confirmation, key 6 returns to its ordinary `STOP` state.
+- **Second press:** commits Stop on the same key before the timeout.
 - **Cancellation:** the fixed Back key exits without executing the destructive action.
 
 ## Do's and Don'ts

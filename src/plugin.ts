@@ -39,6 +39,7 @@ import {
   dialSvg,
   keySvg,
   MOTION_CYCLE_FRAMES,
+  oledForeground,
   stripRegionSvg,
   type StripView
 } from "./render.js";
@@ -50,7 +51,9 @@ const LCD_SETTINGS_TIMEOUT_MS = 15000;
 const KEY_ANIMATION_MS = 128;
 const SHEEP_ANIMATION_FRAMES = 26;
 const SHEEP_ANIMATION_MS = 96;
-const logoImage = svgImage(readFileSync(new URL("../imgs/herdr_logo.svg", import.meta.url), "utf8").replace("currentColor", "#959391"));
+const logoSvg = readFileSync(new URL("../imgs/herdr_logo.svg", import.meta.url), "utf8");
+let cachedLogoColor = "";
+let cachedLogoImage = "";
 const herdr = new HerdrBridge();
 const transientKeyFeedback = new Set<string>();
 const transientDialFeedback = new Set<string>();
@@ -983,7 +986,7 @@ async function renderStrip(action: DialAction, region: number): Promise<void> {
   const settings = settingsMenu.draft ?? storedSettings;
   if (transientDialFeedback.has(action.id)) return;
   const snapshot = herdr.snapshot;
-  const baseline = { image: logoImage };
+  const baseline = { image: themedLogoImage() };
   let view: StripView;
   if (settingsMenu.active) {
     view = {
@@ -1165,6 +1168,15 @@ async function renderKey(action: KeyAction, image: string): Promise<void> {
 
 function svgImage(svg: string): string {
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+}
+
+function themedLogoImage(): string {
+  const color = oledForeground(herdr.theme, "text");
+  if (color !== cachedLogoColor) {
+    cachedLogoColor = color;
+    cachedLogoImage = svgImage(logoSvg.replace("currentColor", color));
+  }
+  return cachedLogoImage;
 }
 
 function delay(milliseconds: number): Promise<void> {

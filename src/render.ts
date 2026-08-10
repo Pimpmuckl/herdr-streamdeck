@@ -335,7 +335,7 @@ function color(rgb: { r: number; g: number; b: number }): string {
   return `rgb(${rgb.r} ${rgb.g} ${rgb.b})`;
 }
 
-function oledForeground(theme: ResolvedThemeSnapshot | null | undefined, role: "text" | "subtext"): string {
+export function oledForeground(theme: ResolvedThemeSnapshot | null | undefined, role: "text" | "subtext"): string {
   if (!theme) return role === "text" ? "#ffffff" : "#9a9ca5";
   return oledColor(role === "text" ? theme.palette.text : theme.palette.subtext0);
 }

@@ -74,7 +74,7 @@ The plugin has no independent palette. Until Herdr exposes its resolved runtime 
 ### Runtime roles
 
 - **OLED field:** every key and dial background is fixed `#000000`. The selected thread adds an inset ring in its lifecycle color while the status border stays at the outer edge. Theme surface colors never tint unused pixels.
-- **Idle brand mark:** the exact Herdr vector uses `#959391` on the black dial strip so it stays quieter than live status content.
+- **Idle brand mark:** the exact Herdr vector uses the same resolved `text` color as primary LCD copy.
 - **Surface role:** `surface1` defines only the resting key outline.
 - **Text roles:** `text` and `subtext0` separate primary labels from slot numbers, titles, and hints.
 - **Contrast adaptation:** configured text and semantic roles retain their hue and are lifted toward white only when needed to remain legible on black.

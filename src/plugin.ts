@@ -18,6 +18,7 @@ import {
   adjustMotionScale,
   adjustMotionSpeed,
   attentionPanes,
+  CommandState,
   commandIntent,
   type DeckSettings,
   MOTION_BASE_SPEED,
@@ -91,44 +92,6 @@ class DeckStore {
     });
     this.updatePromise = update.catch(() => undefined);
     return update;
-  }
-
-  subscribe(listener: Listener): void {
-    this.listeners.add(listener);
-  }
-}
-
-class CommandState {
-  active = false;
-  targetPaneId: string | null = null;
-  targetLabel = "";
-  stopArmed = false;
-  private readonly listeners = new Set<Listener>();
-
-  enter(paneId: string, label: string): void {
-    this.active = true;
-    this.targetPaneId = paneId;
-    this.targetLabel = label;
-    this.stopArmed = false;
-    this.emit();
-  }
-
-  cancel(): void {
-    if (!this.active) return;
-    this.active = false;
-    this.targetPaneId = null;
-    this.targetLabel = "";
-    this.stopArmed = false;
-    this.emit();
-  }
-
-  armStop(): void {
-    this.stopArmed = true;
-    this.emit();
-  }
-
-  private emit(): void {
-    for (const listener of this.listeners) listener();
   }
 
   subscribe(listener: Listener): void {
@@ -550,7 +513,6 @@ class PinnedThreadAction extends SingletonAction {
         await herdr.prompt(paneId, intent.text);
         return "PROMPT SENT";
       case "unavailable":
-        await showKeyError(action, "NO ACTION", "UNASSIGNED", slot, () => this.render(action));
         return null;
     }
   }
@@ -573,8 +535,9 @@ class PinnedThreadAction extends SingletonAction {
       }, theme));
     }
     if (command.active) {
-      const labels = ["CONTINUE", "STATUS", "VERIFY", "ZOOM", "—", "STOP"];
-      const details = ["PROMPT", "PROMPT", "PROMPT", "HERDR", "UNASSIGNED", "CTRL+C"];
+      if (slot === 4) return renderKey(action, keySvg({ label: "", blank: true }, theme));
+      const labels = ["CONTINUE", "STATUS", "VERIFY", "ZOOM", "", "STOP"];
+      const details = ["PROMPT", "PROMPT", "PROMPT", "HERDR", "", "CTRL+C"];
       const armed = slot === 5 && command.stopArmed;
       const label = armed ? "STOP AGAIN" : labels[slot];
       return renderKey(action, keySvg({
@@ -680,14 +643,14 @@ class AttentionAction extends SingletonAction {
 
   override onKeyDown(event: KeyDownEvent): void {
     this.downAt.set(event.action.id, Date.now());
-    if (settingsMenu.active) closeSettings();
-    strip.showIdle();
   }
 
   override async onKeyUp(event: KeyUpEvent): Promise<void> {
     const duration = Date.now() - (this.downAt.get(event.action.id) ?? Date.now());
     this.downAt.delete(event.action.id);
-    if (duration >= HOLD_MS) return showKeyError(event.action, "TAP INBOX", "HOLD UNUSED", undefined, () => this.render(event.action));
+    if (duration >= HOLD_MS) return;
+    if (settingsMenu.active) closeSettings();
+    strip.showIdle();
     const queue = attentionPanes(herdr.snapshot);
     command.cancel();
     pinChooser.cancel();

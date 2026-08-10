@@ -7,6 +7,7 @@ export const MOTION_CYCLE_FRAMES = 21;
 
 type KeyView = {
   label: string;
+  blank?: boolean;
   count?: number;
   context?: string;
   detail?: string;
@@ -42,6 +43,7 @@ export type StripView = (
 ) & { timeout?: number };
 
 export function keySvg(view: KeyView, theme?: ResolvedThemeSnapshot | null): string {
+  if (view.blank) return `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144"><rect width="144" height="144" fill="#000000"/></svg>`;
   const palette = theme?.palette;
   const feedbackColor = view.feedback === "success" ? palette ? oledColor(palette.green) : "#ffffff" : null;
   const text = feedbackColor ? "#000000" : palette && view.danger ? oledColor(palette.red) : oledForeground(theme, "text");

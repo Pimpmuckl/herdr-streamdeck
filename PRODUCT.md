@@ -64,7 +64,7 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
 - The queue contains structured questions or approvals, explicit errors, and unseen completions.
 - Working and ordinary idle threads do not enter the queue.
 - Inbox immediately replaces the full touch strip with the selected attention item and focuses it in the background. Repeated taps or dial 1 turns cycle the queue.
-- Holding Inbox opens the attention queue in Herdr.
+- Holding Inbox does nothing.
 - Resolved items leave the queue automatically. An empty queue reports `ALL CLEAR` across the strip.
 - Passive arrivals update status but never steal operating-system focus or replace the dashboard.
 - Dial 1 cycles attention items while Inbox is open. Dial 2 owns navigation and action within the selected question.
@@ -101,8 +101,8 @@ This is not a miniature Herdr UI or a generic macro pad. Its distinct mechanism 
   2. `STATUS`: request a concise completed, next, and blocked report.
   3. `VERIFY`: request relevant checks and their result.
   4. `ZOOM`: toggle the target pane's normal Herdr zoom.
-  5. Unassigned until real usage identifies a frequent action.
-  6. `STOP`: arm in red, then require a second press to send `Ctrl+C` to the target pane.
+  5. Blank and inert until real usage identifies a frequent action.
+  6. `STOP`: arm in red for three seconds, then require a second press to send `Ctrl+C` to the target pane.
 - Prompt actions are unavailable while a structured question is active.
 - Prompt actions acknowledge `PROMPT SENT`, Zoom acknowledges `ZOOMED`, and Stop acknowledges `INTERRUPTED`. Failures acknowledge `FAILED` before returning.
 - Failures render a short cause and recovery hint on the affected key or dial; the generic Stream Deck warning triangle is never used.

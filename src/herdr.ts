@@ -59,7 +59,7 @@ export class HerdrBridge {
   }
 
   async focusPane(paneId: string): Promise<void> {
-    await this.command(["agent", "focus", paneId]);
+    await this.command(["pane", "focus", paneId]);
     await this.refresh();
   }
 

@@ -58,6 +58,10 @@ export class HerdrBridge {
     void this.poll();
   }
 
+  replay(): void {
+    this.emit();
+  }
+
   async focusPane(paneId: string): Promise<void> {
     const pane = this.snapshot?.panes.find((candidate) => candidate.pane_id === paneId);
     if (pane?.agent) {

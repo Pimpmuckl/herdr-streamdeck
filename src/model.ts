@@ -368,7 +368,6 @@ export function resolvePin(pin: Pin | null, snapshot: HerdrSnapshot | null): Pan
   if (pin.terminalId) {
     const matches = snapshot.panes.filter((pane) => pane.terminal_id === pin.terminalId);
     if (matches.length === 1) return matches[0];
-    return undefined;
   }
   return snapshot.panes.find((pane) => pane.pane_id === pin.paneId);
 }

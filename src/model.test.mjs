@@ -146,6 +146,9 @@ test("device state, pin identity, and device rendering stay coherent", () => {
   assert.equal(resolvePin(pinned, {
     panes: [{ pane_id: "shell", terminal_id: "term-2", focused: false, agent_status: "idle" }]
   }), undefined);
+  assert.equal(resolvePin({ paneId: "shell", label: "shell", terminalId: "old-terminal" }, {
+    panes: [{ pane_id: "shell", terminal_id: "new-terminal", focused: false, agent_status: "idle" }]
+  })?.pane_id, "shell");
   assert.equal(resolvePin(pinned, {
     panes: [{ pane_id: "reopened", terminal_id: "term-2", agent: "codex", focused: false, agent_status: "idle" }]
   })?.pane_id, "reopened");

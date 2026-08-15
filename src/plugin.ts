@@ -85,6 +85,18 @@ class DeckStore {
     return this.loadPromise;
   }
 
+  async reload(): Promise<DeckSettings> {
+    const previous = this.loadPromise;
+    const request = streamDeck.settings.getGlobalSettings<DeckSettings>().then(normalizeSettings);
+    this.loadPromise = request;
+    try {
+      return await request;
+    } catch (error) {
+      if (this.loadPromise === request) this.loadPromise = previous;
+      throw error;
+    }
+  }
+
   update(change: (settings: DeckSettings) => void): Promise<void> {
     const update = this.updatePromise.then(async () => {
       const settings = structuredClone(await this.get());
@@ -339,10 +351,13 @@ const inbox = new InboxState();
 const strip = new StripState();
 const settingsMenu = new SettingsMenuState();
 const recent = new RecentPaneHistory();
+let startupLogged = false;
 herdr.subscribe(() => {
   recent.observe(herdr.snapshot);
   if (strip.recentPaneId && !recent.panes(herdr.snapshot).some((pane) => pane.pane_id === strip.recentPaneId)) strip.showIdle();
+  void logStartupState();
 });
+deck.subscribe(() => void logStartupState());
 herdr.subscribePinRequests((pane) => {
   closeSettings();
   inbox.cancel();
@@ -1183,7 +1198,46 @@ function delay(milliseconds: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+async function logStartupState(): Promise<void> {
+  const snapshot = herdr.snapshot;
+  if (startupLogged || !snapshot) return;
+  let settings: DeckSettings;
+  try {
+    settings = await deck.get();
+  } catch (error) {
+    streamDeck.logger.error(`Startup state unavailable: ${String(error)}`);
+    return;
+  }
+  if (startupLogged) return;
+  let pins = 0;
+  let resolved = 0;
+  for (const page of settings.pages) {
+    for (const pin of page.pins) {
+      if (!pin) continue;
+      pins++;
+      if (resolvePin(pin, snapshot)) resolved++;
+    }
+  }
+  startupLogged = true;
+  streamDeck.logger.info(
+    `Startup state: pins=${pins} panes=${snapshot.panes.length} resolved=${resolved} page=${settings.pageIndex + 1}`
+  );
+}
+
+async function replayDeck(reason: string): Promise<void> {
+  try {
+    await deck.reload();
+    streamDeck.logger.info(`Deck state reloaded after ${reason}`);
+  } catch (error) {
+    streamDeck.logger.error(`Deck state reload failed after ${reason}: ${String(error)}`);
+  } finally {
+    herdr.replay();
+  }
+}
+
 streamDeck.logger.setLevel("info");
+streamDeck.devices.onDeviceDidConnect(() => void replayDeck("device connect"));
+streamDeck.system.onSystemDidWakeUp(() => void replayDeck("system wake"));
 streamDeck.actions.registerAction(new PinnedThreadAction());
 streamDeck.actions.registerAction(new AttentionAction());
 streamDeck.actions.registerAction(new CommandAction());

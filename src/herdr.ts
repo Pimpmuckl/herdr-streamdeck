@@ -59,7 +59,15 @@ export class HerdrBridge {
   }
 
   async focusPane(paneId: string): Promise<void> {
-    await this.command(["pane", "focus", paneId]);
+    const pane = this.snapshot?.panes.find((candidate) => candidate.pane_id === paneId);
+    if (pane?.agent) {
+      await this.command(["agent", "focus", paneId]);
+    } else {
+      const { stdout } = await this.command(["pane", "layout", "--pane", paneId]);
+      const zoomed = JSON.parse(stdout.toString())?.result?.layout?.zoomed;
+      if (typeof zoomed !== "boolean") throw new Error("invalid pane layout response");
+      await this.command(["pane", "zoom", paneId, zoomed ? "--on" : "--off"]);
+    }
     await this.refresh();
   }
 
